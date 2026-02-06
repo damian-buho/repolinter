@@ -1,3 +1,7 @@
+# Archived
+
+The Repolinter project has been archived. If you are a TodoGroup member and wish to see the repository unarchived, please bring this up within the TodoGroup.
+
 # ![Repo Linter](https://raw.githubusercontent.com/todogroup/repolinter/master/docs/images/P_RepoLinter01_logo_only.png) ![Build Status](https://github.com/todogroup/repolinter/workflows/Build/badge.svg)
 
 Lint open source repositories for common issues.
