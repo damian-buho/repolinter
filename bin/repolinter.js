@@ -9,7 +9,6 @@ const git = require('simple-git')()
 const fs = require('fs')
 const os = require('os')
 
-// eslint-disable-next-line no-unused-expressions
 require('yargs')
   .command(
     ['lint [directory]', '*'],
@@ -113,4 +112,4 @@ require('yargs')
   )
   .demandCommand()
   .help()
-  .strict().argv // eslint-disable-line
+  .strict().argv

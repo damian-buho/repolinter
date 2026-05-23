@@ -48,8 +48,7 @@ describe('rule', () => {
 
       const ruleopts = {
         globsAny: ['ReAdMe.md'],
-        hash:
-          '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
+        hash: '2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
         nocase: true
       }
 
@@ -77,8 +76,7 @@ describe('rule', () => {
       const ruleopts = {
         globsAny: ['README.md'],
         algorithm: 'sha512',
-        hash:
-          'f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7'
+        hash: 'f7fbba6e0636f890e56fbbf3283e524c6fa3204ae298382d624741d0dc6638326e282c41be5e4254d8820772c5518a2c5a8c0c7f7eda19594a7eb539453e1ed7'
       }
 
       const actual = await fileContents(mockfs, ruleopts)

@@ -1,9 +1,0 @@
-.nyc_output/
-coverage/
-node_modules/
-tmp/
-.idea/
-vendor/
-.bundle
-out
-.vscode/

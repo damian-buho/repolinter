@@ -3,7 +3,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
+
 const FormatResult = require('../lib/formatresult')
 const slugger = require('../lib/github_slugger')
 

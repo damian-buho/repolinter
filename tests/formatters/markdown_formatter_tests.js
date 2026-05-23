@@ -66,8 +66,10 @@ describe('formatters', () => {
 
     it('generates the correct sections with sample output', () => {
       const output = formatter.formatOutput(result, false)
-      const sections = toc(output, { slugify: slugger.slug, firsth1: true })
-        .json
+      const sections = toc(output, {
+        slugify: slugger.slug,
+        firsth1: true
+      }).json
       const filteredSections = sections.filter(s => s.lvl !== 1)
       // console.debug(JSON.stringify(sections))
       // console.debug(JSON.stringify(`"${output}"`))

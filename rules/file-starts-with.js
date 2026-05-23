@@ -28,7 +28,7 @@ async function fileStartsWith(fs, options) {
     if (extensions && extensions.length > 0) {
       const extJoined = extensions.join('|')
       // \.(svg|png|exe)$
-      regexes.push(new RegExp('.(' + extJoined + ')$', 'i')) // eslint-disable-line no-useless-escape
+      regexes.push(new RegExp('.(' + extJoined + ')$', 'i'))
     }
 
     const patterns = options['skip-paths-matching'].patterns

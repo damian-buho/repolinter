@@ -1,7 +1,7 @@
 const nodefs = require('fs')
-// eslint-disable-next-line no-unused-vars
+
 const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
+
 const path = require('path')
 /**
  * Check if a list of files' size on the file system that is larger than provided size.
