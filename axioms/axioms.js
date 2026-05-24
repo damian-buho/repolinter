@@ -5,5 +5,7 @@ module.exports = {
   licensee: require('./licensee'),
   linguist: require('./linguist'),
   packagers: require('./packagers'),
-  'contributor-count': require('./contributor-count')
+  get 'contributor-count'() {
+    return async fs => (await import('./contributor-count.mjs')).default(fs)
+  }
 }

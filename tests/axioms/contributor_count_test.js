@@ -5,7 +5,7 @@ const chai = require('chai')
 const expect = chai.expect
 const path = require('path')
 const FileSystem = require('../../lib/file_system')
-const contributors = require('../../axioms/contributor-count')
+const contributors = require('../../axioms/axioms')['contributor-count']
 
 describe('contributors axiom', () => {
   it('repolinter contributor count greater than zero', async () => {
