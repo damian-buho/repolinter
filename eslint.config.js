@@ -13,7 +13,8 @@ export default [
       'node_modules/',
       'tmp/',
       'out/',
-      'apidoc/'
+      'apidoc/',
+      'dist/'
     ]
   },
   js.configs.recommended,
@@ -51,7 +52,8 @@ export default [
     },
     rules: {
       'n/no-unpublished-import': 'off',
-      'n/no-missing-import': 'off'
+      'n/no-missing-import': 'off',
+      'import-x/no-named-as-default-member': 'off'
     }
   }
 ]

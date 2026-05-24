@@ -117,7 +117,11 @@ describe('lib', () => {
       })
 
       it('should honor filtered files', async () => {
-        const includedFiles = ['dist/index.js', 'dist/index.js.map', path.join('bin', 'repolinter.bat')]
+        const includedFiles = [
+          'dist/index.js',
+          'dist/index.js.map',
+          path.join('bin', 'repolinter.bat')
+        ]
         const fs = new FileSystem(path.resolve('.'), includedFiles)
 
         const filesRaw = await fs.findAll('**/*', false)
