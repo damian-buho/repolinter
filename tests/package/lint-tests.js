@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
+import path from 'node:path'
 import { expect } from 'chai'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'
@@ -9,58 +9,58 @@ import * as repolinter from '../../dist/index.js'
 
 describe('package', () => {
   describe('repolinter', function () {
-    this.timeout(30000)
+    this.timeout(30_000)
 
     it('does not pass', async () => {
-      const res = await repolinter.lint(path.resolve('tests/package'))
+      const result = await repolinter.lint(path.resolve('tests/package'))
 
-      expect(res.passed).to.equal(false)
-      expect(res.errored).to.equal(false)
+      expect(result.passed).to.equal(false)
+      expect(result.errored).to.equal(false)
     })
 
     it('returns the correct results', async () => {
-      const res = await repolinter.lint(path.resolve('tests/package'))
+      const result = await repolinter.lint(path.resolve('tests/package'))
 
-      expect(res.results).to.have.length(2)
+      expect(result.results).to.have.length(2)
       // readme-file-exists rule
-      expect(res.results[0].ruleInfo.name).to.equal('readme-file-exists')
-      expect(res.results[0].ruleInfo.ruleType).to.equal('file-existence')
-      expect(res.results[0].ruleInfo.fixType).to.equal(undefined)
-      expect(res.results[0].lintResult.passed).to.equal(false)
+      expect(result.results[0].ruleInfo.name).to.equal('readme-file-exists')
+      expect(result.results[0].ruleInfo.ruleType).to.equal('file-existence')
+      expect(result.results[0].ruleInfo.fixType).to.equal(undefined)
+      expect(result.results[0].lintResult.passed).to.equal(false)
       // test-file-exists rule
-      expect(res.results[1].ruleInfo.name).to.equal('test-file-exists')
-      expect(res.results[1].ruleInfo.ruleType).to.equal('file-existence')
-      expect(res.results[1].ruleInfo.fixType).to.equal(undefined)
-      expect(res.results[1].lintResult.passed).to.equal(true)
-      expect(res.results[1].lintResult.targets).to.have.length(1)
-      expect(res.results[1].lintResult.targets[0].passed).to.equal(true)
-      expect(res.results[1].lintResult.targets[0].path).to.equal(
-        'lint_tests.js'
+      expect(result.results[1].ruleInfo.name).to.equal('test-file-exists')
+      expect(result.results[1].ruleInfo.ruleType).to.equal('file-existence')
+      expect(result.results[1].ruleInfo.fixType).to.equal(undefined)
+      expect(result.results[1].lintResult.passed).to.equal(true)
+      expect(result.results[1].lintResult.targets).to.have.length(1)
+      expect(result.results[1].lintResult.targets[0].passed).to.equal(true)
+      expect(result.results[1].lintResult.targets[0].path).to.equal(
+        'lint-tests.js'
       )
     })
 
     it('returns the correct results for a YAML config', async () => {
-      const res = await repolinter.lint(
+      const result = await repolinter.lint(
         path.resolve('tests/package'),
         undefined,
         path.resolve('tests/package/repolinter-yaml.yml')
       )
 
-      expect(res.results).to.have.length(2)
+      expect(result.results).to.have.length(2)
       // readme-file-exists rule
-      expect(res.results[0].ruleInfo.name).to.equal('readme-file-exists')
-      expect(res.results[0].ruleInfo.ruleType).to.equal('file-existence')
-      expect(res.results[0].ruleInfo.fixType).to.equal(undefined)
-      expect(res.results[0].lintResult.passed).to.equal(false)
+      expect(result.results[0].ruleInfo.name).to.equal('readme-file-exists')
+      expect(result.results[0].ruleInfo.ruleType).to.equal('file-existence')
+      expect(result.results[0].ruleInfo.fixType).to.equal(undefined)
+      expect(result.results[0].lintResult.passed).to.equal(false)
       // test-file-exists rule
-      expect(res.results[1].ruleInfo.name).to.equal('test-file-exists')
-      expect(res.results[1].ruleInfo.ruleType).to.equal('file-existence')
-      expect(res.results[1].ruleInfo.fixType).to.equal(undefined)
-      expect(res.results[1].lintResult.passed).to.equal(true)
-      expect(res.results[1].lintResult.targets).to.have.length(1)
-      expect(res.results[1].lintResult.targets[0].passed).to.equal(true)
-      expect(res.results[1].lintResult.targets[0].path).to.equal(
-        'lint_tests.js'
+      expect(result.results[1].ruleInfo.name).to.equal('test-file-exists')
+      expect(result.results[1].ruleInfo.ruleType).to.equal('file-existence')
+      expect(result.results[1].ruleInfo.fixType).to.equal(undefined)
+      expect(result.results[1].lintResult.passed).to.equal(true)
+      expect(result.results[1].lintResult.targets).to.have.length(1)
+      expect(result.results[1].lintResult.targets[0].passed).to.equal(true)
+      expect(result.results[1].lintResult.targets[0].path).to.equal(
+        'lint-tests.js'
       )
     })
 

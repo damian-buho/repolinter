@@ -133,10 +133,10 @@ describe('rule', () => {
       /** @type {any} */
       const mockfs = {
         findFirstFile() {
-          return undefined
+          return
         },
         getFileContents() {
-          return undefined
+          return
         },
         targetDir: '.'
       }
@@ -164,10 +164,10 @@ describe('rule', () => {
       /** @type {any} */
       const mockfs = {
         findFirstFile() {
-          return undefined
+          return
         },
         getFileContents() {
-          return undefined
+          return
         },
         targetDir: '.'
       }

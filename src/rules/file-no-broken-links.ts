@@ -53,7 +53,7 @@ async function fileNoBrokenLinks(
         }
       }
 
-      const linkRes = await new Promise<BrokenLink[]>((resolve, reject) => {
+      const linkResults = await new Promise<BrokenLink[]>((resolve, reject) => {
         const linkBuf: BrokenLink[] = []
         const htmlChecker = new HtmlChecker(
           {
@@ -61,7 +61,7 @@ async function fileNoBrokenLinks(
             excludedKeywords: ['#*']
           },
           {
-            link: (res: BrokenLink) => linkBuf.push(res),
+            link: (linkResult: BrokenLink) => linkBuf.push(linkResult),
             complete: () => resolve(linkBuf)
           }
         )
@@ -74,13 +74,13 @@ async function fileNoBrokenLinks(
           reject(Error('Failed to scan HTML with broken link checker'))
       })
 
-      const brokenLinks = linkRes.filter(link => link.broken)
+      const brokenLinks = linkResults.filter(link => link.broken)
       const { failing, invalid } = brokenLinks.reduce(
-        (res, linkResult) => {
+        (acc, linkResult) => {
           linkResult.brokenReason === 'BLC_INVALID'
-            ? res.invalid.push(linkResult)
-            : res.failing.push(linkResult)
-          return res
+            ? acc.invalid.push(linkResult)
+            : acc.failing.push(linkResult)
+          return acc
         },
         { failing: [] as BrokenLink[], invalid: [] as BrokenLink[] }
       )

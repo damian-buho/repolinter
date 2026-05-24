@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import { expect } from 'chai'
 import FileSystem from '../../dist/lib/file_system.js'
 import fileStartsWith from '../../dist/rules/file-starts-with.js'

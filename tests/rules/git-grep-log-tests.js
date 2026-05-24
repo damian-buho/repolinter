@@ -10,7 +10,7 @@ chaiUse(chaiString)
 
 describe('rule', () => {
   describe('git_grep_log', function () {
-    this.timeout(30000) // Calling external Git might take some time.
+    this.timeout(30_000) // Calling external Git might take some time.
 
     const LOG_WRONG_CASE =
       'THE GIT RULESET CONTAINS TWO NEW RULES THAT SEARCH THE COMMIT MESSAGES'

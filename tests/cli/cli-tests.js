@@ -1,15 +1,15 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
+import path from 'node:path'
 import { expect } from 'chai'
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-import { exec as cpExec } from 'child_process'
-import realFs from 'fs'
+import { exec as cpExec } from 'node:child_process'
+import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
 // eslint-disable-next-line no-control-regex
-const stripAnsi = s => s.replace(/\x1B\[[0-9;]*m/g, '')
+const stripAnsi = s => s.replaceAll(/\u001B\[[0-9;]*m/g, '')
 import * as repolinter from '../../dist/index.js'
 
 /**
@@ -19,15 +19,15 @@ import * as repolinter from '../../dist/index.js'
  * @param {import('child_process').ExecOptions} [opts] Options to execute against.
  * @returns {Promise<{out: string, err: string, code: number}>} The command output
  */
-async function execAsync(command, opts = {}) {
+async function execAsync(command, options = {}) {
   return new Promise((resolve, reject) => {
-    cpExec(command, opts, (err, outstd, errstd) =>
-      err !== null && err.code === undefined
-        ? reject(err)
+    cpExec(command, options, (error, outstd, errstd) =>
+      error !== null && error.code === undefined
+        ? reject(error)
         : resolve({
             out: outstd,
             err: errstd,
-            code: err !== null ? err.code : 0
+            code: error === null ? 0 : error.code
           })
     )
   })
@@ -39,7 +39,7 @@ describe('cli', function () {
       ? path.resolve('dist/cli.js')
       : path.resolve('dist/cli.js')
   const selfPath = path.resolve('tests/cli')
-  this.timeout(30000)
+  this.timeout(30_000)
 
   it('runs repolinter from the CLI', async () => {
     const expected = stripAnsi(
@@ -116,26 +116,29 @@ describe('cli', function () {
         false
       )
     )
-    const [paramTest1, paramTest2, paramTest3, pathTest1] = await Promise.all([
-      execAsync(`${repolinterPath} lint ${selfPath} -r repolinter-other.json`),
-      execAsync(
-        `${repolinterPath} lint ${selfPath} --rulesetFile repolinter-other.json`
-      ),
-      execAsync(
-        `${repolinterPath} lint ${selfPath} --ruleset-file repolinter-other.json`
-      ),
-      execAsync(
-        `${repolinterPath} lint ${selfBinPath} -r tests/cli/repolinter-other.json`
-      )
-    ])
+    const [parameterTest1, parameterTest2, parameterTest3, pathTest1] =
+      await Promise.all([
+        execAsync(
+          `${repolinterPath} lint ${selfPath} -r repolinter-other.json`
+        ),
+        execAsync(
+          `${repolinterPath} lint ${selfPath} --rulesetFile repolinter-other.json`
+        ),
+        execAsync(
+          `${repolinterPath} lint ${selfPath} --ruleset-file repolinter-other.json`
+        ),
+        execAsync(
+          `${repolinterPath} lint ${selfBinPath} -r tests/cli/repolinter-other.json`
+        )
+      ])
 
-    expect(paramTest1.code).to.equal(0)
-    expect(paramTest2.code).to.equal(0)
-    expect(paramTest3.code).to.equal(0)
+    expect(parameterTest1.code).to.equal(0)
+    expect(parameterTest2.code).to.equal(0)
+    expect(parameterTest3.code).to.equal(0)
     expect(pathTest1.code).to.equal(0)
-    expect(paramTest1.out.trim()).to.equals(expectedPath.trim())
-    expect(paramTest2.out.trim()).to.equals(expectedPath.trim())
-    expect(paramTest3.out.trim()).to.equals(expectedPath.trim())
+    expect(parameterTest1.out.trim()).to.equals(expectedPath.trim())
+    expect(parameterTest2.out.trim()).to.equals(expectedPath.trim())
+    expect(parameterTest3.out.trim()).to.equals(expectedPath.trim())
     expect(pathTest1.out.trim()).to.equals(expectedBinPath.trim())
   })
 
@@ -191,7 +194,7 @@ describe('cli', function () {
         headers: { 'content-type': 'application/json' },
         body: await realFs.promises.readFile(
           path.resolve(__dirname, 'repolinter-other.json'),
-          'utf-8'
+          'utf8'
         )
       }
     })
@@ -241,7 +244,7 @@ describe('cli', function () {
         headers: { 'content-type': 'application/json' },
         body: await realFs.promises.readFile(
           path.resolve(__dirname, 'repolinter-other.yml'),
-          'utf-8'
+          'utf8'
         )
       }
     })
@@ -308,7 +311,7 @@ describe('cli', function () {
 
   it('runs repolinter with ruleset file path too long', async () => {
     // 4096 is the max length of a path on ext3/ext4
-    const encodedRuleset = new Array('a'.repeat(4097)).join('')
+    const encodedRuleset = 'a'.repeat(4097)
     const [actual, actual2] = await Promise.all([
       execAsync(`${repolinterPath} lint -c ${encodedRuleset}`),
       execAsync(`${repolinterPath} lint --rulesetEncoded ${encodedRuleset}`)

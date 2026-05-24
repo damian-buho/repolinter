@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { expect } from 'chai'
 import * as repolinter from '../../dist/index.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
@@ -20,18 +20,23 @@ describe('api', () => {
       const mockconfig = [
         new RuleInfo('my-rule', 'error', [], 'apache-notice', {})
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].ruleInfo).to.deep.equal({
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].ruleInfo).to.deep.equal({
         level: 'error',
         name: 'my-rule',
         ruleConfig: {},
         ruleType: 'apache-notice',
         where: []
       })
-      expect(res[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(res[0].lintResult.passed).to.equal(true)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
+      expect(result[0].lintResult.passed).to.equal(true)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a failing rule', async () => {
@@ -40,18 +45,23 @@ describe('api', () => {
           globsAny: ['notafile']
         })
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].ruleInfo).to.deep.equal({
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].ruleInfo).to.deep.equal({
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
         ruleType: 'file-existence',
         where: []
       })
-      expect(res[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
-      expect(res[0].lintResult.passed).to.equal(false)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
+      expect(result[0].lintResult.passed).to.equal(false)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a failing rule with level warning', async () => {
@@ -60,18 +70,23 @@ describe('api', () => {
           globsAny: ['notafile']
         })
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].ruleInfo).to.deep.equal({
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].ruleInfo).to.deep.equal({
         level: 'warning',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
         ruleType: 'file-existence',
         where: []
       })
-      expect(res[0].status).to.equal(FormatResult.RULE_NOT_PASSED_WARN)
-      expect(res[0].lintResult.passed).to.equal(false)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_WARN)
+      expect(result[0].lintResult.passed).to.equal(false)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('disables a rule with level off', async () => {
@@ -80,11 +95,16 @@ describe('api', () => {
           globsAny: ['notafile']
         })
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.IGNORED)
-      expect(res[0].lintResult).to.equal(undefined)
-      expect(res[0].fixResult).to.equal(undefined)
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.IGNORED)
+      expect(result[0].lintResult).to.equal(undefined)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a rule conditionally with axioms', async () => {
@@ -97,7 +117,7 @@ describe('api', () => {
           {}
         )
       ]
-      const res = await repolinter.runRuleset(
+      const result = await repolinter.runRuleset(
         mockconfig,
         {
           language: new Result('', [{ passed: true, path: 'javascript' }], true)
@@ -105,17 +125,17 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(res[0].lintResult.passed).to.equal(true)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
+      expect(result[0].lintResult.passed).to.equal(true)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a rule conditionally with an axiom wildcard', async () => {
       const mockconfig = [
         new RuleInfo('my-rule', 'error', ['language=*'], 'apache-notice', {})
       ]
-      const res = await repolinter.runRuleset(
+      const result = await repolinter.runRuleset(
         mockconfig,
         {
           language: new Result('', [{ passed: true, path: 'javascript' }], true)
@@ -123,10 +143,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(res[0].lintResult.passed).to.equal(true)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
+      expect(result[0].lintResult.passed).to.equal(true)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('ignores a rule conditionally with axioms', async () => {
@@ -139,7 +159,7 @@ describe('api', () => {
           {}
         )
       ]
-      const res = await repolinter.runRuleset(
+      const result = await repolinter.runRuleset(
         mockconfig,
         {
           language: new Result(
@@ -151,42 +171,42 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.IGNORED)
-      expect(res[0].lintResult).to.equal(undefined)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.IGNORED)
+      expect(result[0].lintResult).to.equal(undefined)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a rule conditionally with a numerical axiom', async () => {
       const mockconfig = [
         new RuleInfo('my-rule', 'error', ['number>3'], 'apache-notice', {})
       ]
-      const res = await repolinter.runRuleset(
+      const result = await repolinter.runRuleset(
         mockconfig,
         { number: new Result('', [{ passed: true, path: '4' }], true) },
         realFs,
         false
       )
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(res[0].lintResult.passed).to.equal(true)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
+      expect(result[0].lintResult.passed).to.equal(true)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('ignores a rule conditionally with a numerical axiom', async () => {
       const mockconfig = [
         new RuleInfo('my-rule', 'error', ['number>4'], 'apache-notice', {})
       ]
-      const res = await repolinter.runRuleset(
+      const result = await repolinter.runRuleset(
         mockconfig,
         { number: new Result('', [{ passed: true, path: '4' }], true) },
         realFs,
         false
       )
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.IGNORED)
-      expect(res[0].lintResult).to.equal(undefined)
-      expect(res[0].fixResult).to.equal(undefined)
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.IGNORED)
+      expect(result[0].lintResult).to.equal(undefined)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('ignores a fix if the rule passes', async () => {
@@ -201,11 +221,16 @@ describe('api', () => {
           {}
         )
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(res[0].lintResult.passed).to.equal(true)
-      expect(res[0].fixResult).to.equal(undefined)
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
+      expect(result[0].lintResult.passed).to.equal(true)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('runs a fix if the rule fails', async () => {
@@ -220,12 +245,17 @@ describe('api', () => {
           { file: 'myfile', text: 'hello!' }
         )
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, true)
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
-      expect(res[0].lintResult.passed).to.equal(false)
-      expect(res[0].fixResult.passed).to.equal(true)
-      expect(res[0].ruleInfo).to.deep.equal({
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        true
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
+      expect(result[0].lintResult.passed).to.equal(false)
+      expect(result[0].fixResult.passed).to.equal(true)
+      expect(result[0].ruleInfo).to.deep.equal({
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
@@ -242,11 +272,16 @@ describe('api', () => {
           globsAny: ['notafile']
         })
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.ERROR)
-      expect(res[0].lintResult).to.equal(undefined)
-      expect(res[0].fixResult).to.equal(undefined)
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.ERROR)
+      expect(result[0].lintResult).to.equal(undefined)
+      expect(result[0].fixResult).to.equal(undefined)
     })
 
     it('returns a failing result with an invalid fix', async () => {
@@ -261,10 +296,15 @@ describe('api', () => {
           {}
         )
       ]
-      const res = await repolinter.runRuleset(mockconfig, false, realFs, false)
-      expect(res).to.have.length(1)
-      expect(res[0].status).to.equal(FormatResult.ERROR)
-      expect(res[0].fixResult).to.equal(undefined)
+      const result = await repolinter.runRuleset(
+        mockconfig,
+        false,
+        realFs,
+        false
+      )
+      expect(result).to.have.length(1)
+      expect(result[0].status).to.equal(FormatResult.ERROR)
+      expect(result[0].fixResult).to.equal(undefined)
     })
   })
 })

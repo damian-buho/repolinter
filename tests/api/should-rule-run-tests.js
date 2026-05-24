@@ -7,44 +7,47 @@ import { shouldRuleRun } from '../../dist/index.js'
 describe('api', () => {
   describe('validateConfig', () => {
     it('should allow a rule to run if axioms match', () => {
-      const res = shouldRuleRun(
+      const result = shouldRuleRun(
         ['language=javascript', 'language=*'],
         ['language=javascript']
       )
-      expect(res).to.deep.equal([])
+      expect(result).to.deep.equal([])
     })
 
     it('should allow a rule to run if axioms wildcard match', () => {
-      const res = shouldRuleRun(
+      const result = shouldRuleRun(
         ['language=javascript', 'language=*'],
         ['language=*']
       )
-      expect(res).to.deep.equal([])
+      expect(result).to.deep.equal([])
     })
 
     it('should not allow a rule to run if no axioms match', () => {
-      const res = shouldRuleRun(
+      const result = shouldRuleRun(
         ['language=javascript', 'language=*'],
         ['language=cheese']
       )
-      expect(res).to.deep.equal(['language=cheese'])
+      expect(result).to.deep.equal(['language=cheese'])
     })
 
     it('should not allow non-numerical axioms with numerical comparisons', () => {
-      const res = shouldRuleRun(
+      const result = shouldRuleRun(
         ['language=javascript', 'language=*'],
         ['language>=3']
       )
-      expect(res).to.deep.equal(['language>=3'])
+      expect(result).to.deep.equal(['language>=3'])
     })
 
     it('should not allow invalid operators', () => {
-      const res = shouldRuleRun(['language=3', 'language=*'], ['language=>3'])
-      expect(res).to.deep.equal(['language=>3'])
+      const result = shouldRuleRun(
+        ['language=3', 'language=*'],
+        ['language=>3']
+      )
+      expect(result).to.deep.equal(['language=>3'])
     })
 
     it('should handle a mix of axoims', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'commits=hello',
           'commits=*',
@@ -53,8 +56,8 @@ describe('api', () => {
         ],
         ['commits=hello', 'contributor-count=blah']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'commits=hello',
           'commits=*',
@@ -63,11 +66,11 @@ describe('api', () => {
         ],
         ['commits=nothello', 'contributor-count=blah']
       )
-      expect(resFail).to.deep.equal(['commits=nothello'])
+      expect(resultFail).to.deep.equal(['commits=nothello'])
     })
 
     it('should handle a numerical = axiom', () => {
-      const res = shouldRuleRun(
+      const result = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -76,11 +79,11 @@ describe('api', () => {
         ],
         ['contributors=7']
       )
-      expect(res).to.deep.equal([])
+      expect(result).to.deep.equal([])
     })
 
     it('should handle a numerical > axiom', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -89,8 +92,8 @@ describe('api', () => {
         ],
         ['contributors>6']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -99,11 +102,11 @@ describe('api', () => {
         ],
         ['contributors>7']
       )
-      expect(resFail).to.deep.equal(['contributors>7'])
+      expect(resultFail).to.deep.equal(['contributors>7'])
     })
 
     it('should handle a numerical >= axiom', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -112,8 +115,8 @@ describe('api', () => {
         ],
         ['contributors>=7']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -122,11 +125,11 @@ describe('api', () => {
         ],
         ['contributors>=8']
       )
-      expect(resFail).to.deep.equal(['contributors>=8'])
+      expect(resultFail).to.deep.equal(['contributors>=8'])
     })
 
     it('should handle a numerical < axiom', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -135,8 +138,8 @@ describe('api', () => {
         ],
         ['contributors<8']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -145,11 +148,11 @@ describe('api', () => {
         ],
         ['contributors<7']
       )
-      expect(resFail).to.deep.equal(['contributors<7'])
+      expect(resultFail).to.deep.equal(['contributors<7'])
     })
 
     it('should handle a numerical <= axiom', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -158,8 +161,8 @@ describe('api', () => {
         ],
         ['contributors<=7']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'language=javascript',
           'language=*',
@@ -168,24 +171,24 @@ describe('api', () => {
         ],
         ['contributors<=6']
       )
-      expect(resFail).to.deep.equal(['contributors<=6'])
+      expect(resultFail).to.deep.equal(['contributors<=6'])
     })
 
     it('should handle a mix of numerical axoims', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=7', 'contributors>4', 'commits>500']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=6', 'contributors>4', 'commits>900']
       )
-      expect(resFail).to.deep.equal(['contributors<=6', 'commits>900'])
+      expect(resultFail).to.deep.equal(['contributors<=6', 'commits>900'])
     })
 
     it('should handle both numerical and regular axioms', () => {
-      const resPass = shouldRuleRun(
+      const resultPass = shouldRuleRun(
         [
           'commits=700',
           'commits=*',
@@ -198,8 +201,8 @@ describe('api', () => {
         ],
         ['contributors<=7', 'contributors>4', 'commits>600', 'git=*']
       )
-      expect(resPass).to.deep.equal([])
-      const resFail = shouldRuleRun(
+      expect(resultPass).to.deep.equal([])
+      const resultFail = shouldRuleRun(
         [
           'commits=700',
           'commits=*',
@@ -212,7 +215,7 @@ describe('api', () => {
         ],
         ['contributors<=7', 'contributors>4', 'commits>900', 'git=no']
       )
-      expect(resFail).to.deep.equal(['commits>900', 'git=no'])
+      expect(resultFail).to.deep.equal(['commits>900', 'git=no'])
     })
   })
 })

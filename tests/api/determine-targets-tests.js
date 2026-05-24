@@ -12,7 +12,7 @@ describe('api', () => {
       }
       const mockFs = {
         findFirst(pattern) {
-          return pattern === 'package.json' ? 'package.json' : null
+          return pattern === 'package.json' ? 'package.json' : undefined
         }
       }
       const actual = await repolinter.determineTargets(mockconfig, mockFs)

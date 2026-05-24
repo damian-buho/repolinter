@@ -15,11 +15,11 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileRemove(mockFs, {}, ['myfile'], false)
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].passed).to.equal(true)
-      expect(res.targets[0].path).to.equal('myfile')
+      const result = await fileRemove(mockFs, {}, ['myfile'], false)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].passed).to.equal(true)
+      expect(result.targets[0].path).to.equal('myfile')
       expect(removePaths).to.deep.equal(['myfile'])
     })
 
@@ -32,11 +32,11 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileRemove(mockFs, {}, ['myfile'], true)
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].passed).to.equal(true)
-      expect(res.targets[0].path).to.equal('myfile')
+      const result = await fileRemove(mockFs, {}, ['myfile'], true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].passed).to.equal(true)
+      expect(result.targets[0].path).to.equal('myfile')
       expect(removePaths).to.deep.equal([])
     })
 
@@ -49,13 +49,18 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileRemove(mockFs, {}, ['myfile', 'otherfile'], false)
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(2)
-      expect(res.targets[0].passed).to.equal(true)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[1].passed).to.equal(true)
-      expect(res.targets[1].path).to.equal('otherfile')
+      const result = await fileRemove(
+        mockFs,
+        {},
+        ['myfile', 'otherfile'],
+        false
+      )
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(2)
+      expect(result.targets[0].passed).to.equal(true)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[1].passed).to.equal(true)
+      expect(result.targets[1].path).to.equal('otherfile')
       expect(removePaths).to.deep.equal(['myfile', 'otherfile'])
     })
 
@@ -71,11 +76,16 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileRemove(mockFs, { globsAll: ['myfile'] }, [], false)
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].passed).to.equal(true)
-      expect(res.targets[0].path).to.equal('myfile.txt')
+      const result = await fileRemove(
+        mockFs,
+        { globsAll: ['myfile'] },
+        [],
+        false
+      )
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].passed).to.equal(true)
+      expect(result.targets[0].path).to.equal('myfile.txt')
       expect(removePaths).to.deep.equal(['myfile.txt'])
     })
 
@@ -91,16 +101,16 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileRemove(
+      const result = await fileRemove(
         mockFs,
         { globsAll: ['myfile'] },
         ['otherfile'],
         false
       )
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].passed).to.equal(true)
-      expect(res.targets[0].path).to.equal('myfile.txt')
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].passed).to.equal(true)
+      expect(result.targets[0].path).to.equal('myfile.txt')
       expect(removePaths).to.deep.equal(['myfile.txt'])
     })
 
@@ -108,9 +118,9 @@ describe('fixes', () => {
       /** @type {any} */
       const mockFs = {}
 
-      const res = await fileRemove(mockFs, {}, [], false)
-      expect(res.passed).to.equal(false)
-      expect(res.targets).to.have.length(0)
+      const result = await fileRemove(mockFs, {}, [], false)
+      expect(result.passed).to.equal(false)
+      expect(result.targets).to.have.length(0)
     })
   })
 })

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import path from 'path'
+import path from 'node:path'
 import FileSystem from '../../dist/lib/file_system.js'
 import axioms from '../../dist/axioms/axioms.js'
 
@@ -14,6 +14,8 @@ describe('contributors axiom', () => {
     const contributorCount = await contributors(fs)
     expect(contributorCount.passed).to.equal(true)
     expect(contributorCount.targets).to.have.length(1)
-    expect(parseInt(contributorCount.targets[0].path)).to.be.greaterThan(0)
+    expect(Number.parseInt(contributorCount.targets[0].path)).to.be.greaterThan(
+      0
+    )
   })
 })

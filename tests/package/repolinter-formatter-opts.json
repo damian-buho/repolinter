@@ -18,7 +18,7 @@
       "rule": {
         "type": "file-existence",
         "options": {
-          "globsAny": ["lint_tests.js"]
+          "globsAny": ["lint-tests.js"]
         }
       }
     }

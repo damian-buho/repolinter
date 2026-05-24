@@ -3,18 +3,28 @@
 
 import { expect, use as chaiUse } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import * as Config from '../../dist/lib/config.js'
-import fs from 'fs'
+import fs from 'node:fs'
 import ServerMock from 'mock-http-server'
 chaiUse(chaiAsPromised)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const serveDirectory = directory => ({
+  method: 'GET',
+  path: '*',
+  reply: {
+    status: 200,
+    body: request =>
+      fs.readFileSync(path.resolve(directory, request.pathname.slice(1)))
+  }
+})
+
 describe('lib', () => {
   describe('config', function () {
-    this.timeout(10000)
+    this.timeout(10_000)
 
     describe('isAbsoluteURL', () => {
       it('should identify absolute URLs', async () => {
@@ -28,7 +38,7 @@ describe('lib', () => {
         expect(Config.isAbsoluteURL('/foo')).to.equals(false)
         expect(Config.isAbsoluteURL('file:/foo')).to.equals(false)
         expect(Config.isAbsoluteURL('file:///foo')).to.equals(false)
-        expect(Config.isAbsoluteURL('c:\\foo')).to.equals(false)
+        expect(Config.isAbsoluteURL(String.raw`c:\foo`)).to.equals(false)
       })
     })
 
@@ -49,15 +59,6 @@ describe('lib', () => {
 
     describe('loadConfig', async () => {
       const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
-      const serveDirectory = dir => ({
-        method: 'GET',
-        path: '*',
-        reply: {
-          status: 200,
-          body: request =>
-            fs.readFileSync(path.resolve(dir, request.pathname.substring(1)))
-        }
-      })
       beforeEach(done => server.start(done))
       afterEach(done => server.stop(done))
 

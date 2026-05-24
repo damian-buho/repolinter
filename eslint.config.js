@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import nPlugin from 'eslint-plugin-n'
 import { flatConfigs } from 'eslint-plugin-import-x'
 import promisePlugin from 'eslint-plugin-promise'
+import unicornPlugin from 'eslint-plugin-unicorn'
 import prettierRecommended from 'eslint-plugin-prettier/recommended'
 import globals from 'globals'
 
@@ -21,6 +22,7 @@ export default [
   nPlugin.configs['flat/recommended-module'],
   flatConfigs.recommended,
   promisePlugin.configs['flat/recommended'],
+  unicornPlugin.configs['flat/recommended'],
   prettierRecommended,
   {
     files: ['**/*.js'],

@@ -73,13 +73,13 @@ async function loadConfig(
 
   let configData: string | null = null
   if (isAbsoluteURL(configLocation)) {
-    const res = await fetch(configLocation)
-    if (!res.ok) {
+    const response = await fetch(configLocation)
+    if (!response.ok) {
       throw new Error(
-        `Failed to fetch config from ${configLocation} with status code ${res.status}`
+        `Failed to fetch config from ${configLocation} with status code ${response.status}`
       )
     }
-    configData = await res.text()
+    configData = await response.text()
   } else {
     configData = await fs.promises.readFile(configLocation, 'utf-8')
   }

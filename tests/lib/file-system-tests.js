@@ -1,17 +1,17 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { expect } from 'chai'
-import realFs from 'fs'
+import realFs from 'node:fs'
 import FileSystem from '../../dist/lib/file_system.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
   describe('file_system', function () {
-    this.timeout(10000)
+    this.timeout(10_000)
 
     describe('fileExists', () => {
       it('should return pass if the file exists', async () => {
@@ -22,9 +22,9 @@ describe('lib', () => {
       })
 
       it('should return pass if the directory exists', async () => {
-        const dir = '../lib'
+        const directory = '../lib'
         expect(
-          await FileSystem.fileExists(path.resolve(__dirname, dir))
+          await FileSystem.fileExists(path.resolve(__dirname, directory))
         ).to.equals(true)
       })
 
@@ -47,9 +47,9 @@ describe('lib', () => {
       })
 
       it('should return pass if the directory exists', async () => {
-        const dir = '../lib'
+        const directory = '../lib'
         expect(
-          await fs.relativeFileExists(path.resolve(__dirname, dir))
+          await fs.relativeFileExists(path.resolve(__dirname, directory))
         ).to.equals(true)
       })
 
@@ -174,7 +174,7 @@ describe('lib', () => {
       })
 
       it('should return false for a text file', async () => {
-        const actual = await fs.isBinaryFile('file_system_tests.js')
+        const actual = await fs.isBinaryFile('file-system-tests.js')
         expect(actual).to.equal(false)
       })
     })
@@ -190,7 +190,7 @@ describe('lib', () => {
       it('should return the contents of a file', async () => {
         const raw = await fs.getFileContents('text_file_for_test.txt')
         // replace newlines to prevent compatibility issues
-        const actual = raw.replace(/\r/g, '')
+        const actual = raw.replaceAll('\r', '')
         expect(actual).to.equal(
           'The contents of this file\nwill be monitored for quality assurance purposes\n'
         )
@@ -215,7 +215,7 @@ describe('lib', () => {
         const expected = 'somefilecontents\nmorecontents\n'
         await fs.setFileContents('text_file_for_test.txt', expected)
         const fileContents = await realFs.promises.readFile(filePath, 'utf8')
-        const realFileContents = fileContents.replace(/\r/g, '')
+        const realFileContents = fileContents.replaceAll('\r', '')
         expect(realFileContents).to.equal(expected)
       })
 

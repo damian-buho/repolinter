@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { expect } from 'chai'
 import nock from 'nock'
 import FileSystem from '../../dist/lib/file_system.js'
@@ -14,14 +14,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 describe('rule', () => {
   describe('files_no_broken_links', function () {
     const gitHubMarkupInstalled = commandExists.sync('github-markup')
-    const targetDir = `${__dirname}/markup_test_files`
-    const testFs = new FileSystem(targetDir)
+    const targetDirectory = `${__dirname}/markup_test_files`
+    const testFs = new FileSystem(targetDirectory)
 
-    this.timeout(30000)
+    this.timeout(30_000)
 
-    if (!gitHubMarkupInstalled)
-      it.skip('tests file_no_broken_links functionality', () => {})
-    else {
+    if (gitHubMarkupInstalled) {
       it('returns true if no links are present in markdown', async () => {
         const ruleopts = {
           globsAll: ['no_link.md']
@@ -395,6 +393,8 @@ describe('rule', () => {
           pattern: 'notafile'
         })
       })
+    } else {
+      it.skip('tests file_no_broken_links functionality', () => {})
     }
   })
 })

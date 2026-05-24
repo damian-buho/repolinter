@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { lint as markdownlint } from 'markdownlint/promise'
 import { expect } from 'chai'
 import toc from 'markdown-toc'
@@ -46,7 +46,7 @@ describe('formatters', () => {
       }
     }
 
-    const lintOpts = {
+    const lintOptions = {
       config: {
         default: true,
         'no-inline-html': false,
@@ -56,10 +56,10 @@ describe('formatters', () => {
 
     it('generates valid markdown with sample output', async () => {
       const actual = formatter.formatOutput(result, false)
-      const opts = Object.assign(lintOpts, { strings: { test: actual } })
+      const options = Object.assign(lintOptions, { strings: { test: actual } })
 
-      const res = await markdownlint(opts)
-      expect(res.test).to.have.length(0)
+      const lintResult = await markdownlint(options)
+      expect(lintResult.test).to.have.length(0)
     })
 
     it('generates the correct sections with sample output', () => {
@@ -77,9 +77,9 @@ describe('formatters', () => {
         { slug: 'myrule-other-rule', lvl: 3 }
       ]
 
-      for (let i = 0, len = expected.length; i < len; i++) {
-        expect(filteredSections[i].lvl).to.equal(expected[i].lvl)
-        expect(filteredSections[i].slug).to.contain(expected[i].slug)
+      for (let index = 0, length = expected.length; index < length; index++) {
+        expect(filteredSections[index].lvl).to.equal(expected[index].lvl)
+        expect(filteredSections[index].slug).to.contain(expected[index].slug)
       }
     })
 
@@ -90,20 +90,20 @@ describe('formatters', () => {
     })
 
     it('generates valid markdown when running against itself', async function () {
-      this.timeout(30000)
+      this.timeout(30_000)
 
       const lintres = await repolinter.lint(path.resolve(projectRoot))
 
       const actual = formatter.formatOutput(lintres, false)
-      const opts = Object.assign(lintOpts, { strings: { test: actual } })
+      const options = Object.assign(lintOptions, { strings: { test: actual } })
 
-      const res = await markdownlint(opts)
+      const result = await markdownlint(options)
 
-      expect(res.test).to.deep.equal([])
+      expect(result.test).to.deep.equal([])
     })
 
     it('does not contain the string "undefined"', async function () {
-      this.timeout(30000)
+      this.timeout(30_000)
 
       const lintres = await repolinter.lint(path.resolve(projectRoot))
 

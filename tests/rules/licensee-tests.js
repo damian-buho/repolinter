@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { expect } from 'chai'
 import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
@@ -13,13 +13,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 describe('rule', () => {
   describe('licensee', () => {
     const licenseeInstalled = commandExists.sync('licensee')
-    const targetDir = `${__dirname}/licensee_test_files`
+    const targetDirectory = `${__dirname}/licensee_test_files`
 
-    if (!licenseeInstalled)
-      it.skip('tests license-detectable-by-licensee functionality', () => {})
-    else {
+    if (licenseeInstalled) {
       it('rule fails if no license is detectable', async () => {
-        const testFs = new FileSystem(`${targetDir}/no-license`)
+        const testFs = new FileSystem(`${targetDirectory}/no-license`)
 
         const actual = await licenseDetectable(testFs)
         expect(actual.passed).to.equal(false)
@@ -29,7 +27,7 @@ describe('rule', () => {
       })
 
       it('rule passes if license is detectable, but unknown', async () => {
-        const testFs = new FileSystem(`${targetDir}/unknown-license`)
+        const testFs = new FileSystem(`${targetDirectory}/unknown-license`)
 
         const actual = await licenseDetectable(testFs)
         expect(actual.passed).to.equal(true)
@@ -39,7 +37,7 @@ describe('rule', () => {
       })
 
       it('rule passes if license is detectable and recognized', async () => {
-        const testFs = new FileSystem(`${targetDir}/0bsd`)
+        const testFs = new FileSystem(`${targetDirectory}/0bsd`)
 
         const actual = await licenseDetectable(testFs)
         expect(actual.passed).to.equal(true)
@@ -47,6 +45,8 @@ describe('rule', () => {
           'Licensee identified the license for project: 0BSD'
         )
       })
+    } else {
+      it.skip('tests license-detectable-by-licensee functionality', () => {})
     }
   })
 })

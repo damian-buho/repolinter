@@ -7,7 +7,7 @@ const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
 import Result from '../../dist/lib/result.js'
 import FormatResult from '../../dist/lib/formatresult.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
-import path from 'path'
+import path from 'node:path'
 import * as repolinter from '../../dist/index.js'
 
 describe('formatters', () => {
@@ -53,6 +53,7 @@ describe('formatters', () => {
             new RuleInfo('rule2', 'error', [], 'file-existence', {}),
             'ignored'
           ),
+          // eslint-disable-next-line unicorn/throw-new-error
           FormatResult.CreateError(
             new RuleInfo('rule3', 'error', [], 'file-existence', {}),
             'errored'
@@ -71,7 +72,7 @@ describe('formatters', () => {
     })
 
     it('does not contain the string undefined', async function () {
-      this.timeout(30000)
+      this.timeout(30_000)
       const lintres = await repolinter.lint(path.resolve('.'))
 
       const actual = symbolFormatter.formatOutput(lintres, false)

@@ -11,7 +11,7 @@ describe('rule', () => {
       const ruleOptions = {
         // file size ~41KB
         globsAll: ['tests/rules/image_for_test.png'],
-        size: 42000
+        size: 42_000
       }
 
       const actual = await largeFile(new FileSystem(), ruleOptions)
@@ -23,7 +23,7 @@ describe('rule', () => {
       const ruleOptions = {
         // file size ~41KB
         globsAll: ['tests/rules/image_for_test.png'],
-        size: 40000
+        size: 40_000
       }
 
       const actual = await largeFile(new FileSystem(), ruleOptions)

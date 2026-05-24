@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, use as chaiUse, should as chaiShould } from 'chai'
+import chaiEach from 'chai-each'
 import sinon from 'sinon'
 import FileSystem from '../../dist/lib/file_system.js'
 import GitHelper from '../../dist/lib/git_helper.js'
-import gitListTree from '../../dist/rules/git-list-tree.js'
-import chaiEach from 'chai-each'
+import gitGrepCommits from '../../dist/rules/git-grep-commits.js'
 import chaiString from 'chai-string'
 
 chaiUse(chaiEach)
@@ -15,7 +15,7 @@ chaiUse(chaiString)
 const should = chaiShould()
 
 describe('rule', () => {
-  describe('git_list_tree', function () {
+  describe('git_grep_commits', function () {
     before(function () {
       const stubValue = [
         '3e66e3ec616d59f813bdb878e1146d03872a096e',
@@ -29,39 +29,41 @@ describe('rule', () => {
     after(function () {
       GitHelper.gitAllCommits.restore()
     })
-    const PATH_WRONG_CASE = 'rules/git-list-TREE\\.js'
 
-    it('passes if the denylist pattern does not match any path', () => {
+    const DIFF_CORRECT_CASE = String.raw`Copyright 2017 TODO Group\. All rights reserved\.`
+    const DIFF_WRONG_CASE = String.raw`COPYRIGHT 2017 TODO GROUP\. ALL RIGHTS RESERVED\.`
+
+    it('passes if the denylist pattern does not match any commit', () => {
       const ruleopts = {
-        denylist: [PATH_WRONG_CASE],
+        denylist: [DIFF_WRONG_CASE],
         ignoreCase: false
       }
 
-      const actual = gitListTree(new FileSystem(), ruleopts)
+      const actual = gitGrepCommits(new FileSystem(), ruleopts)
 
       expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(0)
+      expect(actual.message).to.contain(ruleopts.denylist[0])
     })
 
     it('is backwards compatible with blacklist', () => {
       const ruleopts = {
-        blacklist: [PATH_WRONG_CASE],
+        blacklist: [DIFF_WRONG_CASE],
         ignoreCase: false
       }
 
-      const actual = gitListTree(new FileSystem(), ruleopts)
+      const actual = gitGrepCommits(new FileSystem(), ruleopts)
 
       expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(0)
+      expect(actual.message).to.contain(ruleopts.blacklist[0])
     })
 
-    it('fails if the denylist pattern matches a path', () => {
+    it('fails if the denylist pattern matches a commit', () => {
       const ruleopts = {
-        denylist: [PATH_WRONG_CASE],
+        denylist: [DIFF_CORRECT_CASE],
         ignoreCase: true
       }
 
-      const actual = gitListTree(new FileSystem(), ruleopts)
+      const actual = gitGrepCommits(new FileSystem(), ruleopts)
 
       expect(actual.passed).to.equal(false)
       expect(actual.targets).to.not.have.length(0)

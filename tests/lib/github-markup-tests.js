@@ -4,46 +4,48 @@
 import { expect } from 'chai'
 import GitHubMarkup from '../../dist/lib/github_markup.js'
 import commandExists from 'command-exists'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
   describe('github_markup', function () {
     const gitHubMarkupInstalled = commandExists.sync('github-markup')
-    this.timeout(30000)
+    this.timeout(30_000)
 
-    if (!gitHubMarkupInstalled) {
-      it.skip('tests github markup functionality', () => {})
-    } else {
+    if (gitHubMarkupInstalled) {
       it('should render a markdown file', async () => {
-        const res = await GitHubMarkup.renderMarkup(
+        const result = await GitHubMarkup.renderMarkup(
           `${__dirname}/MarkdownForTest.md`
         )
-        expect(res).to.contain('Some text')
+        expect(result).to.contain('Some text')
       })
 
       it('should render an rst file', async () => {
-        const res = await GitHubMarkup.renderMarkup(
+        const result = await GitHubMarkup.renderMarkup(
           `${__dirname}/rst_for_test.rst`
         )
-        expect(res).to.contain(
+        expect(result).to.contain(
           'https://opensource.newrelic.com/oss-category/#community-plus'
         )
       })
 
       it('should fail to render a non-markup file', async () => {
-        const res = await GitHubMarkup.renderMarkup(
+        const result = await GitHubMarkup.renderMarkup(
           `${__dirname}/image_for_test.png`
         )
-        expect(res).to.equal(null)
+        expect(result).to.equal(undefined)
       })
 
       it("should fail to render a file that doesn't exist", async () => {
-        const res = await GitHubMarkup.renderMarkup(`${__dirname}/not_a_file`)
-        expect(res).to.equal(null)
+        const result = await GitHubMarkup.renderMarkup(
+          `${__dirname}/not_a_file`
+        )
+        expect(result).to.equal(undefined)
       })
+    } else {
+      it.skip('tests github markup functionality', () => {})
     }
   })
 })

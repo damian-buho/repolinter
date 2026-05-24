@@ -8,7 +8,7 @@ import fileModify from '../../dist/fixes/file-modify.js'
 describe('fixes', () => {
   describe('file-modify', () => {
     it('appends text to a file', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: 'this is text'
       }
@@ -26,17 +26,17 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockContents).to.equal('the file contentsthis is text')
     })
 
     it('prepends text to a file', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: 'this is text',
         write_mode: 'prepend'
@@ -55,21 +55,21 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockContents).to.equal('this is textthe file contents')
     })
 
     it('does nothing if dryRun is enabled', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: 'this is text'
       }
-      let mockContents = null
+      let mockContents
       /** @type {any} */
       const mockFs = {
         findAllFiles() {
@@ -83,17 +83,17 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, [], true)
+      const result = await fileModify(mockFs, options, [], true)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
-      expect(mockContents).to.equal(null)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
+      expect(mockContents).to.equal(undefined)
     })
 
     it('targets a file specified by the rule', async () => {
-      const opts = {
+      const options = {
         text: 'this is text'
       }
       let mockContents = ''
@@ -110,34 +110,34 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, ['myfile'], false)
+      const result = await fileModify(mockFs, options, ['myfile'], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockContents).to.equal('the file contentsthis is text')
     })
 
     it('fails if no files are specified', async () => {
-      const opts = {
+      const options = {
         text: 'this is text'
       }
       /** @type {any} */
       const mockFs = {}
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(false)
-      expect(res.targets).to.have.length(0)
+      expect(result.passed).to.equal(false)
+      expect(result.targets).to.have.length(0)
     })
 
     it('skips extensions correctly', async () => {
-      const opts = {
+      const options = {
         text: 'this is text',
         'skip-paths-matching': { extensions: ['exe'] }
       }
-      let mockFile = null
+      let mockFile
       /** @type {any} */
       const mockFs = {
         findAllFiles() {
@@ -151,21 +151,21 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, ['myfile.exe'], false)
+      const result = await fileModify(mockFs, options, ['myfile.exe'], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('otherfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('otherfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockFile).to.equal('otherfile')
     })
 
     it('skips path patterns correctly', async () => {
-      const opts = {
+      const options = {
         text: 'this is text',
         'skip-paths-matching': { patterns: ['exe'] }
       }
-      let mockFile = null
+      let mockFile
       /** @type {any} */
       const mockFs = {
         findAllFiles() {
@@ -179,21 +179,21 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, ['myfile.exe'], false)
+      const result = await fileModify(mockFs, options, ['myfile.exe'], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('otherfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('otherfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockFile).to.equal('otherfile')
     })
 
     it('pulls text from a file', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: { file: 'sourcefile' }
       }
-      let mockContents = null
+      let mockContents
       /** @type {any} */
       const mockFs = {
         findFirstFile() {
@@ -210,21 +210,21 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockContents).to.equal('the file contentsthis is text')
     })
 
     it('pulls text from a URL', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: { url: 'https://example.com' }
       }
-      let mockContents = null
+      let mockContents
       /** @type {any} */
       const mockFs = {
         findAllFiles() {
@@ -241,19 +241,19 @@ describe('fixes', () => {
         .get('/')
         .reply(200, 'this is text')
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(true)
-      expect(res.targets).to.have.length(1)
-      expect(res.targets[0].path).to.equal('myfile')
-      expect(res.targets[0].passed).to.equal(true)
+      expect(result.passed).to.equal(true)
+      expect(result.targets).to.have.length(1)
+      expect(result.targets[0].path).to.equal('myfile')
+      expect(result.targets[0].passed).to.equal(true)
       expect(mockContents).to.equal('the file contentsthis is text')
 
       scope.done()
     })
 
     it('adds newlines correctly', async () => {
-      const opts = {
+      const options = {
         files: ['myfile'],
         text: 'this is text',
         newlines: { begin: 3, end: 4 }
@@ -272,9 +272,9 @@ describe('fixes', () => {
         }
       }
 
-      const res = await fileModify(mockFs, opts, [], false)
+      const result = await fileModify(mockFs, options, [], false)
 
-      expect(res.passed).to.equal(true)
+      expect(result.passed).to.equal(true)
       expect(mockContents).to.equal(
         'the file contents\n\n\nthis is text\n\n\n\n'
       )

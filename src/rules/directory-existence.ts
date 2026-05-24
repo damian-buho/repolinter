@@ -6,7 +6,7 @@ import fileExistence from './file-existence.js'
 
 export default function directoryExistence(
   fileSystem: FileSystem,
-  opts: Parameters<typeof fileExistence>[1]
+  options: Parameters<typeof fileExistence>[1]
 ): ReturnType<typeof fileExistence> {
-  return fileExistence(fileSystem, { ...opts, dirs: true })
+  return fileExistence(fileSystem, { ...options, dirs: true })
 }

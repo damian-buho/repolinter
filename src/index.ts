@@ -228,10 +228,10 @@ export async function runRuleset(
   let targetArray: string[] = []
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
-      .filter(([, res]) => res.passed)
-      .map(([axiomId, res]): [string, string[]] => [
+      .filter(([, result]) => result.passed)
+      .map(([axiomId, result]): [string, string[]] => [
         axiomId,
-        res.targets.map((t: any) => t.path)
+        result.targets.map((t: any) => t.path)
       ])
       .map(([axiomId, paths]: [string, string[]]) => [
         `${axiomId}=*`,

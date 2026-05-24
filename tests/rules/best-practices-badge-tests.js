@@ -9,15 +9,15 @@ describe('rule', () => {
     let BestpracticesBadgePresent
 
     before(async () => {
-      BestpracticesBadgePresent = (
+      const bestPracticesModule =
         await import('../../dist/rules/best-practices-badge-present.js')
-      ).default
+      BestpracticesBadgePresent = bestPracticesModule.default
     })
 
     it('fails if readme is missing', async () => {
       const mockfs = {
         findAllFiles: () => [],
-        getFileContents: () => null,
+        getFileContents: () => {},
         targetDir: '.'
       }
 
@@ -86,7 +86,7 @@ describe('rule', () => {
 
       it('passes when minPercentage is not set', async () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
-          minPercentage: null
+          minPercentage: undefined
         })
         expect(actual.passed).to.equal(true)
       })
