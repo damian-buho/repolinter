@@ -35,11 +35,20 @@ module.exports = [
     }
   },
   {
-    files: ['tests/**/*.js'],
+    files: ['tests/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         ...globals.mocha
       }
+    },
+    rules: {
+      'n/no-unpublished-import': 'off'
+    }
+  },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module'
     }
   }
 ]

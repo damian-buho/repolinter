@@ -271,14 +271,30 @@ ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     // count each type of format result in an object
     const sorted = MarkdownFormatter.sortResults(output.results)
     // create the summary block
-    const summary = `\n\nThis Repolinter run generated the following results:
-| ${ERROR_SYMBOL}  Error | ${FAIL_SYMBOL}  Fail | ${WARN_SYMBOL}  Warn | ${PASS_SYMBOL}  Pass | Ignored | Total |
-|---|---|---|---|---|---|
-| ${sorted[FormatResult.ERROR].length} | ${
-      sorted[FormatResult.RULE_NOT_PASSED_ERROR].length
-    } | ${sorted[FormatResult.RULE_NOT_PASSED_WARN].length} | ${
-      sorted[FormatResult.RULE_PASSED].length
-    } | ${sorted[FormatResult.IGNORED].length} | ${output.results.length} |`
+    const values = [
+      sorted[FormatResult.ERROR].length,
+      sorted[FormatResult.RULE_NOT_PASSED_ERROR].length,
+      sorted[FormatResult.RULE_NOT_PASSED_WARN].length,
+      sorted[FormatResult.RULE_PASSED].length,
+      sorted[FormatResult.IGNORED].length,
+      output.results.length
+    ]
+    const headCells = [
+      `${ERROR_SYMBOL} Error`,
+      `${FAIL_SYMBOL} Fail`,
+      `${WARN_SYMBOL} Warn`,
+      `${PASS_SYMBOL} Pass`,
+      'Ignored',
+      'Total'
+    ]
+    const dataCells = values.map(String)
+    const colWidths = headCells.map((h, i) =>
+      Math.max(h.length, dataCells[i].length)
+    )
+    const tableHead = headCells.map(c => c).join('|')
+    const tableSep = colWidths.map(w => '-'.repeat(w)).join('|')
+    const tableData = dataCells.join('|')
+    const summary = `\n\nThis Repolinter run generated the following results:\n\n|${tableHead}|\n|${tableSep}|\n|${tableData}|`
     formatBase.push(summary)
     // configure each section
     const sectionConfig = [
