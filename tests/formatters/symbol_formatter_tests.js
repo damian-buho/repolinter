@@ -3,7 +3,7 @@
 
 const chai = require('chai')
 const expect = chai.expect
-const logSymbols = require('log-symbols')
+const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
 const Result = require('../../lib/result')
 const FormatResult = require('../../lib/formatresult')
 const RuleInfo = require('../../lib/ruleinfo')

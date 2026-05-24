@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const logSymbols = require('log-symbols')
+const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
 const { styleText } = require('util')
 const FormatResult = require('../lib/formatresult')
 // eslint-disable-next-line no-unused-vars

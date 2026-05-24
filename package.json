@@ -55,7 +55,6 @@
     "find-config": "^1.0.0",
     "gitlog": "^5.1.0",
     "isbinaryfile": "^6.0.0",
-    "log-symbols": "^4.0.0",
     "matched": "^5.0.1",
     "simple-git": "^3.16.0",
     "yaml": "^2.9.0",
