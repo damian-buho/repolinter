@@ -36,7 +36,7 @@ describe('cli', function () {
   const repolinterPath =
     process.platform === 'win32'
       ? path.resolve('bin/repolinter.bat')
-      : path.resolve('bin/repolinter.js')
+      : path.resolve('bin/repolinter.mjs')
   const selfPath = path.resolve('tests/cli')
   this.timeout(30000)
 

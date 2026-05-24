@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
-const path = require('path')
-const repolinter = require('..')
-const git = require('simple-git')()
-/** @type {any} */
-const fs = require('fs')
-const os = require('os')
 
-require('yargs')
+import { createRequire } from 'module'
+import path from 'path'
+import fs from 'fs'
+import os from 'os'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+import simpleGit from 'simple-git'
+
+const require = createRequire(import.meta.url)
+const repolinter = require('..')
+const git = simpleGit()
+
+yargs(hideBin(process.argv))
   .command(
     ['lint [directory]', '*'],
     'run repolinter on the specified directory, outputting results to STDOUT.',
@@ -68,7 +74,7 @@ require('yargs')
         .conflicts('rulesetFile', ['rulesetUrl', 'rulesetEncoded'])
         .conflicts('rulesetEncoded', 'rulesetUrl')
     },
-    async (/** @type {any} */ argv) => {
+    async argv => {
       let tmpDir = null
       // temporarily clone a git repo to lint
       if (argv.git) {
@@ -79,7 +85,9 @@ require('yargs')
         if (result) {
           console.error(result)
           process.exitCode = 1
-          fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
+          fs.promises
+            .rm(tmpDir, { recursive: true, force: true })
+            .catch(() => {})
           return
         }
       }
@@ -111,4 +119,5 @@ require('yargs')
   )
   .demandCommand()
   .help()
-  .strict().argv
+  .strict()
+  .parse()

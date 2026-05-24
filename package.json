@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "bin": {
-    "repolinter": "bin/repolinter.js"
+    "repolinter": "bin/repolinter.mjs"
   },
   "engines": {
     "node": ">=20.12.0"
@@ -58,7 +58,7 @@
     "matched": "^5.0.1",
     "simple-git": "^3.16.0",
     "yaml": "^2.9.0",
-    "yargs": "^15.4.1"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
