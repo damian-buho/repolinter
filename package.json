@@ -52,7 +52,6 @@
     "ajv": "^8.20.0",
     "broken-link-checker": "^0.7.8",
     "command-exists": "^1.2.9",
-    "emoji-regex": "^9.2.0",
     "find-config": "^1.0.0",
     "gitlog": "^4.0.3",
     "isbinaryfile": "^4.0.6",
