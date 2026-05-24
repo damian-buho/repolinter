@@ -1,12 +1,13 @@
-// Copyright 2022 TODO Group. All rights reserved.
+// Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-const fileContents = require('./file-contents')
+import Result from '../lib/result.js'
+import fileContents from './file-contents.js'
+
 const bestPracticesRegExp =
   'https://bestpractices\\.coreinfrastructure\\.org(/\\w+)?/projects/\\d+'
 
-module.exports = async function (fileSystem, options = {}) {
+export default async function (fileSystem, options = {}) {
   const readmeContainsBadge = await fileContents(fileSystem, {
     globsAll: ['README*'],
     content: bestPracticesRegExp,

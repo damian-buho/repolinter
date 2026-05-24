@@ -1,11 +1,12 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const path = require('path')
-const FileSystem = require('../../lib/file_system')
-const contributors = require('../../axioms/axioms')['contributor-count']
+import { expect } from 'chai'
+import path from 'path'
+import FileSystem from '../../lib/file_system.js'
+import axioms from '../../axioms/axioms.js'
+
+const contributors = axioms['contributor-count']
 
 describe('contributors axiom', () => {
   it('repolinter contributor count greater than zero', async () => {

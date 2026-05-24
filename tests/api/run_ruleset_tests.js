@@ -1,14 +1,16 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const path = require('path')
-const expect = chai.expect
-const repolinter = require(path.resolve('.'))
-const RuleInfo = require('../../lib/ruleinfo')
-const FileSystem = require('../../lib/file_system')
-const FormatResult = require('../../lib/formatresult')
-const Result = require('../../lib/result')
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { expect } from 'chai'
+import * as repolinter from '../../index.js'
+import RuleInfo from '../../lib/ruleinfo.js'
+import FileSystem from '../../lib/file_system.js'
+import FormatResult from '../../lib/formatresult.js'
+import Result from '../../lib/result.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('api', () => {
   describe('runRuleset', () => {

@@ -1,14 +1,17 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const GitHubMarkup = require('../../lib/github_markup')
-const commandExists = require('command-exists').sync
+import { expect } from 'chai'
+import GitHubMarkup from '../../lib/github_markup.js'
+import commandExists from 'command-exists'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
   describe('github_markup', function () {
-    const gitHubMarkupInstalled = commandExists('github-markup')
+    const gitHubMarkupInstalled = commandExists.sync('github-markup')
     this.timeout(30000)
 
     if (!gitHubMarkupInstalled) {

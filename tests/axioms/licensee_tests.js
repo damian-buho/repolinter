@@ -1,20 +1,21 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const commandExists = require('command-exists').sync
-const path = require('path')
-const chai = require('chai')
-const expect = chai.expect
+import path from 'path'
+import { fileURLToPath } from 'url'
+import commandExists from 'command-exists'
+import { expect } from 'chai'
+import licenseeAxiom from '../../axioms/licensee.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('licensee', function () {
-  const licenseeInstalled = commandExists('licensee')
+  const licenseeInstalled = commandExists.sync('licensee')
   this.timeout(30000)
 
   if (!licenseeInstalled) {
     it.skip('tests licensee functionality', () => {})
   } else {
-    const licenseeAxiom = require('../../axioms/licensee')
-
     it('runs licensee', async () => {
       const mockFs = { targetDir: path.resolve(__dirname, '../../') }
       const res = await licenseeAxiom(mockFs)

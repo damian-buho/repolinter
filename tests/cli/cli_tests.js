@@ -1,15 +1,16 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const path = require('path')
-const chai = require('chai')
-const cp = require('child_process')
-const fs = require('fs')
-const ServerMock = require('mock-http-server')
+import path from 'path'
+import { expect } from 'chai'
+import { fileURLToPath } from 'url'
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import { exec as cpExec } from 'child_process'
+import realFs from 'fs'
+import ServerMock from 'mock-http-server'
 // eslint-disable-next-line no-control-regex
 const stripAnsi = s => s.replace(/\x1B\[[0-9;]*m/g, '')
-const repolinter = require(path.resolve('.'))
-const expect = chai.expect
+import * as repolinter from '../../index.js'
 
 /**
  * Execute a command in a childprocess asynchronously. Not secure, but good for testing.
@@ -20,7 +21,7 @@ const expect = chai.expect
  */
 async function execAsync(command, opts = {}) {
   return new Promise((resolve, reject) => {
-    cp.exec(command, opts, (err, outstd, errstd) =>
+    cpExec(command, opts, (err, outstd, errstd) =>
       err !== null && err.code === undefined
         ? reject(err)
         : resolve({
@@ -36,7 +37,7 @@ describe('cli', function () {
   const repolinterPath =
     process.platform === 'win32'
       ? path.resolve('bin/repolinter.bat')
-      : path.resolve('bin/repolinter.mjs')
+      : path.resolve('bin/repolinter.js')
   const selfPath = path.resolve('tests/cli')
   this.timeout(30000)
 
@@ -71,7 +72,7 @@ describe('cli', function () {
     )
 
     expect(actual.code).to.not.equal(0)
-    const fileExists = await fs.promises
+    const fileExists = await realFs.promises
       .access(path.resolve('tests/cli/fixed.txt'))
       .then(() => true)
       .catch(() => false)
@@ -90,7 +91,7 @@ describe('cli', function () {
 
     expect(actual.code).to.not.equal(0)
     expect(actual2.code).to.not.equal(0)
-    const fileExists = await fs.promises
+    const fileExists = await realFs.promises
       .access(path.resolve('tests/cli/fixed.txt'))
       .then(() => true)
       .catch(() => false)
@@ -188,7 +189,7 @@ describe('cli', function () {
       reply: {
         status: 200,
         headers: { 'content-type': 'application/json' },
-        body: await fs.promises.readFile(
+        body: await realFs.promises.readFile(
           path.resolve(__dirname, 'repolinter-other.json'),
           'utf-8'
         )
@@ -238,7 +239,7 @@ describe('cli', function () {
       reply: {
         status: 200,
         headers: { 'content-type': 'application/json' },
-        body: await fs.promises.readFile(
+        body: await realFs.promises.readFile(
           path.resolve(__dirname, 'repolinter-other.yml'),
           'utf-8'
         )
@@ -337,7 +338,7 @@ describe('cli', function () {
   })
 
   afterEach(async () => {
-    return fs.promises
+    return realFs.promises
       .unlink(path.resolve('tests/cli/fixed.txt'))
       .catch(() => {})
   })

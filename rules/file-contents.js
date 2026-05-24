@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 function getContent(options) {
   return options['human-readable-content'] !== undefined
@@ -32,7 +30,6 @@ function getContext(matchedLine, regexMatch, contextLength) {
  * @ignore
  */
 async function fileContents(fs, options, not = false) {
-  // support legacy configuration keys
   const fileList = options.globsAll || options.files
   const files = await fs.findAllFiles(fileList, !!options.nocase)
   const regexFlags = options.flags || ''
@@ -51,10 +48,6 @@ async function fileContents(fs, options, not = false) {
   let results
 
   if (!options['display-result-context']) {
-    /**
-     * Default "Contains" / "Doesn't contain"
-     * @ignore
-     */
     results = await Promise.all(
       files.map(async file => {
         const fileContents = await fs.getFileContents(file)
@@ -73,17 +66,6 @@ async function fileContents(fs, options, not = false) {
       })
     )
   } else {
-    /**
-     * Add regular expression matched content context into result.
-     * Added contexts includes:
-     *  - line # of the regular expression.
-     *  - 'options.context-char-length' number of characters before and after the regex match.
-     * The added context will be in result.message.
-     *
-     * Note: if 'g' is not presented in 'options.flags',
-     * the regular expression will only display the first match context.
-     * @ignore
-     */
     results = (
       await Promise.all(
         files.map(async file => {
@@ -104,72 +86,24 @@ async function fileContents(fs, options, not = false) {
 
           const fileLines = fileContents.split('\n')
           const contextLines = split
-            /**
-             * @return sum of line numbers in each regexp split chunks.
-             * @ignore
-             */
             .map(fileChunk => {
-              /**
-               * Note: Handle *undefined* in regex split result issue
-               * by treating *undefined* as ''
-               * @ignore
-               */
               if (fileChunk !== undefined) return fileChunk.split('\n').length
               return 1
             })
-            /**
-             * Get lines of regexp match
-             * @return list of lines contains regexp matchs
-             * @ignore
-             */
             .reduce((previous, current, index, array) => {
-              /**
-               * Push number of lines before the first regex match to the result array.
-               * @ignore
-               */
               if (previous.length === 0) {
                 previous.push(current)
               } else if (current === 1 || index === array.length - 1) {
-                /**
-                 * We don't need to count multiple times if one line contains multiple regex match.
-                 * We don't need to count rest of lines after last regex match.
-                 * @ignore
-                 */
               } else {
-                /**
-                 * Add *relative number of lines* between this regex match and last regex match (current-1)
-                 * to the last *absolute number of lines* of last regex match to the top of file (previous[lastElement])
-                 * to get the *absolute number of lines* of current regex match.
-                 * @ignore
-                 */
-                previous.push(current - 1 + previous[previous.length - 1])
+                previous.push(current - 1 + previous.at(-1))
               }
               return previous
             }, [])
-            /**
-             * @return lines and contexts of every regex matches.
-             * @ignore
-             */
             .reduce((previous, current) => {
               const matchedLine = fileLines[current - 1]
-              /**
-               * We can't do multi-line match on a single line context,
-               * so we try to detect a match on the line
-               * and print helpful info if there is none.
-               *
-               * Note: multi-line output context can be challenging to read.
-               * So instead of print unpredictable context in the output,
-               * we just print line number.
-               * @ignore
-               */
               if (regexFlags.includes('m')) {
                 let currentMatch = regex.exec(matchedLine)
 
-                /**
-                 * Found no match, the regex match was multi-line.
-                 * Print info in context instead of actual context.
-                 * @ignore
-                 */
                 if (currentMatch === null) {
                   previous.push({
                     line: current,
@@ -178,11 +112,6 @@ async function fileContents(fs, options, not = false) {
                   })
                   return previous
                 }
-                /**
-                 * Find a match, so we try to find all matches.
-                 * Reset regex.lastIndex to start from beginning.
-                 * @ignore
-                 */
                 regex.lastIndex = 0
                 while ((currentMatch = regex.exec(matchedLine)) !== null) {
                   previous.push({
@@ -198,17 +127,8 @@ async function fileContents(fs, options, not = false) {
                 return previous
               }
 
-              /**
-               * No *global* flag means regex.lastIndex will not advance.
-               * We just need to run regex.exec once
-               * @ignore
-               */
               if (!regexFlags.includes('g')) {
                 const currentMatch = regex.exec(matchedLine)
-                /**
-                 * Found a match! Put it in the result
-                 * @ignore
-                 */
                 if (currentMatch != null) {
                   previous.push({
                     line: current,
@@ -220,20 +140,12 @@ async function fileContents(fs, options, not = false) {
                   })
                   return previous
                 }
-                /**
-                 * User should never reach here, throw an error when that happens.
-                 * @ignore
-                 */
                 console.trace('Error trace:')
                 throw new Error(
                   'Please open an issue on https://github.com/todogroup/repolinter'
                 )
               }
 
-              /**
-               * Find all matches on the string with non-multi-line regex
-               * @ignore
-               */
               let currentMatch
               while ((currentMatch = regex.exec(matchedLine)) !== null) {
                 previous.push({
@@ -275,4 +187,4 @@ async function fileContents(fs, options, not = false) {
   return new Result('', filteredResults, passed)
 }
 
-module.exports = fileContents
+export default fileContents

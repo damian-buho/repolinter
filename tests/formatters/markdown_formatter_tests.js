@@ -1,31 +1,23 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { lint as markdownlint } from 'markdownlint/promise'
+import { expect } from 'chai'
+import toc from 'markdown-toc'
+import { slug as slugger } from '../../lib/github_slugger.js'
+import FormatResult from '../../lib/formatresult.js'
+import RuleInfo from '../../lib/ruleinfo.js'
+import Result from '../../lib/result.js'
+import * as repolinter from '../../index.js'
+import formatter from '../../formatters/markdown_formatter.js'
 
-const require = createRequire(import.meta.url)
-const chai = require('chai')
-const toc = require('markdown-toc')
-const slugger = require('../../lib/github_slugger')
-const FormatResult = require('../../lib/formatresult')
-const RuleInfo = require('../../lib/ruleinfo')
-const Result = require('../../lib/result')
-const repolinter = require('../../index')
-
-const { expect } = chai
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '../..')
 
 describe('formatters', () => {
   describe('markdown_formatter', () => {
-    let formatter
-    before(() => {
-      formatter = require('../../formatters/markdown_formatter')
-    })
-
     /** @type {import('../..').LintResult} */
     const result = {
       passed: true,
@@ -73,7 +65,7 @@ describe('formatters', () => {
     it('generates the correct sections with sample output', () => {
       const output = formatter.formatOutput(result, false)
       const sections = toc(output, {
-        slugify: slugger.slug,
+        slugify: slugger,
         firsth1: true
       }).json
       const filteredSections = sections.filter(s => s.lvl !== 1)

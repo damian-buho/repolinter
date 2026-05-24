@@ -1,12 +1,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const spawnSync = require('child_process').spawnSync
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
-
-const GitHelper = require('../lib/git_helper')
+import { spawnSync } from 'child_process'
+import Result from '../lib/result.js'
+import GitHelper from '../lib/git_helper.js'
 
 function listCommitsWithLines(fileSystem, options) {
   const pattern = '(' + options.denylist.join('|') + ')'
@@ -27,13 +24,6 @@ function listCommitsWithLines(fileSystem, options) {
     .filter(commit => commit.lines.length > 0)
 }
 
-/**
- * @param targetDir
- * @param pattern
- * @param ignoreCase
- * @param commit
- * @ignore
- */
 function gitGrep(targetDir, pattern, ignoreCase, commit) {
   const args = [
     '-C',
@@ -50,13 +40,6 @@ function gitGrep(targetDir, pattern, ignoreCase, commit) {
     .filter(x => !!x)
 }
 
-/**
- * @param targetDir
- * @param pattern
- * @param ignoreCase
- * @param commit
- * @ignore
- */
 function gitLinesAtCommit(targetDir, pattern, ignoreCase, commit) {
   const lines = gitGrep(targetDir, pattern, ignoreCase, commit).map(entry => {
     const [path, ...rest] = entry.substring(commit.length + 1).split(':')
@@ -66,11 +49,6 @@ function gitLinesAtCommit(targetDir, pattern, ignoreCase, commit) {
   return lines
 }
 
-/**
- * @param fileSystem
- * @param options
- * @ignore
- */
 function listFiles(fileSystem, options) {
   const files = []
 
@@ -104,15 +82,7 @@ function listFiles(fileSystem, options) {
   return files
 }
 
-/**
- *
- * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
- * @param {object} options The rule configuration
- * @returns {Result} The lint rule result
- * @ignore
- */
 function gitGrepCommits(fs, options) {
-  // backwards compatibility with blacklist
   options.denylist = options.denylist || options.blacklist
 
   const files = listFiles(fs, options)
@@ -149,4 +119,4 @@ function gitGrepCommits(fs, options) {
   return new Result('', targets, false)
 }
 
-module.exports = gitGrepCommits
+export default gitGrepCommits

@@ -1,8 +1,7 @@
-const nodefs = require('fs')
+import nodefs from 'fs'
+import Result from '../lib/result.js'
+import path from 'path'
 
-const Result = require('../lib/result')
-
-const path = require('path')
 /**
  * Check if a list of files' size on the file system that is larger than provided size.
  *
@@ -13,7 +12,6 @@ const path = require('path')
  * @ignore
  */
 async function largeFile(fs, options, not = false) {
-  // support legacy configuration keys
   const fileList = options.globsAll || options.files
   const files = await fs.findAllFiles(fileList, !!options.nocase)
 
@@ -67,4 +65,4 @@ async function largeFile(fs, options, not = false) {
   return new Result('Large file(s) found:', filteredResults, passed)
 }
 
-module.exports = largeFile
+export default largeFile

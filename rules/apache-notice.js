@@ -1,8 +1,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const fileExistence = require('./file-existence')
-module.exports = function (fileSystem) {
+import fileExistence from './file-existence.js'
+
+export default function (fileSystem) {
   return fileExistence(fileSystem, {
     globsAny: ['NOTICE*'],
     'fail-message':

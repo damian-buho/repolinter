@@ -1,10 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const spawnSync = require('child_process').spawnSync
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import { spawnSync } from 'child_process'
+import Result from '../lib/result.js'
 
 function grepLog(fileSystem, options) {
   const args = [
@@ -13,8 +11,9 @@ function grepLog(fileSystem, options) {
     'log',
     '--all',
     '--format=full',
-    '-E'
-  ].concat(options.denylist.map(pattern => `--grep=${pattern}`))
+    '-E',
+    ...options.denylist.map(pattern => `--grep=${pattern}`)
+  ]
   if (options.ignoreCase) {
     args.push('-i')
   }
@@ -22,20 +21,12 @@ function grepLog(fileSystem, options) {
   return parseLog(log)
 }
 
-/**
- * @param log
- * @ignore
- */
 function parseLog(log) {
   const logEntries = log.split('\ncommit ').filter(x => !!x)
 
   return logEntries.map(entry => extractInfo(entry))
 }
 
-/**
- * @param commit
- * @ignore
- */
 function extractInfo(commit) {
   const [hash, , , ...message] = commit.split('\n')
   return {
@@ -44,15 +35,7 @@ function extractInfo(commit) {
   }
 }
 
-/**
- *
- * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
- * @param {object} options The rule configuration
- * @returns {Result} The lint rule result
- * @ignore
- */
 function gitGrepLog(fs, options) {
-  // backwards compatibility with blacklist
   options.denylist = options.denylist || options.blacklist
 
   const commits = grepLog(fs, options)
@@ -83,4 +66,4 @@ function gitGrepLog(fs, options) {
   return new Result('', targets, false)
 }
 
-module.exports = gitGrepLog
+export default gitGrepLog

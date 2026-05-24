@@ -3,16 +3,16 @@
 
 /** @module repolinter */
 
-const path = require('path')
-const fs = require('fs')
-const config = require('./lib/config')
-const Result = require('./lib/result')
-const RuleInfo = require('./lib/ruleinfo')
-const FormatResult = require('./lib/formatresult')
-const FileSystem = require('./lib/file_system')
-const Rules = require('./rules/rules')
-const Fixes = require('./fixes/fixes')
-const Axioms = require('./axioms/axioms')
+import path from 'path'
+import fs from 'fs'
+import * as config from './lib/config.js'
+import Result from './lib/result.js'
+import RuleInfo from './lib/ruleinfo.js'
+import FormatResult from './lib/formatresult.js'
+import FileSystem from './lib/file_system.js'
+import Rules from './rules/rules.js'
+import Fixes from './fixes/fixes.js'
+import Axioms from './axioms/axioms.js'
 
 /**
  * @typedef {Object} Formatter
@@ -22,56 +22,31 @@ const Axioms = require('./axioms/axioms')
 /**
  * This formatter outputs the LintResult CLI style, including
  * colors on supported platforms.
- * ```console
- * ✔ license-file-exists: found (LICENSE)
- * ✔ readme-file-exists: found (README.md)
- * ✔ contributing-file-exists: found (CONTRIBUTING)
- * ✔ code-of-conduct-file-exists: found (CODE-OF-CONDUCT)
- * ✔ changelog-file-exists: found (CHANGELOG)
- * ✔ readme-references-license: File README.md contains license
- * ✔ license-detectable-by-licensee: Licensee identified the license for project: Apache License 2.0
- * ✔ test-directory-exists: found (tests)
- * ✔ integrates-with-ci: found (.travis.yml)
- * ✔ source-license-headers-exist: The first 5 lines of 'index.js' contain all of the requested patterns.
- * ...
- * ✔ github-issue-template-exists: found (ISSUE_TEMPLATE)
- * ✔ github-pull-request-template-exists: found (PULL_REQUEST_TEMPLATE)
- * ✔ package-metadata-exists: found (Gemfile)
- * ✔ package-metadata-exists: found (package.json)
- * ```
  *
  * @type {Formatter}
  */
-module.exports.defaultFormatter = require('./formatters/symbol_formatter')
+import defaultFormatter from './formatters/symbol_formatter.js'
+export { defaultFormatter }
 
 /**
  * This formatter outputs the raw JSON string of the LintResult object.
  *
  * @type {Formatter}
  */
-module.exports.jsonFormatter = require('./formatters/json_formatter')
+import jsonFormatter from './formatters/json_formatter.js'
+export { jsonFormatter }
 
 /**
  * This formatter outputs a markdown document designed to created into
  * a GitHub issue or similar.
- * ```markdown
- * # Repolinter Report
- *
- * This Repolinter run generated the following results:
- * | ❗  Error | ❌  Fail | ⚠️  Warn | ✅  Pass | Ignored | Total |
- * |---|---|---|---|---|---|
- * | 0 | 0 | 0 | 15 | 10 | 25 |
- * ...
- * ```
- * You can also specify formatOptions.disclaimer to include a disclaimer
- * at the top of the markdown document.
  *
  * @type {Formatter}
  */
-module.exports.markdownFormatter = require('./formatters/markdown_formatter')
+import markdownFormatter from './formatters/markdown_formatter.js'
+export { markdownFormatter }
 
 /** The same as defaultFormatter @type {Formatter} */
-module.exports.resultFormatter = exports.defaultFormatter
+export const resultFormatter = defaultFormatter
 
 /**
  * @typedef {Object} LintResult
@@ -108,7 +83,7 @@ module.exports.resultFormatter = exports.defaultFormatter
  * @param {boolean} [dryRun] If true, repolinter will report suggested fixes, but will make no disk modifications.
  * @returns {Promise<LintResult>} An object representing the output of the linter
  */
-async function lint(
+export async function lint(
   targetDir,
   filterPaths = [],
   ruleset = null,
@@ -135,10 +110,16 @@ async function lint(
       } else {
         if (fs.existsSync(path.resolve(targetDir, ruleset))) {
           rulesetPath = path.resolve(targetDir, ruleset)
-        } else if (fs.existsSync(path.resolve(__dirname, ruleset))) {
-          rulesetPath = path.resolve(__dirname, ruleset)
         } else {
-          rulesetPath = null
+          const herePath = path.join(
+            path.dirname(new URL(import.meta.url).pathname),
+            ruleset
+          )
+          if (fs.existsSync(herePath)) {
+            rulesetPath = herePath
+          } else {
+            rulesetPath = null
+          }
         }
       }
     } else if (!ruleset) {
@@ -168,7 +149,6 @@ async function lint(
     }
   }
 
-  // validate config
   const val = await config.validateConfig(ruleset)
   if (!val.passed) {
     return {
@@ -187,16 +167,12 @@ async function lint(
       formatOptions: ruleset.formatOptions
     }
   }
-  // parse it
   const configParsed = config.parseConfig(ruleset)
-  // determine axiom targets
   /** @ignore @type {Object.<string, Result>} */
   let targetObj = {}
-  // Identify axioms and execute them
   if (ruleset.axioms) {
     targetObj = await determineTargets(ruleset.axioms, fileSystem)
   }
-  // execute ruleset
   const result = await runRuleset(configParsed, targetObj, fileSystem, dryRun)
   const passed = !result.find(
     r =>
@@ -206,7 +182,6 @@ async function lint(
         !r.lintResult.passed)
   )
 
-  // render all the results
   const allFormatInfo = {
     params: {
       targetDir,
@@ -226,29 +201,20 @@ async function lint(
 
 /**
  * Checks a rule's list of axioms against a list of valid
- * targets, and determines if the rule should run or not
- * based on the following rules criteria:
- * * The rule's list has a direct match on a target OR
- * * The rule specifies a numerical axiom (ex. >) and the target
- *   list contains a target that matches that axiom.
- *
- * Supported numerical axioms are >, <, >=, <=, and = Only
+ * targets, and determines if the rule should run or not.
  *
  * @memberof repolinter
  * @param {string[]} validTargets The axiom target list in "target=thing" format, including the wildcard entry ("target=*").
- * For numerical targets it is assumed that only one entry and the wildcard are present (e.g. ["target=2", "target=3", "target=*"] is invalid)
  * @param {string[]} ruleAxioms The rule "where" specification to validate against.
- * @returns {string[]} The list pf unsatisfied axioms, if any. Empty array indicates the rule should run.
+ * @returns {string[]} The list of unsatisfied axioms, if any. Empty array indicates the rule should run.
  */
-function shouldRuleRun(validTargets, ruleAxioms) {
-  // parse out numerical axioms, splitting them by name, operand, and number
+export function shouldRuleRun(validTargets, ruleAxioms) {
   const ruleRegex = /([\w-]+)((?:>|<)=?)(\d+)/i
   const numericalRuleAxioms = []
   const regularRuleAxioms = []
   for (const ruleax of ruleAxioms) {
     const match = ruleRegex.exec(ruleax)
     if (match !== null && match[1] && match[2] && !isNaN(parseInt(match[3]))) {
-      // parse the numerical version
       numericalRuleAxioms.push({
         axiom: ruleax,
         name: match[1],
@@ -256,29 +222,21 @@ function shouldRuleRun(validTargets, ruleAxioms) {
         number: parseInt(match[3])
       })
     } else {
-      // parse the non-numerical version
       regularRuleAxioms.push(ruleax)
     }
   }
-  // test that every non-number axiom matches a target
-  // start a list of condidions that don't pass
   const table = new Set(validTargets)
   const failedRuleAxioms = regularRuleAxioms.filter(r => !table.has(r))
-  // check the numbered axioms
-  // convert the targets into { targetName: number } for all numerical ones
   const numericalTargets = validTargets
     .map(r => r.split('='))
-    .map(([name, maybeNumber]) => [name, parseInt(maybeNumber)])
-    .filter(([name, maybeNumber]) => !isNaN(maybeNumber))
+    .map(([targetName, maybeNumber]) => [targetName, parseInt(maybeNumber)])
+    .filter(([, maybeNumber]) => !isNaN(maybeNumber))
   /** @ts-ignore */
   const numericalTargetsMap = new Map(numericalTargets)
-  // test each numerical Rule against it's numerical axiom, return the axioms that failed
   return numericalRuleAxioms
-    .filter(({ axiom, name, operand, number }) => {
-      // get the number to test against
+    .filter(({ name, operand, number }) => {
       const target = numericalTargetsMap.get(name)
       if (target === undefined) return true
-      // test the number based on the operand
       return !(
         (operand === '<' && target < number) ||
         (operand === '<=' && target <= number) ||
@@ -301,29 +259,23 @@ function shouldRuleRun(validTargets, ruleAxioms) {
  * @param {boolean} dryRun If true, repolinter will report suggested fixes, but will make no disk modifications.
  * @returns {Promise<FormatResult[]>} Objects indicating the result of the linter rules
  */
-async function runRuleset(ruleset, targets, fileSystem, dryRun) {
-  // generate a flat array of axiom string identifiers
+export async function runRuleset(ruleset, targets, fileSystem, dryRun) {
   /** @ignore @type {string[]} */
   let targetArray = []
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
-      // restricted to only passed axioms
-      .filter(([axiomId, res]) => res.passed)
-      // pair the axiom ID with the axiom target array
+      .filter(([, res]) => res.passed)
       .map(([axiomId, res]) => [axiomId, res.targets.map(t => t.path)])
-      // join the target arrays together into one array of all the targets
-      .map(([axiomId, paths]) =>
-        [`${axiomId}=*`].concat(paths.map(p => `${axiomId}=${p}`))
-      )
+      .map(([axiomId, paths]) => [
+        `${axiomId}=*`,
+        ...paths.map(p => `${axiomId}=${p}`)
+      ])
       .reduce((a, c) => a.concat(c), [])
   }
-  // run the ruleset
   const results = ruleset.map(async r => {
-    // check axioms and enable appropriately
     if (r.level === 'off') {
       return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
     }
-    // filter to only targets with no matches
     if (typeof targets !== 'boolean' && r.where && r.where.length) {
       const ignoreReasons = shouldRuleRun(targetArray, r.where)
       if (ignoreReasons.length > 0) {
@@ -335,15 +287,12 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
         )
       }
     }
-    // check if the rule file exists
-    if (!Object.prototype.hasOwnProperty.call(Rules, r.ruleType)) {
+    if (!Object.hasOwn(Rules, r.ruleType)) {
       return FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
     }
     let result
     try {
-      // load the rule
       const ruleFunc = Rules[r.ruleType]
-      // run the rule!
       result = await ruleFunc(fileSystem, r.ruleConfig)
     } catch (e) {
       return FormatResult.CreateError(
@@ -351,17 +300,13 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
         `${r.ruleType} threw an error: ${e.message}`
       )
     }
-    // generate fix targets
     const fixTargets = !result.passed
       ? result.targets.filter(t => !t.passed && t.path).map(t => t.path)
       : []
-    // if there's no fix or the rule passed, we're done
     if (!r.fixType || result.passed) {
       return FormatResult.CreateLintOnly(r, result)
     }
-    // else run the fix
-    // check if the rule file exists
-    if (!Object.prototype.hasOwnProperty.call(Fixes, r.fixType)) {
+    if (!Object.hasOwn(Fixes, r.fixType)) {
       return FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
     }
     let fixresult
@@ -374,7 +319,6 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
         `${r.fixType} threw an error: ${e.message}`
       )
     }
-    // all done! return the final format object
     return FormatResult.CreateLintAndFix(r, result, fixresult)
   })
 
@@ -390,12 +334,10 @@ async function runRuleset(ruleset, targets, fileSystem, dryRun) {
  * @param {FileSystem} fs The filesystem to run axioms against
  * @returns {Promise<Object.<string, Result>>} An object representing axiom name: axiom results. The array will be null if the axiom could not run.
  */
-async function determineTargets(axiomconfig, fs) {
-  // load axioms
+export async function determineTargets(axiomconfig, fs) {
   const ruleresults = await Promise.all(
     Object.entries(axiomconfig).map(async ([axiomId, axiomName]) => {
-      // Execute axiom if it exists
-      if (!Object.prototype.hasOwnProperty.call(Axioms, axiomId)) {
+      if (!Object.hasOwn(Axioms, axiomId)) {
         return [
           axiomName,
           new Result(`invalid axiom name ${axiomId}`, [], false)
@@ -405,20 +347,12 @@ async function determineTargets(axiomconfig, fs) {
       return [axiomName, await axiomFunction(fs)]
     })
   )
-  // flatten result
   return ruleresults.reduce((a, [k, v]) => {
     a[k] = v
     return a
   }, {})
 }
 
-module.exports.runRuleset = runRuleset
-module.exports.determineTargets = determineTargets
-module.exports.validateConfig = config.validateConfig
-module.exports.parseConfig = config.parseConfig
-module.exports.shouldRuleRun = shouldRuleRun
-module.exports.lint = lint
-module.exports.Result = Result
-module.exports.RuleInfo = RuleInfo
-module.exports.FileSystem = FileSystem
-module.exports.FormatResult = FormatResult
+export const validateConfig = config.validateConfig
+export const parseConfig = config.parseConfig
+export { Result, RuleInfo, FileSystem, FormatResult }

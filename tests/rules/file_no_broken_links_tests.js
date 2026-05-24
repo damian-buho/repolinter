@@ -1,16 +1,19 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-const chai = require('chai')
-const nock = require('nock')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
-const commandExists = require('command-exists').sync
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { expect } from 'chai'
+import nock from 'nock'
+import FileSystem from '../../lib/file_system.js'
+import commandExists from 'command-exists'
+import fileNoBrokenLinks from '../../rules/file-no-broken-links.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('rule', () => {
   describe('files_no_broken_links', function () {
-    const gitHubMarkupInstalled = commandExists('github-markup')
-    const fileNoBrokenLinks = require('../../rules/file-no-broken-links')
+    const gitHubMarkupInstalled = commandExists.sync('github-markup')
     const targetDir = `${__dirname}/markup_test_files`
     const testFs = new FileSystem(targetDir)
 

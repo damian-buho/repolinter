@@ -1,15 +1,18 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-chai.use(require('chai-each'))
-chai.use(require('chai-string').default)
-const expect = chai.expect
+import { expect, use as chaiUse, should as chaiShould } from 'chai'
+import sinon from 'sinon'
+import FileSystem from '../../lib/file_system.js'
+import GitHelper from '../../lib/git_helper.js'
+import gitListTree from '../../rules/git-list-tree.js'
+import chaiEach from 'chai-each'
+import chaiString from 'chai-string'
+
+chaiUse(chaiEach)
+chaiUse(chaiString)
 // eslint-disable-next-line no-unused-vars
-const should = chai.should()
-const sinon = require('sinon')
-const FileSystem = require('../../lib/file_system')
-const GitHelper = require('../../lib/git_helper')
+const should = chaiShould()
 
 describe('rule', () => {
   describe('git_list_tree', function () {
@@ -26,7 +29,6 @@ describe('rule', () => {
     after(function () {
       GitHelper.gitAllCommits.restore()
     })
-    const gitListTree = require('../../rules/git-list-tree')
     const PATH_WRONG_CASE = 'rules/git-list-TREE\\.js'
 
     it('passes if the denylist pattern does not match any path', () => {

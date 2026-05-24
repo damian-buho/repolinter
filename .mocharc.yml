@@ -1,2 +1,2 @@
 spec:
-  - "tests/**/*.{js,mjs}"
+  - "tests/**/*.js"

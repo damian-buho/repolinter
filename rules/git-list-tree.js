@@ -1,27 +1,15 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const spawnSync = require('child_process').spawnSync
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
-const GitHelper = require('../lib/git_helper')
+import { spawnSync } from 'child_process'
+import Result from '../lib/result.js'
+import GitHelper from '../lib/git_helper.js'
 
-/**
- * @param targetDir
- * @param commit
- * @ignore
- */
 function gitFilesAtCommit(targetDir, commit) {
   const args = ['-C', targetDir, 'ls-tree', '-r', '--name-only', commit]
   return spawnSync('git', args).stdout.toString().split('\n')
 }
 
-/**
- * @param fileSystem
- * @param options
- * @ignore
- */
 function listFiles(fileSystem, options) {
   const files = []
 
@@ -47,15 +35,7 @@ function listFiles(fileSystem, options) {
   return files
 }
 
-/**
- *
- * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
- * @param {object} options The rule configuration
- * @returns {Result} The lint rule result
- * @ignore
- */
 function gitListTree(fs, options) {
-  // backwards compatibility with blacklist
   options.denylist = options.denylist || options.blacklist
 
   const files = listFiles(fs, options)
@@ -90,4 +70,4 @@ function gitListTree(fs, options) {
   return new Result('', targets, false)
 }
 
-module.exports = gitListTree
+export default gitListTree

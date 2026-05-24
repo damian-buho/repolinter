@@ -1,14 +1,12 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const nock = require('nock')
-const chai = require('chai')
-const expect = chai.expect
+import nock from 'nock'
+import { expect } from 'chai'
+import fileModify from '../../fixes/file-modify.js'
 
 describe('fixes', () => {
   describe('file-modify', () => {
-    const fileModify = require('../../fixes/file-modify')
-
     it('appends text to a file', async () => {
       const opts = {
         files: ['myfile'],

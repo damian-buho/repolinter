@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 /**
  * Create a new file, or replace a files contents
@@ -16,7 +14,6 @@ const FileSystem = require('../lib/file_system')
  * @ignore
  */
 async function fileCreate(fs, options, targets, dryRun = false) {
-  // check if the file exists and error if necessary
   const exists =
     targets.length > 0 || (await fs.relativeFileExists(options.file))
   if (!options.replace && exists) {
@@ -46,7 +43,6 @@ async function fileCreate(fs, options, targets, dryRun = false) {
     )
   }
 
-  // read the text from the source, if necessary
   let content
   if (typeof options.text === 'string') {
     content = options.text
@@ -86,11 +82,9 @@ async function fileCreate(fs, options, targets, dryRun = false) {
 
   const shouldRemove = options.replace && targets.length > 0
   if (!dryRun) {
-    // delete the old files if necessary
     if (shouldRemove) {
       await Promise.all(targets.map(t => fs.removeFile(t)))
     }
-    // write it to the file
     await fs.setFileContents(options.file, content)
   }
 
@@ -109,10 +103,11 @@ async function fileCreate(fs, options, targets, dryRun = false) {
   return new Result(
     '',
     [
-      { message: `Create file with ${what}`, passed: true, path: options.file }
-    ].concat(removeTargets),
+      { message: `Create file with ${what}`, passed: true, path: options.file },
+      ...removeTargets
+    ],
     true
   )
 }
 
-module.exports = fileCreate
+export default fileCreate

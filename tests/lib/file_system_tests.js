@@ -1,15 +1,16 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const path = require('path')
-const chai = require('chai')
-const expect = chai.expect
-const realFs = require('fs')
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { expect } from 'chai'
+import realFs from 'fs'
+import FileSystem from '../../lib/file_system.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
   describe('file_system', function () {
-    const FileSystem = require('../../lib/file_system')
-
     this.timeout(10000)
 
     describe('fileExists', () => {
@@ -87,7 +88,7 @@ describe('lib', () => {
     describe('findAllFiles', () => {
       it('should ignore symlinks for ** globs', async () => {
         const symlink = './tests/lib/symlink_for_test'
-        const stats = require('fs').lstatSync(symlink)
+        const stats = realFs.lstatSync(symlink)
         expect(stats.isSymbolicLink()).to.equal(true)
         const fs = new FileSystem(path.resolve('./tests'))
         const files = await fs.findAllFiles('**/lib/symlink_for_test', false)

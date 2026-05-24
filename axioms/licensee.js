@@ -1,10 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-const licensee = require('../lib/licensee')
-const Result = require('../lib/result')
+import licensee from '../lib/licensee.js'
+import Result from '../lib/result.js'
 
-module.exports = async function (fileSystem) {
+export default async function (fileSystem) {
   let licenses = []
   try {
     licenses = await licensee.identifyLicense(fileSystem.targetDir)

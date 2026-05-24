@@ -1,9 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const { commandExists } = require('../../lib/command_exists')
+import { expect } from 'chai'
+import { commandExists } from '../../lib/command_exists.js'
 
 describe('lib', () => {
   describe('command_exists', function () {

@@ -1,14 +1,12 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import { expect } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import largeFile from '../../rules/large-file.js'
 
 describe('rule', () => {
   describe('largeFile', () => {
-    const largeFile = require('../../rules/large-file')
-
     it('returns a passed result if file is smaller than threshold size.', async () => {
       const ruleOptions = {
         // file size ~41KB

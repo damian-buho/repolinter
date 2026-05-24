@@ -1,1 +1,1 @@
-@node %~dpn0.js %*
+@node %~dp0\repolinter.js %*

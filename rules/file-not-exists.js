@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 /**
  * Check if a file is not present in the repository. Fails on the first file
@@ -42,4 +40,4 @@ async function fileNotExistence(fs, options) {
       )
 }
 
-module.exports = fileNotExistence
+export default fileNotExistence

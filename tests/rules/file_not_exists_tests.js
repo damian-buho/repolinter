@@ -1,13 +1,11 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import fileNotExists from '../../rules/file-not-exists.js'
 
 describe('rule', () => {
   describe('files_not_exists', () => {
-    const fileNotExists = require('../../rules/file-not-exists')
-
     it('returns a passed result if no files exist', async () => {
       /** @type {any} */
       const mockfs = {

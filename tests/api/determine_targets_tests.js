@@ -1,10 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const path = require('path')
-const expect = chai.expect
-const repolinter = require(path.resolve('.'))
+import { expect } from 'chai'
+import * as repolinter from '../../index.js'
 
 describe('api', () => {
   describe('determineTargets', () => {

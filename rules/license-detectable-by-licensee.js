@@ -1,10 +1,8 @@
 // Copyright 2018 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const licensee = require('../lib/licensee')
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import licensee from '../lib/licensee.js'
+import Result from '../lib/result.js'
 
 /**
  * Check if the repository licence can be detected by the licensee tool
@@ -27,7 +25,6 @@ async function licenceDetect(fs) {
   result.passed = licenses.length > 0
   result.message = (() => {
     if (result.passed) {
-      // License: Apache License 2.0
       const identified = licenses[0]
       return `Licensee identified the license for project: ${identified}`
     } else {
@@ -38,4 +35,4 @@ async function licenceDetect(fs) {
   return result
 }
 
-module.exports = licenceDetect
+export default licenceDetect

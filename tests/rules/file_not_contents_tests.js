@@ -1,14 +1,14 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import fs from 'fs'
+import path from 'path'
+import { expect } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import fileNotContents from '../../rules/file-not-contents.js'
 
 describe('rule', () => {
   describe('files_not_contents', () => {
-    const fileNotContents = require('../../rules/file-not-contents')
-
     it('returns passes if requested file content do not exist', async () => {
       /** @type {any} */
       const mockfs = {
@@ -109,16 +109,16 @@ describe('rule', () => {
 
     it('should handle broken symlinks', async () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      const stat = require('fs').lstatSync(brokenSymlink)
+      const stat = fs.lstatSync(brokenSymlink)
       expect(stat.isSymbolicLink()).to.equal(true)
-      const fs = new FileSystem(require('path').resolve('.'))
+      const fsInstance = new FileSystem(path.resolve('.'))
 
       const ruleopts = {
         globsAll: [brokenSymlink],
         lineCount: 1,
         content: 'something'
       }
-      const actual = await fileNotContents(fs, ruleopts)
+      const actual = await fileNotContents(fsInstance, ruleopts)
       expect(actual.passed).to.equal(true)
     })
 

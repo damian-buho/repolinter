@@ -1,13 +1,18 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const nock = require('nock')
-const expect = chai.expect
+import { expect } from 'chai'
+import nock from 'nock'
 
 describe('rule', () => {
   describe('Best Practices Badge', () => {
-    const BestpracticesBadgePresent = require('../../rules/best-practices-badge-present')
+    let BestpracticesBadgePresent
+
+    before(async () => {
+      BestpracticesBadgePresent = (
+        await import('../../rules/best-practices-badge-present.js')
+      ).default
+    })
 
     it('fails if readme is missing', async () => {
       const mockfs = {

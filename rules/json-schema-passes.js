@@ -1,10 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-const Ajv = require('ajv')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
+import Ajv from 'ajv'
 
 /**
  * Check if a file matches a given JSON schema
@@ -25,12 +23,10 @@ async function jsonSchemaPasses(fs, options) {
       !!options['succeed-on-non-existent']
     )
   }
-  // get the file contents
   let fileContents = await fs.getFileContents(file)
   if (fileContents === undefined) {
     fileContents = ''
   }
-  // parse them as JSON
   let parsed
   try {
     parsed = JSON.parse(fileContents)
@@ -48,7 +44,6 @@ async function jsonSchemaPasses(fs, options) {
       false
     )
   }
-  // validate the JSON
   const validator = new Ajv({ strict: false }).compile(options.schema)
   if (validator.errors) {
     throw new Error(
@@ -77,4 +72,4 @@ async function jsonSchemaPasses(fs, options) {
   )
 }
 
-module.exports = jsonSchemaPasses
+export default jsonSchemaPasses

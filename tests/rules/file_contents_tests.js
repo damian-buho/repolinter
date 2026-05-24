@@ -1,14 +1,14 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import fs from 'fs'
+import path from 'path'
+import { expect } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import fileContents from '../../rules/file-contents.js'
 
 describe('rule', () => {
   describe('files_contents', () => {
-    const fileContents = require('../../rules/file-contents')
-
     it('returns passes if requested file contents exists', async () => {
       /** @type {any} */
       const mockfs = {
@@ -195,16 +195,16 @@ describe('rule', () => {
 
     it('should handle broken symlinks', async () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      const stat = require('fs').lstatSync(brokenSymlink)
+      const stat = fs.lstatSync(brokenSymlink)
       expect(stat.isSymbolicLink()).to.equal(true)
-      const fs = new FileSystem(require('path').resolve('.'))
+      const fsInstance = new FileSystem(path.resolve('.'))
 
       const rule = {
         globsAll: [brokenSymlink],
         lineCount: 1,
         patterns: ['something']
       }
-      const actual = await fileContents(fs, rule)
+      const actual = await fileContents(fsInstance, rule)
       expect(actual.passed).to.equal(true)
     })
   })

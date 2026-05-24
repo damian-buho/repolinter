@@ -1,24 +1,44 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-module.exports = {
-  'apache-notice': require('./apache-notice'),
-  'best-practices-badge-present': require('./best-practices-badge-present'),
-  'directory-existence': require('./directory-existence'),
-  'file-contents': require('./file-contents'),
-  'file-existence': require('./file-existence'),
-  'file-hash': require('./file-hash'),
-  'file-hashes-not-exist': require('./file-hashes-not-exist'),
-  'file-no-broken-links': require('./file-no-broken-links'),
-  'file-not-contents': require('./file-not-contents'),
-  'file-not-exists': require('./file-not-exists'),
-  'file-starts-with': require('./file-starts-with'),
-  'file-type-exclusion': require('./file-type-exclusion'),
-  'git-grep-commits': require('./git-grep-commits'),
-  'git-grep-log': require('./git-grep-log'),
-  'git-list-tree': require('./git-list-tree'),
-  'git-working-tree': require('./git-working-tree'),
-  'large-file': require('./large-file'),
-  'license-detectable-by-licensee': require('./license-detectable-by-licensee'),
-  'json-schema-passes': require('./json-schema-passes')
+import apacheNotice from './apache-notice.js'
+import bestPracticesBadgePresent from './best-practices-badge-present.js'
+import directoryExistence from './directory-existence.js'
+import fileContents from './file-contents.js'
+import fileExistence from './file-existence.js'
+import fileHash from './file-hash.js'
+import fileHashesNotExist from './file-hashes-not-exist.js'
+import fileNoBrokenLinks from './file-no-broken-links.js'
+import fileNotContents from './file-not-contents.js'
+import fileNotExists from './file-not-exists.js'
+import fileStartsWith from './file-starts-with.js'
+import fileTypeExclusion from './file-type-exclusion.js'
+import gitGrepCommits from './git-grep-commits.js'
+import gitGrepLog from './git-grep-log.js'
+import gitListTree from './git-list-tree.js'
+import gitWorkingTree from './git-working-tree.js'
+import largeFile from './large-file.js'
+import licenseDetectableByLicensee from './license-detectable-by-licensee.js'
+import jsonSchemaPasses from './json-schema-passes.js'
+
+export default {
+  'apache-notice': apacheNotice,
+  'best-practices-badge-present': bestPracticesBadgePresent,
+  'directory-existence': directoryExistence,
+  'file-contents': fileContents,
+  'file-existence': fileExistence,
+  'file-hash': fileHash,
+  'file-hashes-not-exist': fileHashesNotExist,
+  'file-no-broken-links': fileNoBrokenLinks,
+  'file-not-contents': fileNotContents,
+  'file-not-exists': fileNotExists,
+  'file-starts-with': fileStartsWith,
+  'file-type-exclusion': fileTypeExclusion,
+  'git-grep-commits': gitGrepCommits,
+  'git-grep-log': gitGrepLog,
+  'git-list-tree': gitListTree,
+  'git-working-tree': gitWorkingTree,
+  'large-file': largeFile,
+  'license-detectable-by-licensee': licenseDetectableByLicensee,
+  'json-schema-passes': jsonSchemaPasses
 }

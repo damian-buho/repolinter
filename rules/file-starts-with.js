@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 /**
  * Check that a list of files does not contain a regular expression.
@@ -27,7 +25,6 @@ async function fileStartsWith(fs, options) {
     const extensions = options['skip-paths-matching'].extensions
     if (extensions && extensions.length > 0) {
       const extJoined = extensions.join('|')
-      // \.(svg|png|exe)$
       regexes.push(new RegExp('.(' + extJoined + ')$', 'i'))
     }
 
@@ -36,7 +33,7 @@ async function fileStartsWith(fs, options) {
       const filteredPatterns = patterns
         .filter(p => typeof p === 'string' && p !== '')
         .map(p => new RegExp(p, options['skip-paths-matching'].flags))
-      regexes = regexes.concat(filteredPatterns)
+      regexes = [...regexes, ...filteredPatterns]
     }
     filteredFiles = filteredFiles.filter(
       file => !regexes.some(regex => file.match(regex))
@@ -87,4 +84,4 @@ async function fileStartsWith(fs, options) {
   return new Result('', targets, passed)
 }
 
-module.exports = fileStartsWith
+export default fileStartsWith

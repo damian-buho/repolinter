@@ -1,18 +1,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const spawnSync = require('child_process').spawnSync
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import { spawnSync } from 'child_process'
+import Result from '../lib/result.js'
 
-/**
- *
- * @param {FileSystem} fs A filesystem object configured with filter paths and target directories
- * @param {object} options The rule configuration
- * @returns {Result} The lint rule result
- * @ignore
- */
 function gitWorkingTree(fs, options) {
   const args = ['-C', fs.targetDir, 'rev-parse', '--show-prefix']
   const gitResult = spawnSync('git', args)
@@ -41,4 +32,4 @@ function gitWorkingTree(fs, options) {
   }
 }
 
-module.exports = gitWorkingTree
+export default gitWorkingTree

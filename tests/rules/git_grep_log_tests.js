@@ -1,17 +1,17 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import { expect, use as chaiUse } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import gitGrepLog from '../../rules/git-grep-log.js'
+import chaiString from 'chai-string'
 
-chai.use(require('chai-string').default)
+chaiUse(chaiString)
 
 describe('rule', () => {
   describe('git_grep_log', function () {
     this.timeout(30000) // Calling external Git might take some time.
 
-    const gitGrepLog = require('../../rules/git-grep-log')
     const LOG_WRONG_CASE =
       'THE GIT RULESET CONTAINS TWO NEW RULES THAT SEARCH THE COMMIT MESSAGES'
 

@@ -2,11 +2,26 @@
   "name": "repolinter",
   "version": "0.12.0",
   "description": "Lint open source repositories",
+  "type": "module",
   "main": "index.js",
   "types": "index.d.ts",
-  "bin": {
-    "repolinter": "bin/repolinter.mjs"
+  "exports": {
+    ".": "./index.js"
   },
+  "bin": {
+    "repolinter": "bin/repolinter.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "bin/repolinter.js",
+    "lib/",
+    "rules/",
+    "fixes/",
+    "axioms/",
+    "formatters/",
+    "rulesets/"
+  ],
   "engines": {
     "node": ">=20.12.0"
   },
@@ -35,7 +50,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/todogroup/repolinter.git"
+    "url": "git+https://github.com/todogroup/repolinter.git"
   },
   "prettier": {
     "arrowParens": "avoid",

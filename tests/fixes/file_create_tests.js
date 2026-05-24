@@ -1,14 +1,12 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const nock = require('nock')
-const chai = require('chai')
-const expect = chai.expect
+import nock from 'nock'
+import { expect } from 'chai'
+import fileCreate from '../../fixes/file-create.js'
 
 describe('fixes', () => {
   describe('file-create', () => {
-    const fileCreate = require('../../fixes/file-create')
-
     it('creates a file', async () => {
       const opts = {
         file: 'myfile',

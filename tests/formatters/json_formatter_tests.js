@@ -1,20 +1,16 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const FormatResult = require('../../lib/formatresult')
-const RuleInfo = require('../../lib/ruleinfo')
-const Result = require('../../lib/result')
-const expect = chai.expect
-// eslint-disable-next-line no-unused-vars
-const should = chai.should()
+import { expect } from 'chai'
+import jsonFormatter from '../../formatters/json_formatter.js'
+import FormatResult from '../../lib/formatresult.js'
+import RuleInfo from '../../lib/ruleinfo.js'
+import Result from '../../lib/result.js'
 
 describe('formatters', () => {
   describe('json_formatter', () => {
     // TODO: Fix this test after fixing the formatter
     it('returns a json string with the correct info', () => {
-      const jsonFormatter = require('../../formatters/json_formatter')
-
       /** @type {import('../..').LintResult} */
       const result = {
         passed: true,

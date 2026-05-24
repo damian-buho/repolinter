@@ -1,11 +1,11 @@
-const js = require('@eslint/js')
-const nPlugin = require('eslint-plugin-n').default
-const importPlugin = require('eslint-plugin-import-x')
-const promisePlugin = require('eslint-plugin-promise')
-const prettierRecommended = require('eslint-plugin-prettier/recommended')
-const globals = require('globals')
+import js from '@eslint/js'
+import nPlugin from 'eslint-plugin-n'
+import { flatConfigs } from 'eslint-plugin-import-x'
+import promisePlugin from 'eslint-plugin-promise'
+import prettierRecommended from 'eslint-plugin-prettier/recommended'
+import globals from 'globals'
 
-module.exports = [
+export default [
   {
     ignores: [
       '.nyc_output/',
@@ -17,38 +17,41 @@ module.exports = [
     ]
   },
   js.configs.recommended,
-  nPlugin.configs['flat/recommended-script'],
-  importPlugin.flatConfigs.recommended,
+  nPlugin.configs['flat/recommended-module'],
+  flatConfigs.recommended,
   promisePlugin.configs['flat/recommended'],
   prettierRecommended,
   {
+    files: ['**/*.js'],
+    ignores: ['eslint.config.js'],
     languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'commonjs',
+      ecmaVersion: 2024,
+      sourceType: 'module',
       globals: {
         ...globals.node
       }
     },
     rules: {
-      'n/no-unpublished-require': 'off',
-      'import-x/no-unresolved': ['error', { commonjs: true }]
+      'n/no-unpublished-import': 'off',
+      'n/no-unsupported-features/node-builtins': [
+        'error',
+        {
+          allowExperimental: true
+        }
+      ],
+      'import-x/no-unresolved': 'off'
     }
   },
   {
-    files: ['tests/**/*.{js,mjs}'],
+    files: ['tests/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.mocha
       }
     },
     rules: {
-      'n/no-unpublished-import': 'off'
-    }
-  },
-  {
-    files: ['**/*.mjs'],
-    languageOptions: {
-      sourceType: 'module'
+      'n/no-unpublished-import': 'off',
+      'n/no-missing-import': 'off'
     }
   }
 ]

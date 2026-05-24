@@ -1,7 +1,8 @@
-const Result = require('../lib/result')
-const crypto = require('crypto')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+// Copyright 2017 TODO Group. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+import Result from '../lib/result.js'
+import crypto from 'crypto'
 
 /**
  * Check files' hashes not included in a list of certain cryptographic hashes.
@@ -69,4 +70,4 @@ async function fileHashesNotExist(fs, options) {
   return new Result('File matching has found', results, passed)
 }
 
-module.exports = fileHashesNotExist
+export default fileHashesNotExist

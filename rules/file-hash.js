@@ -1,10 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-const crypto = require('crypto')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
+import crypto from 'crypto'
 
 /**
  * Check if a file matches a certain cryptographic hash.
@@ -46,4 +44,4 @@ async function fileHash(fs, options) {
   return new Result('', [{ path: file, passed, message }], passed)
 }
 
-module.exports = fileHash
+export default fileHash

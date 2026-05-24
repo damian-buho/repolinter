@@ -1,15 +1,13 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import { expect } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import gitWorkingTree from '../../rules/git-working-tree.js'
 
 describe('rule', () => {
   describe('git_working_tree', function () {
     this.timeout(5000) // Calling external Git might take some time.
-
-    const gitWorkingTree = require('../../rules/git-working-tree')
 
     it('passes if the specified directory is managed with Git', () => {
       const result = gitWorkingTree(new FileSystem(), {

@@ -1,13 +1,11 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import fileTypeExclusion from '../../rules/file-type-exclusion.js'
 
 describe('rule', () => {
   describe('file_type_exclusion', () => {
-    const fileTypeExclusion = require('../../rules/file-type-exclusion')
-
     it("returns passed result if requested file type doesn't exist", async () => {
       /** @type {any} */
       const mockfs = {

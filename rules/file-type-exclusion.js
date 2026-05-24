@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 /**
  * Check if a filetype extension is not present in a repository
@@ -31,4 +29,4 @@ async function fileTypeExclusion(fs, options) {
   return new Result('', targets, passed)
 }
 
-module.exports = fileTypeExclusion
+export default fileTypeExclusion

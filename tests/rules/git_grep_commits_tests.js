@@ -1,22 +1,21 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const chaiEach = require('chai-each')
-chai.use(chaiEach)
-const expect = chai.expect
-// eslint-disable-next-line no-unused-vars
-const should = chai.should()
-const sinon = require('sinon')
-const FileSystem = require('../../lib/file_system')
-const GitHelper = require('../../lib/git_helper')
+import { expect, use as chaiUse, should as chaiShould } from 'chai'
+import chaiEach from 'chai-each'
+import sinon from 'sinon'
+import FileSystem from '../../lib/file_system.js'
+import GitHelper from '../../lib/git_helper.js'
+import gitGrepCommits from '../../rules/git-grep-commits.js'
+import chaiString from 'chai-string'
 
-chai.use(require('chai-string').default)
+chaiUse(chaiEach)
+chaiUse(chaiString)
+// eslint-disable-next-line no-unused-vars
+const should = chaiShould()
 
 describe('rule', () => {
   describe('git_grep_commits', function () {
-    const gitGrepCommits = require('../../rules/git-grep-commits')
-
     before(function () {
       const stubValue = [
         '3e66e3ec616d59f813bdb878e1146d03872a096e',

@@ -1,20 +1,16 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
-const { styleText } = require('util')
-const FormatResult = require('../lib/formatresult')
-// eslint-disable-next-line no-unused-vars
-const Result = require('../lib/result')
+import { styleText } from 'util'
+import FormatResult from '../lib/formatresult.js'
 
-/**
- * Pads a string with a space if the string exists,
- * returns the falsey input value otherwise.
- *
- * @private
- * @param {string?} string The string or null input
- * @returns {string} A padded string or empty string
- */
+const logSymbols = {
+  info: '\u2139',
+  success: '\u2714',
+  warning: '\u26A0',
+  error: '\u2716'
+}
+
 function frontSpace(string) {
   return string ? ' ' + string : ''
 }
@@ -25,17 +21,6 @@ function frontSpace(string) {
  * @protected
  */
 class SymbolFormatter {
-  /**
-   * Format a FormatResult object into a line of human-readable text.
-   *
-   * @param {Result} result The result to format, must be valid
-   * @param {string} ruleName The name of the rule this result is from
-   * @param {string} rulePolicyUrl The policyUrl of the rule this result is from
-   * @param {string} rulePolicyInfo The policyInfo of the rule this result is from
-   * @param {string} errorSymbol The symbol to use if the result did not pass
-   * @param {string} okSymbol The symbol to use if the result passed
-   * @returns {string} The formatted string
-   */
   static formatResult(
     result,
     ruleName,
@@ -44,7 +29,6 @@ class SymbolFormatter {
     errorSymbol,
     okSymbol = logSymbols.success
   ) {
-    // format lint output
     let policyLines = ''
     if (!result.passed) {
       if (rulePolicyUrl)
@@ -57,11 +41,9 @@ class SymbolFormatter {
     }  ${ruleName}:${frontSpace(result.message)}${
       !result.passed ? policyLines : ''
     }`
-    // condensed one-line version for rules with no targets
     if (result.targets.length === 0) {
       return formatbase
     }
-    // condensed one-line version for rules with one target
     if (result.targets.length === 1) {
       return (
         formatbase +
@@ -70,7 +52,6 @@ class SymbolFormatter {
         })`
       )
     }
-    // expanded version for more complicated rules
     return (
       formatbase +
       result.targets
@@ -84,12 +65,6 @@ class SymbolFormatter {
     )
   }
 
-  /**
-   * Get the logsymbol associated with a log level (specified in the JSON configuration schema)
-   *
-   * @param {string} level The log level string ("info", "warning", or "error"
-   * @returns {string} A corresponding logsymbol
-   */
   static getSymbol(level) {
     switch (level) {
       case 'info':
@@ -103,12 +78,6 @@ class SymbolFormatter {
     }
   }
 
-  /**
-   *
-   * @param {LintResult} output The linter output to format
-   * @param {boolean} dryRun Whether or not to generate in "report" format
-   * @returns {string} The formatted output
-   */
   static formatOutput(output, dryRun) {
     const ret = [`Target directory: ${output.params.targetDir}`]
     if (output.params.filterPaths.length) {
@@ -121,31 +90,30 @@ class SymbolFormatter {
     if (output.errored) {
       return ret.join('') + `\n${styleText(['bgRed', 'white'], output.errMsg)}`
     }
-    // output axiom errors, if any
     ret.push(
       Object.entries(output.targets)
-        .filter(([k, v]) => v.passed !== true)
+        .filter(([, v]) => v.passed !== true)
         .map(([k, v]) =>
-          styleText('yellow', `\nAxiom ${k} failed to run with error: ${v.message}`)
+          styleText(
+            'yellow',
+            `\nAxiom ${k} failed to run with error: ${v.message}`
+          )
         )
         .join('')
     )
-    // lint section
     ret.push(
       styleText('inverse', '\nLint:') +
         output.results
           .map(result => {
-            // log errors
             if (result.status === FormatResult.ERROR) {
-              return `\n${logSymbols.error} ${styleText(['bgRed', 'white'],
+              return `\n${logSymbols.error} ${styleText(
+                ['bgRed', 'white'],
                 `${result.ruleInfo.name} failed to run:`
               )} ${result.runMessage}`
             }
-            // log ignored rules
             if (result.status === FormatResult.IGNORED) {
               return `\n${logSymbols.info} ${result.ruleInfo.name}: ${result.runMessage}`
             }
-            // log all others
             return SymbolFormatter.formatResult(
               result.lintResult,
               result.ruleInfo.name,
@@ -156,7 +124,6 @@ class SymbolFormatter {
           })
           .join('')
     )
-    // fix section
     const fixresults = output.results.filter(r => r.fixResult)
     if (fixresults.length > 0) {
       ret.push(
@@ -177,4 +144,4 @@ class SymbolFormatter {
   }
 }
 
-module.exports = SymbolFormatter
+export default SymbolFormatter

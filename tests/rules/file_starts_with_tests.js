@@ -1,14 +1,14 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
-const FileSystem = require('../../lib/file_system')
+import fs from 'fs'
+import path from 'path'
+import { expect } from 'chai'
+import FileSystem from '../../lib/file_system.js'
+import fileStartsWith from '../../rules/file-starts-with.js'
 
 describe('rule', () => {
   describe('file-starts-with', () => {
-    const fileStartsWith = require('../../rules/file-starts-with')
-
     it('returns a passed result if requested file matches the patterns', async () => {
       const ruleopts = {
         globsAll: ['rules/file-starts-with.js'],
@@ -145,9 +145,9 @@ describe('rule', () => {
 
     it('should handle broken symlinks', async () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      const stat = require('fs').lstatSync(brokenSymlink)
+      const stat = fs.lstatSync(brokenSymlink)
       expect(stat.isSymbolicLink()).to.equal(true)
-      const fs = new FileSystem(require('path').resolve('.'))
+      const fsInstance = new FileSystem(path.resolve('.'))
 
       const ruleopts = {
         globsAll: [brokenSymlink],
@@ -155,7 +155,7 @@ describe('rule', () => {
         patterns: ['something']
       }
 
-      const actual = await fileStartsWith(fs, ruleopts)
+      const actual = await fileStartsWith(fsInstance, ruleopts)
       expect(actual.passed).to.equal(false)
       expect(actual.targets).to.have.length(1)
       expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])

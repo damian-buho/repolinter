@@ -1,10 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-const linguist = require('../lib/linguist')
-const Result = require('../lib/result')
+import linguist from '../lib/linguist.js'
+import Result from '../lib/result.js'
 
-module.exports = async function (fileSystem) {
+export default async function (fileSystem) {
   const languages = []
   try {
     var jsonObj = await linguist.identifyLanguages(fileSystem.targetDir)

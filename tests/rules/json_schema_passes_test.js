@@ -1,14 +1,14 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-chai.use(require('chai-as-promised').default)
-const expect = chai.expect
+import { expect, use as chaiUse } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import jsonSchemaPasses from '../../rules/json-schema-passes.js'
+
+chaiUse(chaiAsPromised)
 
 describe('rule', () => {
   describe('json_schema_passes', () => {
-    const jsonSchemaPasses = require('../../rules/json-schema-passes')
-
     it('returns passes if requested file matches the schema', async () => {
       /** @type {any} */
       const mockfs = {

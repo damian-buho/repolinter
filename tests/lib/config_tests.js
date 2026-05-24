@@ -1,18 +1,19 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised').default
-const expect = chai.expect
-const path = require('path')
-const fs = require('fs')
-const ServerMock = require('mock-http-server')
-chai.use(chaiAsPromised)
+import { expect, use as chaiUse } from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import * as Config from '../../lib/config.js'
+import fs from 'fs'
+import ServerMock from 'mock-http-server'
+chaiUse(chaiAsPromised)
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
   describe('config', function () {
-    const Config = require('../../lib/config')
-
     this.timeout(10000)
 
     describe('isAbsoluteURL', () => {

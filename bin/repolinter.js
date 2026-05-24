@@ -2,16 +2,14 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { createRequire } from 'module'
 import path from 'path'
 import fs from 'fs'
 import os from 'os'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import simpleGit from 'simple-git'
+import * as repolinter from '../index.js'
 
-const require = createRequire(import.meta.url)
-const repolinter = require('..')
 const git = simpleGit()
 
 yargs(hideBin(process.argv))
@@ -76,7 +74,6 @@ yargs(hideBin(process.argv))
     },
     async argv => {
       let tmpDir = null
-      // temporarily clone a git repo to lint
       if (argv.git) {
         tmpDir = await fs.promises.mkdtemp(
           path.join(os.tmpdir(), 'repolinter-')
@@ -91,14 +88,12 @@ yargs(hideBin(process.argv))
           return
         }
       }
-      // run the linter
       const output = await repolinter.lint(
         tmpDir || path.resolve(process.cwd(), argv.directory),
         argv.allowPaths,
         argv.rulesetUrl || argv.rulesetFile || argv.rulesetEncoded,
         argv.dryRun
       )
-      // create the output
       let formatter
       if (argv.format && argv.format.toLowerCase() === 'json') {
         formatter = repolinter.jsonFormatter
@@ -108,10 +103,8 @@ yargs(hideBin(process.argv))
         formatter = repolinter.defaultFormatter
       }
       const formattedOutput = formatter.formatOutput(output, argv.dryRun)
-      // log it!
       console.log(formattedOutput)
       process.exitCode = output.passed ? 0 : 1
-      // delete the tmpdir if it exists
       if (tmpDir) {
         fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
       }

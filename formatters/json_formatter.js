@@ -18,4 +18,4 @@ class JsonFormatter {
   }
 }
 
-module.exports = JsonFormatter
+export default JsonFormatter

@@ -1,11 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-import { createRequire } from 'module'
 import gitlog from 'gitlog'
-
-const require = createRequire(import.meta.url)
-const Result = require('../lib/result')
+import Result from '../lib/result.js'
 
 export default async function (fileSystem) {
   const commits = await gitlog({

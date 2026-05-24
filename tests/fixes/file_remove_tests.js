@@ -1,13 +1,11 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import fileRemove from '../../fixes/file-remove.js'
 
 describe('fixes', () => {
   describe('file-remove', () => {
-    const fileRemove = require('../../fixes/file-remove')
-
     it('removes a file', async () => {
       const removePaths = []
       /** @type {any} */

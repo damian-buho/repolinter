@@ -1,10 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
-const fileContents = require('./file-contents')
+import Result from '../lib/result.js'
+import fileContents from './file-contents.js'
 
 /**
  * Check that a list of files does not contain regular expression(s).
@@ -15,19 +13,10 @@ const fileContents = require('./file-contents')
  * @ignore
  */
 async function fileNotContents(fs, options) {
-  /**
-   * Found options.content, check for single regular expression match
-   * @ignore
-   */
   if (options.content && !options.contents) {
     return fileContents(fs, options, true)
   }
 
-  /**
-   * Found options.contents, check for regular expressions matches
-   * @type {Awaited<number>[]}
-   * @ignore
-   */
   const results = await Promise.all(
     options.contents.map(content => {
       const singleOption = { ...options }
@@ -55,4 +44,4 @@ async function fileNotContents(fs, options) {
   return new Result('', aggregatedTargets, passed)
 }
 
-module.exports = fileNotContents
+export default fileNotContents

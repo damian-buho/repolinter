@@ -1,12 +1,11 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const path = require('path')
-const chai = require('chai')
-const RuleInfo = require('../../lib/ruleinfo')
-const Result = require('../../lib/result')
-const expect = chai.expect
-const repolinter = require(path.resolve('.'))
+import path from 'path'
+import { expect } from 'chai'
+import RuleInfo from '../../lib/ruleinfo.js'
+import Result from '../../lib/result.js'
+import * as repolinter from '../../index.js'
 
 describe('package', () => {
   describe('repolinter', function () {

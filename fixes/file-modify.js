@@ -1,9 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const Result = require('../lib/result')
-// eslint-disable-next-line no-unused-vars
-const FileSystem = require('../lib/file_system')
+import Result from '../lib/result.js'
 
 /**
  * Prepend or append text to a file
@@ -25,16 +23,13 @@ async function fileModify(fs, options, targets, dryRun = false) {
     )
   }
 
-  // find all files matching the regular expressions specified
   let files = await fs.findAllFiles(realTargets, options.nocase)
 
-  // skip files if necessary
   if (options['skip-paths-matching']) {
     let regexes = []
     const extensions = options['skip-paths-matching'].extensions
     if (extensions && extensions.length > 0) {
       const extJoined = extensions.join('|')
-      // \.(svg|png|exe)$
       regexes.push(new RegExp('.(' + extJoined + ')$', 'i'))
     }
 
@@ -43,12 +38,11 @@ async function fileModify(fs, options, targets, dryRun = false) {
       const filteredPatterns = patterns
         .filter(p => typeof p === 'string' && p !== '')
         .map(p => new RegExp(p, options['skip-paths-matching'].flags))
-      regexes = regexes.concat(filteredPatterns)
+      regexes = [...regexes, ...filteredPatterns]
     }
     files = files.filter(file => !regexes.some(regex => file.match(regex)))
   }
 
-  // read the text from the source, if necessary
   let content
   if (typeof options.text === 'string') {
     content = options.text
@@ -86,18 +80,18 @@ async function fileModify(fs, options, targets, dryRun = false) {
     )
   }
 
-  // write it to the file
   const resTargets = await Promise.all(
     files.map(async file => {
-      // do file operation
       if (!dryRun) {
         const startNewlines =
           options.newlines && options.newlines.begin
-            ? new Array(options.newlines.begin).fill('\n').join('')
+            ? Array.from({ length: options.newlines.begin }, () => '\n').join(
+                ''
+              )
             : ''
         const endNewlines =
           options.newlines && options.newlines.end
-            ? new Array(options.newlines.end).fill('\n').join('')
+            ? Array.from({ length: options.newlines.end }, () => '\n').join('')
             : ''
         const fileContent = startNewlines + content + endNewlines
         if (options.write_mode === 'prepend') {
@@ -112,7 +106,6 @@ async function fileModify(fs, options, targets, dryRun = false) {
           )
         }
       }
-      // return the target information
       const message =
         typeof options.text === 'object'
           ? `${options.write_mode} text from ${
@@ -133,4 +126,4 @@ async function fileModify(fs, options, targets, dryRun = false) {
   return new Result('', resTargets, true)
 }
 
-module.exports = fileModify
+export default fileModify

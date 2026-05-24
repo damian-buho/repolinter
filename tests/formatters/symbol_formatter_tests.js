@@ -1,20 +1,18 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import symbolFormatter from '../../formatters/symbol_formatter.js'
 const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
-const Result = require('../../lib/result')
-const FormatResult = require('../../lib/formatresult')
-const RuleInfo = require('../../lib/ruleinfo')
-const path = require('path')
-const repolinter = require(path.resolve('.'))
+import Result from '../../lib/result.js'
+import FormatResult from '../../lib/formatresult.js'
+import RuleInfo from '../../lib/ruleinfo.js'
+import path from 'path'
+import * as repolinter from '../../index.js'
 
 describe('formatters', () => {
   describe('symbol_formatter', () => {
     it('returns a simple string with the correct log symbol', () => {
-      const symbolFormatter = require('../../formatters/symbol_formatter')
-
       const result = new Result('a message', [], true)
       const successResult = symbolFormatter.formatResult(
         result,
@@ -37,8 +35,6 @@ describe('formatters', () => {
     })
 
     it('contains all results in output', () => {
-      const symbolFormatter = require('../../formatters/symbol_formatter')
-
       const output = {
         params: {
           targetDir: 'dir',
@@ -76,7 +72,6 @@ describe('formatters', () => {
 
     it('does not contain the string undefined', async function () {
       this.timeout(30000)
-      const symbolFormatter = require('../../formatters/symbol_formatter')
       const lintres = await repolinter.lint(path.resolve('.'))
 
       const actual = symbolFormatter.formatOutput(lintres, false)

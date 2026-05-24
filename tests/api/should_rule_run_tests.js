@@ -1,9 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const { shouldRuleRun } = require('../..')
-const expect = chai.expect
+import { expect } from 'chai'
+import { shouldRuleRun } from '../../index.js'
 
 describe('api', () => {
   describe('validateConfig', () => {

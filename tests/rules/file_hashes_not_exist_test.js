@@ -1,13 +1,11 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import filesNotHash from '../../rules/file-hashes-not-exist.js'
 
 describe('rule', () => {
   describe('files_not_hash', () => {
-    const filesNotHash = require('../../rules/file-hashes-not-exist')
-
     it('returns pass if requested files not matches the hashes', async () => {
       /** @type {any} */
       const mockfs = {

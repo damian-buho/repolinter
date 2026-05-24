@@ -1,13 +1,11 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const chai = require('chai')
-const expect = chai.expect
+import { expect } from 'chai'
+import fileContents from '../../rules/file-hash.js'
 
 describe('rule', () => {
   describe('files_hash', () => {
-    const fileContents = require('../../rules/file-hash')
-
     it('returns passes if requested file matches the hash', async () => {
       /** @type {any} */
       const mockfs = {
