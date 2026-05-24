@@ -300,8 +300,8 @@ describe('cli', function () {
 
     expect(actual.code).to.equal(1)
     expect(actual2.code).to.equal(1)
-    expect(actual.out.trim()).to.contain('configuration should be object')
-    expect(actual2.out.trim()).to.contain('configuration should be object')
+    expect(actual.out.trim()).to.contain('configuration must be object')
+    expect(actual2.out.trim()).to.contain('configuration must be object')
   })
 
   it('runs repolinter with ruleset file path too long', async () => {
@@ -314,8 +314,8 @@ describe('cli', function () {
 
     expect(actual.code).to.equal(1)
     expect(actual2.code).to.equal(1)
-    expect(actual.out.trim()).to.contain('configuration should be object')
-    expect(actual2.out.trim()).to.contain('configuration should be object')
+    expect(actual.out.trim()).to.contain('configuration must be object')
+    expect(actual2.out.trim()).to.contain('configuration must be object')
   })
 
   it('should handle encoded rulesets with encoded extends', async () => {

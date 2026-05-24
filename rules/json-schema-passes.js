@@ -49,11 +49,11 @@ async function jsonSchemaPasses(fs, options) {
     )
   }
   // validate the JSON
-  const validator = new Ajv().compile(options.schema)
+  const validator = new Ajv({ strict: false }).compile(options.schema)
   if (validator.errors) {
     throw new Error(
       `Failed to parse JSON schema with errors ${validator.errors
-        .map(e => `root${e.dataPath} ${e.message}`)
+        .map(e => `root${e.instancePath} ${e.message}`)
         .join(', ')}`
     )
   }
@@ -67,7 +67,7 @@ async function jsonSchemaPasses(fs, options) {
     message = res
       ? 'JSON validation passed'
       : `JSON validation failed with errors: ${validator.errors
-          .map(e => `root${e.dataPath} ${e.message}`)
+          .map(e => `root${e.instancePath} ${e.message}`)
           .join(', ')}`
   }
   return new Result(
