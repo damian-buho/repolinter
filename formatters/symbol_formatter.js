@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const logSymbols = require('log-symbols')
-const chalk = require('chalk')
+const { styleText } = require('util')
 const FormatResult = require('../lib/formatresult')
 // eslint-disable-next-line no-unused-vars
 const Result = require('../lib/result')
@@ -119,25 +119,25 @@ class SymbolFormatter {
       )
     }
     if (output.errored) {
-      return ret.join('') + `\n${chalk.bgRed(output.errMsg)}`
+      return ret.join('') + `\n${styleText(['bgRed', 'white'], output.errMsg)}`
     }
     // output axiom errors, if any
     ret.push(
       Object.entries(output.targets)
         .filter(([k, v]) => v.passed !== true)
         .map(([k, v]) =>
-          chalk.yellow(`\nAxiom ${k} failed to run with error: ${v.message}`)
+          styleText('yellow', `\nAxiom ${k} failed to run with error: ${v.message}`)
         )
         .join('')
     )
     // lint section
     ret.push(
-      chalk.inverse('\nLint:') +
+      styleText('inverse', '\nLint:') +
         output.results
           .map(result => {
             // log errors
             if (result.status === FormatResult.ERROR) {
-              return `\n${logSymbols.error} ${chalk.bgRed(
+              return `\n${logSymbols.error} ${styleText(['bgRed', 'white'],
                 `${result.ruleInfo.name} failed to run:`
               )} ${result.runMessage}`
             }
@@ -160,7 +160,7 @@ class SymbolFormatter {
     const fixresults = output.results.filter(r => r.fixResult)
     if (fixresults.length > 0) {
       ret.push(
-        chalk.inverse(`\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
+        styleText('inverse', `\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
           fixresults.map(result =>
             SymbolFormatter.formatResult(
               result.fixResult,
