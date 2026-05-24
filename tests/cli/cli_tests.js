@@ -6,7 +6,7 @@ const chai = require('chai')
 const cp = require('child_process')
 const fs = require('fs')
 const ServerMock = require('mock-http-server')
-const stripAnsi = require('strip-ansi')
+const stripAnsi = s => s.replace(/\x1B\[[0-9;]*m/g, '')
 const repolinter = require(path.resolve('.'))
 const expect = chai.expect
 
