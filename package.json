@@ -1,7 +1,7 @@
 {
-  "name": "repolinter",
-  "version": "0.12.0",
-  "description": "Lint open source repositories",
+  "name": "@damian-buho/repolinter",
+  "version": "1.0.0",
+  "description": "Lint open source repositories (fork)",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -40,14 +40,17 @@
     "open source"
   ],
   "author": "The TODO Group",
+  "contributors": [
+    "Damián Búho <damian.buho@proton.me> (https://github.com/damian-buho)"
+  ],
   "license": "Apache-2.0",
-  "homepage": "https://github.com/todogroup/repolinter",
+  "homepage": "https://github.com/damian-buho/repolinter",
   "bugs": {
-    "url": "https://github.com/todogroup/repolinter/issues"
+    "url": "https://github.com/damian-buho/repolinter/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/todogroup/repolinter.git"
+    "url": "git+https://github.com/damian-buho/repolinter.git"
   },
   "prettier": {
     "arrowParens": "avoid",
