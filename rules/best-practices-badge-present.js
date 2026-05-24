@@ -1,7 +1,6 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-const fetch = require('node-fetch')
 const Result = require('../lib/result')
 const fileContents = require('./file-contents')
 const bestPracticesRegExp =

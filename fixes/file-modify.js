@@ -4,11 +4,6 @@
 const Result = require('../lib/result')
 // eslint-disable-next-line no-unused-vars
 const FileSystem = require('../lib/file_system')
-/**
- * @type {any}
- * @ignore
- */
-const fetch = require('node-fetch')
 
 /**
  * Prepend or append text to a file
