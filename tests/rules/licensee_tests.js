@@ -4,9 +4,9 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
+import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
-import licenseDetectable from '../../rules/license-detectable-by-licensee.js'
+import licenseDetectable from '../../dist/rules/license-detectable-by-licensee.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

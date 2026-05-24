@@ -5,7 +5,7 @@ import { expect, use as chaiUse } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import * as Config from '../../lib/config.js'
+import * as Config from '../../dist/lib/config.js'
 import fs from 'fs'
 import ServerMock from 'mock-http-server'
 chaiUse(chaiAsPromised)
@@ -41,7 +41,7 @@ describe('lib', () => {
         const parent = path.join(__dirname, '..')
         const defaultConfig = path.join(
           __dirname,
-          '../../rulesets/default.json'
+          '../../dist/rulesets/default.json'
         )
         expect(Config.findConfig(parent)).to.equals(defaultConfig)
       })

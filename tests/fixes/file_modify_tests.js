@@ -3,7 +3,7 @@
 
 import nock from 'nock'
 import { expect } from 'chai'
-import fileModify from '../../fixes/file-modify.js'
+import fileModify from '../../dist/fixes/file-modify.js'
 
 describe('fixes', () => {
   describe('file-modify', () => {

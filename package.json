@@ -3,35 +3,32 @@
   "version": "0.12.0",
   "description": "Lint open source repositories",
   "type": "module",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "bin": {
-    "repolinter": "bin/repolinter.js"
+    "repolinter": "dist/cli.js"
   },
   "files": [
-    "index.js",
-    "index.d.ts",
-    "bin/repolinter.js",
-    "lib/",
-    "rules/",
-    "fixes/",
-    "axioms/",
-    "formatters/",
-    "rulesets/"
+    "dist/"
   ],
   "engines": {
     "node": ">=20.12.0"
   },
   "scripts": {
+    "build": "tsc && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
+    "prebuild": "rm -rf dist",
     "pretest": "npm run lint",
     "test": "mocha",
     "coverage": "nyc npm test",
     "lint": "eslint ./",
     "fix": "eslint ./ --fix",
-    "apidoc": "documentation build index.js -f html -o apidoc -c documentation.yml"
+    "apidoc": "documentation build src/index.ts -f html -o apidoc -c documentation.yml"
   },
   "keywords": [
     "lint",
@@ -77,6 +74,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/chai": "^5.2.3",
+    "@types/eslint": "^9.6.1",
+    "@types/mocha": "^10.0.10",
+    "@types/nock": "^10.0.3",
+    "@types/node": "^25.9.1",
+    "@types/sinon": "^21.0.1",
+    "@types/yaml": "^1.9.6",
+    "@types/yargs": "^17.0.35",
     "chai": "^6.2.2",
     "chai-as-promised": "^8.0.2",
     "chai-each": "0.0.1",

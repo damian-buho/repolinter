@@ -6,12 +6,12 @@ import { fileURLToPath } from 'url'
 import { lint as markdownlint } from 'markdownlint/promise'
 import { expect } from 'chai'
 import toc from 'markdown-toc'
-import { slug as slugger } from '../../lib/github_slugger.js'
-import FormatResult from '../../lib/formatresult.js'
-import RuleInfo from '../../lib/ruleinfo.js'
-import Result from '../../lib/result.js'
-import * as repolinter from '../../index.js'
-import formatter from '../../formatters/markdown_formatter.js'
+import { slug as slugger } from '../../dist/lib/github_slugger.js'
+import FormatResult from '../../dist/lib/formatresult.js'
+import RuleInfo from '../../dist/lib/ruleinfo.js'
+import Result from '../../dist/lib/result.js'
+import * as repolinter from '../../dist/index.js'
+import formatter from '../../dist/formatters/markdown_formatter.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '../..')

@@ -3,8 +3,8 @@
 
 import path from 'path'
 import { expect } from 'chai'
-import packagers from '../../axioms/packagers.js'
-import FileSystem from '../../lib/file_system.js'
+import packagers from '../../dist/axioms/packagers.js'
+import FileSystem from '../../dist/lib/file_system.js'
 
 describe('packagers', () => {
   it('repolinter is only npm', async () => {

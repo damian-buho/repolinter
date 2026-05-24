@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import GitHubMarkup from '../../lib/github_markup.js'
+import GitHubMarkup from '../../dist/lib/github_markup.js'
 import commandExists from 'command-exists'
 import path from 'path'
 import { fileURLToPath } from 'url'

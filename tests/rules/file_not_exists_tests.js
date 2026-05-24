@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import fileNotExists from '../../rules/file-not-exists.js'
+import fileNotExists from '../../dist/rules/file-not-exists.js'
 
 describe('rule', () => {
   describe('files_not_exists', () => {

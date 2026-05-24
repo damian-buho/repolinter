@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import fileTypeExclusion from '../../rules/file-type-exclusion.js'
+import fileTypeExclusion from '../../dist/rules/file-type-exclusion.js'
 
 describe('rule', () => {
   describe('file_type_exclusion', () => {

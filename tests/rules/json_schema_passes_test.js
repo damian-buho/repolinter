@@ -3,7 +3,7 @@
 
 import { expect, use as chaiUse } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import jsonSchemaPasses from '../../rules/json-schema-passes.js'
+import jsonSchemaPasses from '../../dist/rules/json-schema-passes.js'
 
 chaiUse(chaiAsPromised)
 

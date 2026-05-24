@@ -4,9 +4,9 @@
 import { expect, use as chaiUse, should as chaiShould } from 'chai'
 import chaiEach from 'chai-each'
 import sinon from 'sinon'
-import FileSystem from '../../lib/file_system.js'
-import GitHelper from '../../lib/git_helper.js'
-import gitGrepCommits from '../../rules/git-grep-commits.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import GitHelper from '../../dist/lib/git_helper.js'
+import gitGrepCommits from '../../dist/rules/git-grep-commits.js'
 import chaiString from 'chai-string'
 
 chaiUse(chaiEach)

@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import symbolFormatter from '../../formatters/symbol_formatter.js'
+import symbolFormatter from '../../dist/formatters/symbol_formatter.js'
 const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
-import Result from '../../lib/result.js'
-import FormatResult from '../../lib/formatresult.js'
-import RuleInfo from '../../lib/ruleinfo.js'
+import Result from '../../dist/lib/result.js'
+import FormatResult from '../../dist/lib/formatresult.js'
+import RuleInfo from '../../dist/lib/ruleinfo.js'
 import path from 'path'
-import * as repolinter from '../../index.js'
+import * as repolinter from '../../dist/index.js'
 
 describe('formatters', () => {
   describe('symbol_formatter', () => {

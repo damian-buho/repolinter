@@ -5,9 +5,9 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { expect } from 'chai'
 import nock from 'nock'
-import FileSystem from '../../lib/file_system.js'
+import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
-import fileNoBrokenLinks from '../../rules/file-no-broken-links.js'
+import fileNoBrokenLinks from '../../dist/rules/file-no-broken-links.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

@@ -5,7 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { expect } from 'chai'
 import realFs from 'fs'
-import FileSystem from '../../lib/file_system.js'
+import FileSystem from '../../dist/lib/file_system.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -117,29 +117,29 @@ describe('lib', () => {
       })
 
       it('should honor filtered files', async () => {
-        const includedFiles = ['index.js', path.join('bin', 'repolinter.bat')]
+        const includedFiles = ['dist/index.js', 'dist/index.js.map', path.join('bin', 'repolinter.bat')]
         const fs = new FileSystem(path.resolve('.'), includedFiles)
 
         const filesRaw = await fs.findAll('**/*', false)
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.deep.equal(includedFiles)
+        expect(files).to.have.deep.members(includedFiles)
       })
 
       it('should honor nocase true', async () => {
-        const includedFiles = ['index.js']
+        const includedFiles = ['dist/index.js']
         const fs = new FileSystem(path.resolve('.'), includedFiles)
 
         const filesRaw = await fs.findAll('**/iNdEx.Js', true)
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.deep.equal(includedFiles)
+        expect(files).to.have.deep.members(includedFiles)
       })
 
       it('should honor nocase false', async () => {
-        const includedFiles = ['index.js']
+        const includedFiles = ['dist/index.js']
         const fs = new FileSystem(path.resolve('.'), includedFiles)
 
         const filesRaw = await fs.findAll('**/iNdEx.Js', false)
@@ -150,7 +150,7 @@ describe('lib', () => {
       })
 
       it('should not honor nocase by default', async () => {
-        const includedFiles = ['index.js']
+        const includedFiles = ['dist/index.js']
         const fs = new FileSystem(path.resolve('.'), includedFiles)
 
         const filesRaw = await fs.findAll('**/iNdEx.Js')

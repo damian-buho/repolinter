@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import largeFile from '../../rules/large-file.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import largeFile from '../../dist/rules/large-file.js'
 
 describe('rule', () => {
   describe('largeFile', () => {

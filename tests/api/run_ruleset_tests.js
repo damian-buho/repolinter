@@ -4,11 +4,11 @@
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { expect } from 'chai'
-import * as repolinter from '../../index.js'
-import RuleInfo from '../../lib/ruleinfo.js'
-import FileSystem from '../../lib/file_system.js'
-import FormatResult from '../../lib/formatresult.js'
-import Result from '../../lib/result.js'
+import * as repolinter from '../../dist/index.js'
+import RuleInfo from '../../dist/lib/ruleinfo.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import FormatResult from '../../dist/lib/formatresult.js'
+import Result from '../../dist/lib/result.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

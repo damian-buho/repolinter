@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import { slug } from '../../lib/github_slugger.js'
+import { slug } from '../../dist/lib/github_slugger.js'
 
 describe('lib', () => {
   describe('github_slugger', () => {

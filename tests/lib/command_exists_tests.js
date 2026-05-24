@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import { commandExists } from '../../lib/command_exists.js'
+import { commandExists } from '../../dist/lib/command_exists.js'
 
 describe('lib', () => {
   describe('command_exists', function () {

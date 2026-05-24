@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, use as chaiUse } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import gitGrepLog from '../../rules/git-grep-log.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import gitGrepLog from '../../dist/rules/git-grep-log.js'
 import chaiString from 'chai-string'
 
 chaiUse(chaiString)

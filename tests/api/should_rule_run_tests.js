@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import { shouldRuleRun } from '../../index.js'
+import { shouldRuleRun } from '../../dist/index.js'
 
 describe('api', () => {
   describe('validateConfig', () => {

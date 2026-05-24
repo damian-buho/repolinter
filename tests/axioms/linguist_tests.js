@@ -5,7 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import commandExists from 'command-exists'
 import { expect } from 'chai'
-import linguistAxiom from '../../axioms/linguist.js'
+import linguistAxiom from '../../dist/axioms/linguist.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

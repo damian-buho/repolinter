@@ -10,7 +10,7 @@ describe('rule', () => {
 
     before(async () => {
       BestpracticesBadgePresent = (
-        await import('../../rules/best-practices-badge-present.js')
+        await import('../../dist/rules/best-practices-badge-present.js')
       ).default
     })
 

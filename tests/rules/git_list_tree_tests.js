@@ -3,9 +3,9 @@
 
 import { expect, use as chaiUse, should as chaiShould } from 'chai'
 import sinon from 'sinon'
-import FileSystem from '../../lib/file_system.js'
-import GitHelper from '../../lib/git_helper.js'
-import gitListTree from '../../rules/git-list-tree.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import GitHelper from '../../dist/lib/git_helper.js'
+import gitListTree from '../../dist/rules/git-list-tree.js'
 import chaiEach from 'chai-each'
 import chaiString from 'chai-string'
 

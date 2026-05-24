@@ -3,9 +3,9 @@
 
 import path from 'path'
 import { expect } from 'chai'
-import RuleInfo from '../../lib/ruleinfo.js'
-import Result from '../../lib/result.js'
-import * as repolinter from '../../index.js'
+import RuleInfo from '../../dist/lib/ruleinfo.js'
+import Result from '../../dist/lib/result.js'
+import * as repolinter from '../../dist/index.js'
 
 describe('package', () => {
   describe('repolinter', function () {

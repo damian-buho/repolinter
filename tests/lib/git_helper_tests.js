@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import { gitAllCommits } from '../../lib/git_helper.js'
-import FileSystem from '../../lib/file_system.js'
+import { gitAllCommits } from '../../dist/lib/git_helper.js'
+import FileSystem from '../../dist/lib/file_system.js'
 
 describe('gitAllCommits', () => {
   describe('git_grep_commits', function () {

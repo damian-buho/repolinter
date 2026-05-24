@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import fileRemove from '../../fixes/file-remove.js'
+import fileRemove from '../../dist/fixes/file-remove.js'
 
 describe('fixes', () => {
   describe('file-remove', () => {

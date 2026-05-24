@@ -4,8 +4,8 @@
 import fs from 'fs'
 import path from 'path'
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import fileContents from '../../rules/file-contents.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import fileContents from '../../dist/rules/file-contents.js'
 
 describe('rule', () => {
   describe('files_contents', () => {

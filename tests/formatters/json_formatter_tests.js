@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import jsonFormatter from '../../formatters/json_formatter.js'
-import FormatResult from '../../lib/formatresult.js'
-import RuleInfo from '../../lib/ruleinfo.js'
-import Result from '../../lib/result.js'
+import jsonFormatter from '../../dist/formatters/json_formatter.js'
+import FormatResult from '../../dist/lib/formatresult.js'
+import RuleInfo from '../../dist/lib/ruleinfo.js'
+import Result from '../../dist/lib/result.js'
 
 describe('formatters', () => {
   describe('json_formatter', () => {
@@ -35,7 +35,7 @@ describe('formatters', () => {
         }
       }
       const expected =
-        '{"passed":true,"errored":false,"results":[{"ruleInfo":{"name":"myrule","level":"error","where":[],"ruleType":"file-existence","ruleConfig":{}},"status":"PASSED","lintResult":{"message":"Did it!","targets":[],"passed":true}},{"ruleInfo":{"name":"myrule","level":"error","where":[],"ruleType":"file-existence","ruleConfig":{}},"runMessage":"whoops","status":"IGNORED"}],"targets":{"language":{"message":"No language?","targets":[],"passed":false}},"params":{"targetDir":".","filterPaths":[],"ruleset":{}}}'
+        '{"passed":true,"errored":false,"results":[{"status":"PASSED","ruleInfo":{"name":"myrule","level":"error","where":[],"ruleType":"file-existence","ruleConfig":{}},"lintResult":{"targets":[],"passed":true,"message":"Did it!"}},{"status":"IGNORED","ruleInfo":{"name":"myrule","level":"error","where":[],"ruleType":"file-existence","ruleConfig":{}},"runMessage":"whoops"}],"targets":{"language":{"targets":[],"passed":false,"message":"No language?"}},"params":{"targetDir":".","filterPaths":[],"ruleset":{}}}'
 
       const successResult = jsonFormatter.formatOutput(result, false)
       expect(successResult).to.equal(expected)

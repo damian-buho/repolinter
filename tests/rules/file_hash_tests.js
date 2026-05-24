@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import fileContents from '../../rules/file-hash.js'
+import fileContents from '../../dist/rules/file-hash.js'
 
 describe('rule', () => {
   describe('files_hash', () => {

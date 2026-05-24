@@ -4,8 +4,8 @@
 import fs from 'fs'
 import path from 'path'
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import fileNotContents from '../../rules/file-not-contents.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import fileNotContents from '../../dist/rules/file-not-contents.js'
 
 describe('rule', () => {
   describe('files_not_contents', () => {

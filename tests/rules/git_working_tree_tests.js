@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import gitWorkingTree from '../../rules/git-working-tree.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import gitWorkingTree from '../../dist/rules/git-working-tree.js'
 
 describe('rule', () => {
   describe('git_working_tree', function () {

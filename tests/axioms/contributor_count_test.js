@@ -3,8 +3,8 @@
 
 import { expect } from 'chai'
 import path from 'path'
-import FileSystem from '../../lib/file_system.js'
-import axioms from '../../axioms/axioms.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import axioms from '../../dist/axioms/axioms.js'
 
 const contributors = axioms['contributor-count']
 

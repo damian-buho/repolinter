@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect } from 'chai'
-import * as repolinter from '../../index.js'
+import * as repolinter from '../../dist/index.js'
 
 describe('api', () => {
   describe('parseConfig', () => {

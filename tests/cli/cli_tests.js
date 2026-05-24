@@ -10,7 +10,7 @@ import realFs from 'fs'
 import ServerMock from 'mock-http-server'
 // eslint-disable-next-line no-control-regex
 const stripAnsi = s => s.replace(/\x1B\[[0-9;]*m/g, '')
-import * as repolinter from '../../index.js'
+import * as repolinter from '../../dist/index.js'
 
 /**
  * Execute a command in a childprocess asynchronously. Not secure, but good for testing.
@@ -36,8 +36,8 @@ async function execAsync(command, opts = {}) {
 describe('cli', function () {
   const repolinterPath =
     process.platform === 'win32'
-      ? path.resolve('bin/repolinter.bat')
-      : path.resolve('bin/repolinter.js')
+      ? path.resolve('dist/cli.js')
+      : path.resolve('dist/cli.js')
   const selfPath = path.resolve('tests/cli')
   this.timeout(30000)
 

@@ -4,14 +4,14 @@
 import fs from 'fs'
 import path from 'path'
 import { expect } from 'chai'
-import FileSystem from '../../lib/file_system.js'
-import fileStartsWith from '../../rules/file-starts-with.js'
+import FileSystem from '../../dist/lib/file_system.js'
+import fileStartsWith from '../../dist/rules/file-starts-with.js'
 
 describe('rule', () => {
   describe('file-starts-with', () => {
     it('returns a passed result if requested file matches the patterns', async () => {
       const ruleopts = {
-        globsAll: ['rules/file-starts-with.js'],
+        globsAll: ['dist/rules/file-starts-with.js'],
         lineCount: 2,
         patterns: ['Copyright', 'License']
       }

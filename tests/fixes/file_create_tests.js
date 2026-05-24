@@ -3,7 +3,7 @@
 
 import nock from 'nock'
 import { expect } from 'chai'
-import fileCreate from '../../fixes/file-create.js'
+import fileCreate from '../../dist/fixes/file-create.js'
 
 describe('fixes', () => {
   describe('file-create', () => {
