@@ -21,7 +21,7 @@
     "node": ">=20.12.0"
   },
   "scripts": {
-    "build": "tsc && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
+    "build": "tsc && chmod +x dist/cli.js && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
     "prebuild": "rm -rf dist",
     "pretest": "npm run lint",
     "test": "mocha",
