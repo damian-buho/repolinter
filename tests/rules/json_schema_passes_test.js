@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const chai = require('chai')
-chai.use(require('chai-as-promised'))
+chai.use(require('chai-as-promised').default)
 const expect = chai.expect
 
 describe('rule', () => {

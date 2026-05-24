@@ -5,7 +5,7 @@ const chai = require('chai')
 const expect = chai.expect
 const FileSystem = require('../../lib/file_system')
 
-chai.use(require('chai-string'))
+chai.use(require('chai-string').default)
 
 describe('rule', () => {
   describe('git_grep_log', function () {

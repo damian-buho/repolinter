@@ -11,8 +11,8 @@ describe('rule', () => {
 
     it('fails if readme is missing', async () => {
       const mockfs = {
-        findAllFiles: _ => [],
-        getFileContents: _ => null,
+        findAllFiles: () => [],
+        getFileContents: () => null,
         targetDir: '.'
       }
 
@@ -23,8 +23,8 @@ describe('rule', () => {
 
     it('fails if readme does not contain the Best Practices Badge', async () => {
       const mockfs = {
-        findAllFiles: _ => ['README'],
-        getFileContents: _ => '...',
+        findAllFiles: () => ['README'],
+        getFileContents: () => '...',
         targetDir: '.'
       }
 
@@ -38,8 +38,8 @@ describe('rule', () => {
 
     it('passes if readme contains the Best Practices badge (URL with locale)', async () => {
       const mockfs = {
-        findAllFiles: _ => ['README'],
-        getFileContents: _ =>
+        findAllFiles: () => ['README'],
+        getFileContents: () =>
           '[badge](https://bestpractices.coreinfrastructure.org/en/projects/100)',
         targetDir: '.'
       }
@@ -50,8 +50,8 @@ describe('rule', () => {
 
     it('passes if readme contains the Best Practices Badge (URL without locale)', async () => {
       const mockfs = {
-        findAllFiles: _ => ['README'],
-        getFileContents: _ =>
+        findAllFiles: () => ['README'],
+        getFileContents: () =>
           '[badge](https://bestpractices.coreinfrastructure.org/projects/100)',
         targetDir: '.'
       }
@@ -62,8 +62,8 @@ describe('rule', () => {
 
     it('fails if readme contains the Best Practices Badge has invalid URL', async () => {
       const mockfs = {
-        findAllFiles: _ => ['README'],
-        getFileContents: _ =>
+        findAllFiles: () => ['README'],
+        getFileContents: () =>
           'https://bestpractices.coreinfrastructure.org/en/projects/wrong',
         targetDir: '.'
       }
@@ -73,8 +73,8 @@ describe('rule', () => {
     })
     describe('minPercentage', () => {
       const mockfs = {
-        findAllFiles: _ => ['README'],
-        getFileContents: _ =>
+        findAllFiles: () => ['README'],
+        getFileContents: () =>
           '[badge](https://bestpractices.coreinfrastructure.org/projects/100)',
         targetDir: '.'
       }

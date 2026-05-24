@@ -3,7 +3,7 @@
 
 const chai = require('chai')
 chai.use(require('chai-each'))
-chai.use(require('chai-string'))
+chai.use(require('chai-string').default)
 const expect = chai.expect
 // eslint-disable-next-line no-unused-vars
 const should = chai.should()

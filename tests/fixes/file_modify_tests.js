@@ -148,8 +148,8 @@ describe('fixes', () => {
         getFileContents() {
           return 'the file contents'
         },
-        setFileContents(file, contents) {
-          mockFile = file
+        setFileContents(f) {
+          mockFile = f
         }
       }
 
@@ -176,8 +176,8 @@ describe('fixes', () => {
         getFileContents() {
           return 'the file contents'
         },
-        setFileContents(file, contents) {
-          mockFile = file
+        setFileContents(f) {
+          mockFile = f
         }
       }
 
@@ -232,11 +232,11 @@ describe('fixes', () => {
         findAllFiles() {
           return ['myfile']
         },
-        getFileContents(file) {
+        getFileContents() {
           return 'the file contents'
         },
-        setFileContents(file, contents) {
-          mockContents = contents
+        setFileContents(f, c) {
+          mockContents = c
         }
       }
       const scope = nock('https://example.com')

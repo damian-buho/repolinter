@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+const chaiAsPromised = require('chai-as-promised').default
 const expect = chai.expect
 const path = require('path')
 const fs = require('fs')

@@ -11,7 +11,7 @@ const sinon = require('sinon')
 const FileSystem = require('../../lib/file_system')
 const GitHelper = require('../../lib/git_helper')
 
-chai.use(require('chai-string'))
+chai.use(require('chai-string').default)
 
 describe('rule', () => {
   describe('git_grep_commits', function () {
