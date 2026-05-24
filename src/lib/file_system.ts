@@ -91,10 +91,7 @@ class FileSystem {
       .filter(p => this.shouldInclude(p))
   }
 
-  async findAll(
-    globs: string | string[],
-    nocase = false
-  ): Promise<string[]> {
+  async findAll(globs: string | string[], nocase = false): Promise<string[]> {
     const fixedGlobs =
       typeof globs === 'string'
         ? this.normalizePath(globs)

@@ -194,22 +194,22 @@ async function fileContents(
       )
     )
       .filter(
-        (
-          result
-        ): result is ContextResult &
-          { passed: boolean } =>
+        (result): result is ContextResult & { passed: boolean } =>
           result !== null && (not ? !result.passed : result.passed)
       )
-      .reduce((previous, current) => {
-        current.contextLines.forEach(lineContext => {
-          previous.push({
-            passed: current.passed,
-            path: current.path,
-            message: `${current.message} on line ${lineContext.line}, context: \n\t|${lineContext.context}`
+      .reduce(
+        (previous, current) => {
+          current.contextLines.forEach(lineContext => {
+            previous.push({
+              passed: current.passed,
+              path: current.path,
+              message: `${current.message} on line ${lineContext.line}, context: \n\t|${lineContext.context}`
+            })
           })
-        })
-        return previous
-      }, [] as Array<{ passed: boolean; path: string; message: string }>)
+          return previous
+        },
+        [] as Array<{ passed: boolean; path: string; message: string }>
+      )
   }
 
   const filteredResults = results.filter(

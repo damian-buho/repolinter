@@ -92,50 +92,56 @@ async function fileModify(
   }
 
   const resTargets = await Promise.all(
-    files.map(async (file): Promise<{
-      message: string
-      passed: boolean
-      path: string
-    }> => {
-      if (!dryRun) {
-        const startNewlines =
-          options.newlines && options.newlines.begin
-            ? Array.from({ length: options.newlines.begin }, () => '\n').join(
-                ''
-              )
-            : ''
-        const endNewlines =
-          options.newlines && options.newlines.end
-            ? Array.from({ length: options.newlines.end }, () => '\n').join('')
-            : ''
-        const fileContent = startNewlines + content! + endNewlines
-        if (options.write_mode === 'prepend') {
-          await fs.setFileContents(
-            file,
-            fileContent + (await fs.getFileContents(file))
-          )
-        } else {
-          await fs.setFileContents(
-            file,
-            (await fs.getFileContents(file)) + fileContent
-          )
+    files.map(
+      async (
+        file
+      ): Promise<{
+        message: string
+        passed: boolean
+        path: string
+      }> => {
+        if (!dryRun) {
+          const startNewlines =
+            options.newlines && options.newlines.begin
+              ? Array.from({ length: options.newlines.begin }, () => '\n').join(
+                  ''
+                )
+              : ''
+          const endNewlines =
+            options.newlines && options.newlines.end
+              ? Array.from({ length: options.newlines.end }, () => '\n').join(
+                  ''
+                )
+              : ''
+          const fileContent = startNewlines + content! + endNewlines
+          if (options.write_mode === 'prepend') {
+            await fs.setFileContents(
+              file,
+              fileContent + (await fs.getFileContents(file))
+            )
+          } else {
+            await fs.setFileContents(
+              file,
+              (await fs.getFileContents(file)) + fileContent
+            )
+          }
+        }
+        const message =
+          typeof options.text === 'object'
+            ? `${options.write_mode} text from ${
+                options.text.file || options.text.url
+              } to file`
+            : `${options.write_mode} \`${JSON.stringify(content).slice(
+                1,
+                -1
+              )}\` to file`
+        return {
+          message,
+          passed: true,
+          path: file
         }
       }
-      const message =
-        typeof options.text === 'object'
-          ? `${options.write_mode} text from ${
-              options.text.file || options.text.url
-            } to file`
-          : `${options.write_mode} \`${JSON.stringify(content).slice(
-              1,
-              -1
-            )}\` to file`
-      return {
-        message,
-        passed: true,
-        path: file
-      }
-    })
+    )
   )
 
   return new Result('', resTargets, true)

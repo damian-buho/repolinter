@@ -48,11 +48,7 @@ class MarkdownFormatter {
     return `<a href="#user-content-${s}" id="user-content-${s}">#</a>`
   }
 
-  static formatResult(
-    result: any,
-    symbol: string,
-    dryRun: boolean
-  ): string {
+  static formatResult(result: any, symbol: string, dryRun: boolean): string {
     const header = MarkdownFormatter.formatRuleHeading(
       result.ruleInfo.name,
       symbol
@@ -132,7 +128,9 @@ class MarkdownFormatter {
             result.fixResult && t.path
               ? [
                   t,
-                  result.fixResult.targets.find((f: any) => f.path === t.path) || null
+                  result.fixResult.targets.find(
+                    (f: any) => f.path === t.path
+                  ) || null
                 ]
               : [t, null]
           )
@@ -156,7 +154,9 @@ class MarkdownFormatter {
     }
     if (result.fixResult && result.fixResult.passed) {
       const unassociatedFixList = result.fixResult.targets.filter(
-        (t: any) => !t.path || !result.lintResult.targets.find((l: any) => l.path === t.path)
+        (t: any) =>
+          !t.path ||
+          !result.lintResult.targets.find((l: any) => l.path === t.path)
       )
       if (result.fixResult.message || unassociatedFixList.length !== 0) {
         const fixSuggest = `\n\n${dryRun ? SUGGESTED_FIX : APPLIED_FIX}${opWrap(
@@ -166,7 +166,8 @@ class MarkdownFormatter {
         )}`
         formatBase.push(fixSuggest)
         const fixList = unassociatedFixList.map(
-          (f: any) => `\n- \`${f.path || f.pattern}\`${opWrap(': ', f.message, '.')}`
+          (f: any) =>
+            `\n- \`${f.path || f.pattern}\`${opWrap(': ', f.message, '.')}`
         )
         if (fixList.length) {
           formatBase.push('\n')
@@ -177,9 +178,7 @@ class MarkdownFormatter {
     return formatBase.join('')
   }
 
-  static sortResults(
-    results: any[]
-  ): Record<string, any[]> {
+  static sortResults(results: any[]): Record<string, any[]> {
     const out: Record<string, any[]> = {}
     for (const key of FormatResult.getAllStatus()) {
       out[key] = []
@@ -286,9 +285,9 @@ ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     const allSections = relevantSections.map(cfg =>
       MarkdownFormatter.createSection(
         cfg.name,
-        sorted[cfg.type]!
-          .map(r => MarkdownFormatter.formatResult(r, cfg.symbol, dryRun))
-          .join('\n\n'),
+        sorted[cfg.type]!.map(r =>
+          MarkdownFormatter.formatResult(r, cfg.symbol, dryRun)
+        ).join('\n\n'),
         cfg.collapse
       )
     )

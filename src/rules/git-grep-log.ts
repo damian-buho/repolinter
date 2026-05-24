@@ -51,10 +51,7 @@ function extractInfo(commit: string): CommitInfo {
   }
 }
 
-function gitGrepLog(
-  fs: FileSystem,
-  options: GitGrepLogOptions
-): Result {
+function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
   options.denylist = options.denylist || options.blacklist
 
   const commits = grepLog(fs, options)

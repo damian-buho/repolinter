@@ -5,15 +5,12 @@ import licensee from '../lib/licensee.js'
 import Result from '../lib/result.js'
 import type FileSystem from '../lib/file_system.js'
 
-export default async function (
-  fileSystem: FileSystem
-): Promise<Result> {
+export default async function (fileSystem: FileSystem): Promise<Result> {
   let licenses: string[] = []
   try {
     licenses = await licensee.identifyLicense(fileSystem.targetDir)
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : String(error)
+    const message = error instanceof Error ? error.message : String(error)
     return new Result(message, [], false)
   }
   return new Result(

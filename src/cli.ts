@@ -79,10 +79,7 @@ yargs(hideBin(process.argv))
         tmpDir = await fs.promises.mkdtemp(
           path.join(os.tmpdir(), 'repolinter-')
         )
-        const result = await git.clone(
-          argv.directory as string,
-          tmpDir
-        )
+        const result = await git.clone(argv.directory as string, tmpDir)
         if (result) {
           console.error(result)
           process.exitCode = 1
@@ -101,12 +98,18 @@ yargs(hideBin(process.argv))
       let formatter: Formatter
       if (argv.format && (argv.format as string).toLowerCase() === 'json') {
         formatter = repolinter.jsonFormatter
-      } else if (argv.format && (argv.format as string).toLowerCase() === 'markdown') {
+      } else if (
+        argv.format &&
+        (argv.format as string).toLowerCase() === 'markdown'
+      ) {
         formatter = repolinter.markdownFormatter
       } else {
         formatter = repolinter.defaultFormatter
       }
-      const formattedOutput = formatter.formatOutput(output, argv.dryRun as boolean)
+      const formattedOutput = formatter.formatOutput(
+        output,
+        argv.dryRun as boolean
+      )
       console.log(formattedOutput)
       process.exitCode = output.passed ? 0 : 1
       if (tmpDir) {

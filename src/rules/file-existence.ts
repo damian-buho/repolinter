@@ -17,7 +17,8 @@ async function fileExistence(
   fs: FileSystem,
   options: FileExistenceOptions
 ): Promise<Result> {
-  const fileList = options.globsAny ?? options.files ?? options.directories ?? []
+  const fileList =
+    options.globsAny ?? options.files ?? options.directories ?? []
   const file = options.dirs
     ? await fs.findFirst(fileList, options.nocase)
     : await fs.findFirstFile(fileList, options.nocase)

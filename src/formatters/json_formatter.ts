@@ -4,10 +4,7 @@
 import type { LintResult } from '../index.js'
 
 class JsonFormatter {
-  static formatOutput(
-    output: LintResult,
-    _dryRun: boolean
-  ): string {
+  static formatOutput(output: LintResult, _dryRun: boolean): string {
     return JSON.stringify(output)
   }
 }

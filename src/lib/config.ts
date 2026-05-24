@@ -167,7 +167,9 @@ async function validateConfig(
   if (!validator(config)) {
     return {
       passed: false,
-      error: `Configuration validation failed with errors: \n${(validator.errors ?? [])
+      error: `Configuration validation failed with errors: \n${(
+        validator.errors ?? []
+      )
         .map(
           (e: any) =>
             `\tconfiguration${e.instancePath} ${e.message}\n\nIt's likely the rulesetPath or rulesetUrl isn't configured correctly.`

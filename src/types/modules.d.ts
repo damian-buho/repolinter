@@ -43,9 +43,18 @@ declare module 'command-exists' {
 }
 
 declare module 'find-config' {
-  export function obj(name: string, options?: { dir?: string }): { path: string } | undefined
-  export function read(name: string, options?: { dir?: string }): string | undefined
-  export default function (name: string, options?: { dir?: string; cwd?: string }): string | null
+  export function obj(
+    name: string,
+    options?: { dir?: string }
+  ): { path: string } | undefined
+  export function read(
+    name: string,
+    options?: { dir?: string }
+  ): string | undefined
+  export default function (
+    name: string,
+    options?: { dir?: string; cwd?: string }
+  ): string | null
 }
 
 declare module 'gitlog' {
@@ -74,9 +83,18 @@ declare module 'matched' {
     nodir?: boolean
     symlinks?: Record<string, boolean>
   }
-  export function sync(globs: string | string[], options?: MatchedOptions): string[]
-  export function promise(globs: string | string[], options?: MatchedOptions): Promise<string[]>
-  export default function (globs: string | string[], options?: MatchedOptions): Promise<string[]>
+  export function sync(
+    globs: string | string[],
+    options?: MatchedOptions
+  ): string[]
+  export function promise(
+    globs: string | string[],
+    options?: MatchedOptions
+  ): Promise<string[]>
+  export default function (
+    globs: string | string[],
+    options?: MatchedOptions
+  ): Promise<string[]>
 }
 
 declare module 'chai-each' {

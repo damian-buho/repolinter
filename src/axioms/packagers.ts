@@ -4,9 +4,7 @@
 import Result from '../lib/result.js'
 import type FileSystem from '../lib/file_system.js'
 
-export default async function (
-  fileSystem: FileSystem
-): Promise<Result> {
+export default async function (fileSystem: FileSystem): Promise<Result> {
   const packageManagerPatterns: Record<string, string> = {
     'pom.xml': 'maven',
     'project.xml': 'maven1',
@@ -26,9 +24,8 @@ export default async function (
 
   const packagers = (
     await Promise.all(
-      Object.entries(packageManagerPatterns).map(
-        async ([pattern, packager]) =>
-          (await fileSystem.findFirst(pattern)) ? packager : null
+      Object.entries(packageManagerPatterns).map(async ([pattern, packager]) =>
+        (await fileSystem.findFirst(pattern)) ? packager : null
       )
     )
   ).filter((p): p is string => p !== null)

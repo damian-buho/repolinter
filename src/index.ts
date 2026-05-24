@@ -198,12 +198,10 @@ export function shouldRuleRun(
   const failedRuleAxioms = regularRuleAxioms.filter(r => !table.has(r))
   const numericalTargets = validTargets
     .map(r => r.split('='))
-    .map(
-      ([targetName = '', maybeNumber = '']): [string, number] => [
-        targetName,
-        parseInt(maybeNumber)
-      ]
-    )
+    .map(([targetName = '', maybeNumber = '']): [string, number] => [
+      targetName,
+      parseInt(maybeNumber)
+    ])
     .filter(([, maybeNumber]) => !isNaN(maybeNumber))
   const numericalTargetsMap = new Map(numericalTargets)
   return numericalRuleAxioms
@@ -231,7 +229,10 @@ export async function runRuleset(
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
       .filter(([, res]) => res.passed)
-      .map(([axiomId, res]): [string, string[]] => [axiomId, res.targets.map((t: any) => t.path)])
+      .map(([axiomId, res]): [string, string[]] => [
+        axiomId,
+        res.targets.map((t: any) => t.path)
+      ])
       .map(([axiomId, paths]: [string, string[]]) => [
         `${axiomId}=*`,
         ...paths.map(p => `${axiomId}=${p}`)

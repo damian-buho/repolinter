@@ -61,36 +61,15 @@ export default class FormatResult {
     ]
   }
 
-  static CreateIgnored(
-    ruleInfo: RuleInfo,
-    message: string
-  ): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      message,
-      FormatResult.IGNORED,
-      null,
-      null
-    )
+  static CreateIgnored(ruleInfo: RuleInfo, message: string): FormatResult {
+    return new FormatResult(ruleInfo, message, FormatResult.IGNORED, null, null)
   }
 
-  static CreateError(
-    ruleInfo: RuleInfo,
-    message: string
-  ): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      message,
-      FormatResult.ERROR,
-      null,
-      null
-    )
+  static CreateError(ruleInfo: RuleInfo, message: string): FormatResult {
+    return new FormatResult(ruleInfo, message, FormatResult.ERROR, null, null)
   }
 
-  static CreateLintOnly(
-    ruleInfo: RuleInfo,
-    lintRes: Result
-  ): FormatResult {
+  static CreateLintOnly(ruleInfo: RuleInfo, lintRes: Result): FormatResult {
     return new FormatResult(
       ruleInfo,
       null,

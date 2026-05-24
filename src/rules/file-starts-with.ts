@@ -32,9 +32,7 @@ async function fileStartsWith(
 
   let filteredFiles = files
   if (options['skip-binary-files']) {
-    filteredFiles = filteredFiles.filter(
-      file => !fs.isBinaryFile(file)
-    )
+    filteredFiles = filteredFiles.filter(file => !fs.isBinaryFile(file))
   }
 
   if (options['skip-paths-matching']) {

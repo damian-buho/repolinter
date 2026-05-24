@@ -51,10 +51,7 @@ function listFiles(
   return files
 }
 
-function gitListTree(
-  fs: FileSystem,
-  options: GitListTreeOptions
-): Result {
+function gitListTree(fs: FileSystem, options: GitListTreeOptions): Result {
   options.denylist = options.denylist || options.blacklist
 
   const files = listFiles(fs, options)
