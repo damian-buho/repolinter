@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0
 const path = require('path')
 const repolinter = require('..')
-const rimraf = require('rimraf')
 const git = require('simple-git')()
 /** @type {any} */
 const fs = require('fs')
@@ -80,7 +79,7 @@ require('yargs')
         if (result) {
           console.error(result)
           process.exitCode = 1
-          rimraf(tmpDir, () => {})
+          fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
           return
         }
       }
@@ -106,7 +105,7 @@ require('yargs')
       process.exitCode = output.passed ? 0 : 1
       // delete the tmpdir if it exists
       if (tmpDir) {
-        rimraf(tmpDir, function () {})
+        fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
       }
     }
   )
