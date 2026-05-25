@@ -3,7 +3,8 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import nock from 'nock'
 import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
@@ -12,12 +13,10 @@ import fileNoBrokenLinks from '../../dist/rules/file-no-broken-links.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('rule', () => {
-  describe('files_no_broken_links', function () {
+  describe('files_no_broken_links', () => {
     const gitHubMarkupInstalled = commandExists.sync('github-markup')
     const targetDirectory = `${__dirname}/markup_test_files`
     const testFs = new FileSystem(targetDirectory)
-
-    this.timeout(30_000)
 
     if (gitHubMarkupInstalled) {
       it('returns true if no links are present in markdown', async () => {
@@ -27,9 +26,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'no_link.md'
         })
@@ -46,9 +45,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'link.md'
         })
@@ -67,9 +66,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'link.md'
         })
@@ -88,9 +87,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'link.md'
         })
@@ -109,9 +108,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'autolink.md'
         })
@@ -130,9 +129,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'link.rst'
         })
@@ -151,9 +150,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'link.rst'
         })
@@ -168,9 +167,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'section_link.md'
         })
@@ -183,9 +182,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'section_link.rst'
         })
@@ -198,9 +197,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'relative_link.md'
         })
@@ -213,9 +212,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'relative_link_with_section.md'
         })
@@ -228,9 +227,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'subdirectory/nested_relative_link.md'
         })
@@ -243,9 +242,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'subdirectory/invalid_nested_relative_link.md'
         })
@@ -258,9 +257,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'relative_link_outside_dir.md'
         })
@@ -274,9 +273,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'relative_link_outside_dir.md'
         })
@@ -289,9 +288,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'invalid_relative_link.md'
         })
@@ -304,9 +303,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           path: 'absolute_link.md'
         })
@@ -326,9 +325,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'multiple_links.md'
         })
@@ -349,13 +348,13 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(2)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 2)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: true,
           path: 'link.md'
         })
-        expect(actual.targets[1]).to.deep.include({
+        assert.deepStrictEqual(actual.targets[1], {
           passed: true,
           path: 'link.rst'
         })
@@ -370,9 +369,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(false)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           pattern: 'notafile'
         })
@@ -386,9 +385,9 @@ describe('rule', () => {
 
         const actual = await fileNoBrokenLinks(testFs, ruleopts)
 
-        expect(actual.passed).to.equal(true)
-        expect(actual.targets).to.have.length(1)
-        expect(actual.targets[0]).to.deep.include({
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.deepStrictEqual(actual.targets[0], {
           passed: false,
           pattern: 'notafile'
         })
@@ -397,4 +396,4 @@ describe('rule', () => {
       it.skip('tests file_no_broken_links functionality', () => {})
     }
   })
-})
+}, { timeout: 30_000 })

@@ -4,7 +4,8 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { lint as markdownlint } from 'markdownlint/promise'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import toc from 'markdown-toc'
 import { slug as slugger } from '../../dist/lib/github_slugger.js'
 import FormatResult from '../../dist/lib/formatresult.js'
@@ -18,7 +19,6 @@ const projectRoot = path.resolve(__dirname, '../..')
 
 describe('formatters', () => {
   describe('markdown_formatter', () => {
-    /** @type {import('../..').LintResult} */
     const result = {
       passed: true,
       errored: false,
@@ -59,7 +59,7 @@ describe('formatters', () => {
       const options = Object.assign(lintOptions, { strings: { test: actual } })
 
       const lintResult = await markdownlint(options)
-      expect(lintResult.test).to.have.length(0)
+      assert.strictEqual(lintResult.test.length, 0)
     })
 
     it('generates the correct sections with sample output', () => {
@@ -78,20 +78,18 @@ describe('formatters', () => {
       ]
 
       for (let index = 0, length = expected.length; index < length; index++) {
-        expect(filteredSections[index].lvl).to.equal(expected[index].lvl)
-        expect(filteredSections[index].slug).to.contain(expected[index].slug)
+        assert.strictEqual(filteredSections[index].lvl, expected[index].lvl)
+        assert.ok(filteredSections[index].slug.includes(expected[index].slug))
       }
     })
 
     it('contains the disclaimer', () => {
       const output = formatter.formatOutput(result, false)
 
-      expect(output).to.contain(result.formatOptions.disclaimer)
+      assert.ok(output.includes(result.formatOptions.disclaimer))
     })
 
-    it('generates valid markdown when running against itself', async function () {
-      this.timeout(30_000)
-
+    it('generates valid markdown when running against itself', async () => {
       const lintres = await repolinter.lint(path.resolve(projectRoot))
 
       const actual = formatter.formatOutput(lintres, false)
@@ -99,17 +97,15 @@ describe('formatters', () => {
 
       const result = await markdownlint(options)
 
-      expect(result.test).to.deep.equal([])
-    })
+      assert.deepStrictEqual(result.test, [])
+    }, { timeout: 30_000 })
 
-    it('does not contain the string "undefined"', async function () {
-      this.timeout(30_000)
-
+    it('does not contain the string "undefined"', async () => {
       const lintres = await repolinter.lint(path.resolve(projectRoot))
 
       const actual = formatter.formatOutput(lintres, false)
 
-      expect(actual).to.not.contain('undefined')
-    })
+      assert.ok(!actual.includes('undefined'))
+    }, { timeout: 30_000 })
   })
 })

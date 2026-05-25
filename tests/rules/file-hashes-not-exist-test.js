@@ -1,7 +1,8 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import filesNotHash from '../../dist/rules/file-hashes-not-exist.js'
 
 describe('rule', () => {
@@ -24,7 +25,7 @@ describe('rule', () => {
       }
 
       const actual = await filesNotHash(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
 
     it('returns failure if requested files matches the hash', async () => {
@@ -47,11 +48,12 @@ describe('rule', () => {
       }
 
       const actual = await filesNotHash(mockfs, ruleopts)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: false,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Match hash'
       })
     })
 
@@ -76,11 +78,12 @@ describe('rule', () => {
       }
 
       const actual = await filesNotHash(mockfs, ruleopts)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: false,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Match hash'
       })
     })
 
@@ -100,7 +103,7 @@ describe('rule', () => {
       }
 
       const actual = await filesNotHash(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
   })
 })

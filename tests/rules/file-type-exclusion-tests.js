@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileTypeExclusion from '../../dist/rules/file-type-exclusion.js'
 
 describe('rule', () => {
@@ -21,7 +22,7 @@ describe('rule', () => {
 
       const actual = await fileTypeExclusion(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
 
     it('returns failed result if requested file type exists', async () => {
@@ -39,10 +40,10 @@ describe('rule', () => {
 
       const actual = await fileTypeExclusion(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].path).to.equal('foo.dll')
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.strictEqual(actual.targets[0].path, 'foo.dll')
     })
   })
 })

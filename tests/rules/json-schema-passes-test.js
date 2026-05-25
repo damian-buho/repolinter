@@ -1,11 +1,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect, use as chaiUse } from 'chai'
-import chaiAsPromised from 'chai-as-promised'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import jsonSchemaPasses from '../../dist/rules/json-schema-passes.js'
-
-chaiUse(chaiAsPromised)
 
 describe('rule', () => {
   describe('json_schema_passes', () => {
@@ -33,11 +31,11 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(true)
-      expect(actual.targets[0].path).to.equal(mockfs.findFirstFile())
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, true)
+      assert.strictEqual(actual.targets[0].path, mockfs.findFirstFile())
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
     })
 
     it('returns fail if requested file does not match the schema', async () => {
@@ -64,11 +62,11 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].path).to.equal(mockfs.findFirstFile())
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.strictEqual(actual.targets[0].path, mockfs.findFirstFile())
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
     })
 
     it('throws if the schema is invalid', async () => {
@@ -93,9 +91,10 @@ describe('rule', () => {
         }
       }
 
-      await expect(
-        jsonSchemaPasses(mockfs, ruleopts)
-      ).to.eventually.be.rejectedWith(Error)
+      await assert.rejects(
+        () => jsonSchemaPasses(mockfs, ruleopts),
+        Error
+      )
     })
 
     it('returns fail if the file had invalid JSON', async () => {
@@ -122,11 +121,11 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].path).to.equal(mockfs.findFirstFile())
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.strictEqual(actual.targets[0].path, mockfs.findFirstFile())
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
     })
 
     it('succeeds if the file does not exist and succeed-on-non-existent is set', async () => {
@@ -154,10 +153,10 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
-      expect(actual.targets[0].path).to.equal(undefined)
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
+      assert.strictEqual(actual.targets[0].path, undefined)
     })
 
     it('returns fail if the file does not exist', async () => {
@@ -184,10 +183,10 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
-      expect(actual.targets[0].path).to.equal(undefined)
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
+      assert.strictEqual(actual.targets[0].path, undefined)
     })
 
     it('includes human-readable-message in the output', async () => {
@@ -215,14 +214,12 @@ describe('rule', () => {
 
       const actual = await jsonSchemaPasses(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].path).to.equal(mockfs.findFirstFile())
-      expect(actual.targets[0].pattern).to.equal(ruleopts.glob)
-      expect(actual.targets[0].message).to.contain(
-        ruleopts['human-readable-message']
-      )
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.strictEqual(actual.targets[0].path, mockfs.findFirstFile())
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
+      assert.ok(actual.targets[0].message.includes(ruleopts['human-readable-message']))
     })
   })
 })

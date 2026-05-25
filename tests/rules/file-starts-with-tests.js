@@ -3,7 +3,8 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file_system.js'
 import fileStartsWith from '../../dist/rules/file-starts-with.js'
 
@@ -18,10 +19,10 @@ describe('rule', () => {
 
       const actual = await fileStartsWith(new FileSystem(), ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(true)
-      expect(actual.targets[0].path).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, true)
+      assert.strictEqual(actual.targets[0].path, ruleopts.globsAll[0])
     })
 
     it("returns a failure result if requested file doesn't match all the patterns", async () => {
@@ -44,13 +45,13 @@ describe('rule', () => {
 
       const actual = await fileStartsWith(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].path).to.equal('somefile.js')
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].message).to.contain('Copyright')
-      expect(actual.targets[0].message).to.contain('Rights')
-      expect(actual.targets[0].message).to.not.contain('javascript')
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].path, 'somefile.js')
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.ok(actual.targets[0].message.includes('Copyright'))
+      assert.ok(actual.targets[0].message.includes('Rights'))
+      assert.ok(!actual.targets[0].message.includes('javascript'))
     })
 
     it('returns failure if skip binary files is enabled and only file is binary file', async () => {
@@ -62,9 +63,9 @@ describe('rule', () => {
       }
 
       const actual = await fileStartsWith(new FileSystem(), ruleopts)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
     it('returns a single result when glob has no matches and has succeed-on-non-existent option', async () => {
@@ -85,9 +86,9 @@ describe('rule', () => {
 
       const actual = await fileStartsWith(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
     it('skips files with the `skip-paths-matching` option', async () => {
@@ -115,10 +116,10 @@ describe('rule', () => {
 
       const actual = await fileStartsWith(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(true)
-      expect(actual.targets[0].path).to.equal('afile.js')
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, true)
+      assert.strictEqual(actual.targets[0].path, 'afile.js')
     })
 
     it("returns failure if the requested files don't exist", async () => {
@@ -138,15 +139,15 @@ describe('rule', () => {
 
       const actual = await fileStartsWith(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
     it('should handle broken symlinks', async () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
       const stat = fs.lstatSync(brokenSymlink)
-      expect(stat.isSymbolicLink()).to.equal(true)
+      assert.strictEqual(stat.isSymbolicLink(), true)
       const fsInstance = new FileSystem(path.resolve('.'))
 
       const ruleopts = {
@@ -156,9 +157,9 @@ describe('rule', () => {
       }
 
       const actual = await fileStartsWith(fsInstance, ruleopts)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
   })
 })

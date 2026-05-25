@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import * as repolinter from '../../dist/index.js'
 
 describe('api', () => {
@@ -23,8 +24,8 @@ describe('api', () => {
 
       const { passed, error } = await repolinter.validateConfig(mockconfig)
 
-      expect(error).to.equal(undefined)
-      expect(passed).to.equal(true)
+      assert.strictEqual(error, undefined)
+      assert.strictEqual(passed, true)
     })
 
     it('validates a legacy configuration', async () => {
@@ -35,8 +36,8 @@ describe('api', () => {
 
       const { passed, error } = await repolinter.validateConfig(mockconfig)
 
-      expect(error).to.equal(undefined)
-      expect(passed).to.equal(true)
+      assert.strictEqual(error, undefined)
+      assert.strictEqual(passed, true)
     })
 
     it('rejects an invalid configuration', async () => {
@@ -46,15 +47,15 @@ describe('api', () => {
 
       const { passed, error } = await repolinter.validateConfig(mockconfig)
 
-      expect(error).not.to.equal(undefined)
-      expect(passed).to.equal(false)
+      assert.notStrictEqual(error, undefined)
+      assert.strictEqual(passed, false)
     })
 
     it('rejects a non-object configuration', async () => {
       const { passed, error } = await repolinter.validateConfig(7)
 
-      expect(error).not.to.equal(undefined)
-      expect(passed).to.equal(false)
+      assert.notStrictEqual(error, undefined)
+      assert.strictEqual(passed, false)
     })
 
     it('rejects an invalid error level', async () => {
@@ -74,8 +75,8 @@ describe('api', () => {
 
       const { passed, error } = await repolinter.validateConfig(mockconfig)
 
-      expect(error).not.to.equal(undefined)
-      expect(passed).to.equal(false)
+      assert.notStrictEqual(error, undefined)
+      assert.strictEqual(passed, false)
     })
 
     it('rejects invalid rule options', async () => {
@@ -95,8 +96,8 @@ describe('api', () => {
 
       const { passed, error } = await repolinter.validateConfig(mockconfig)
 
-      expect(error).not.to.equal(undefined)
-      expect(passed).to.equal(false)
+      assert.notStrictEqual(error, undefined)
+      assert.strictEqual(passed, false)
     })
   })
 })

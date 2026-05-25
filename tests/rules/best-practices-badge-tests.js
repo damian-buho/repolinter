@@ -1,7 +1,8 @@
 // Copyright 2022 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it, before } from 'node:test'
+import assert from 'node:assert/strict'
 import nock from 'nock'
 
 describe('rule', () => {
@@ -22,8 +23,8 @@ describe('rule', () => {
       }
 
       const actual = await BestpracticesBadgePresent(mockfs)
-      expect(actual.passed).to.equal(false)
-      expect(actual.message).to.include('not find')
+      assert.strictEqual(actual.passed, false)
+      assert.ok(actual.message.includes('not find'))
     })
 
     it('fails if readme does not contain the Best Practices Badge', async () => {
@@ -34,11 +35,9 @@ describe('rule', () => {
       }
 
       const actual = await BestpracticesBadgePresent(mockfs)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets.length).to.equal(1)
-      expect(actual.targets[0].message).to.equal(
-        "Doesn't contain Best Practices Badge"
-      )
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].message, "Doesn't contain Best Practices Badge")
     })
 
     it('passes if readme contains the Best Practices badge (URL with locale)', async () => {
@@ -50,7 +49,7 @@ describe('rule', () => {
       }
 
       const actual = await BestpracticesBadgePresent(mockfs)
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
 
     it('passes if readme contains the Best Practices Badge (URL without locale)', async () => {
@@ -62,7 +61,7 @@ describe('rule', () => {
       }
 
       const actual = await BestpracticesBadgePresent(mockfs)
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
 
     it('fails if readme contains the Best Practices Badge has invalid URL', async () => {
@@ -74,7 +73,7 @@ describe('rule', () => {
       }
 
       const actual = await BestpracticesBadgePresent(mockfs)
-      expect(actual.passed).to.equal(false)
+      assert.strictEqual(actual.passed, false)
     })
     describe('minPercentage', () => {
       const mockfs = {
@@ -88,14 +87,14 @@ describe('rule', () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
           minPercentage: undefined
         })
-        expect(actual.passed).to.equal(true)
+        assert.strictEqual(actual.passed, true)
       })
 
       it('passes when minPercentage is set to 0', async () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
           minPercentage: 0
         })
-        expect(actual.passed).to.equal(true)
+        assert.strictEqual(actual.passed, true)
       })
 
       it('fails when minPercentage is > than percentage returned by API', async () => {
@@ -106,7 +105,7 @@ describe('rule', () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
           minPercentage: 100
         })
-        expect(actual.passed).to.equal(false)
+        assert.strictEqual(actual.passed, false)
         scope.done()
       })
 
@@ -118,7 +117,7 @@ describe('rule', () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
           minPercentage: 100
         })
-        expect(actual.passed).to.equal(false)
+        assert.strictEqual(actual.passed, false)
         scope.done()
       })
 
@@ -130,7 +129,7 @@ describe('rule', () => {
         const actual = await BestpracticesBadgePresent(mockfs, {
           minPercentage: 100
         })
-        expect(actual.passed).to.equal(true)
+        assert.strictEqual(actual.passed, true)
         scope.done()
       })
     })

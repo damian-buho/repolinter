@@ -2,41 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'node:path'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'
 import * as repolinter from '../../dist/index.js'
 
 describe('package', () => {
-  describe('repolinter', function () {
-    this.timeout(30_000)
-
+  describe('repolinter', () => {
     it('does not pass', async () => {
       const result = await repolinter.lint(path.resolve('tests/package'))
 
-      expect(result.passed).to.equal(false)
-      expect(result.errored).to.equal(false)
+      assert.strictEqual(result.passed, false)
+      assert.strictEqual(result.errored, false)
     })
 
     it('returns the correct results', async () => {
       const result = await repolinter.lint(path.resolve('tests/package'))
 
-      expect(result.results).to.have.length(2)
-      // readme-file-exists rule
-      expect(result.results[0].ruleInfo.name).to.equal('readme-file-exists')
-      expect(result.results[0].ruleInfo.ruleType).to.equal('file-existence')
-      expect(result.results[0].ruleInfo.fixType).to.equal(undefined)
-      expect(result.results[0].lintResult.passed).to.equal(false)
-      // test-file-exists rule
-      expect(result.results[1].ruleInfo.name).to.equal('test-file-exists')
-      expect(result.results[1].ruleInfo.ruleType).to.equal('file-existence')
-      expect(result.results[1].ruleInfo.fixType).to.equal(undefined)
-      expect(result.results[1].lintResult.passed).to.equal(true)
-      expect(result.results[1].lintResult.targets).to.have.length(1)
-      expect(result.results[1].lintResult.targets[0].passed).to.equal(true)
-      expect(result.results[1].lintResult.targets[0].path).to.equal(
-        'lint-tests.js'
-      )
+      assert.strictEqual(result.results.length, 2)
+      assert.strictEqual(result.results[0].ruleInfo.name, 'readme-file-exists')
+      assert.strictEqual(result.results[0].ruleInfo.ruleType, 'file-existence')
+      assert.strictEqual(result.results[0].ruleInfo.fixType, undefined)
+      assert.strictEqual(result.results[0].lintResult.passed, false)
+      assert.strictEqual(result.results[1].ruleInfo.name, 'test-file-exists')
+      assert.strictEqual(result.results[1].ruleInfo.ruleType, 'file-existence')
+      assert.strictEqual(result.results[1].ruleInfo.fixType, undefined)
+      assert.strictEqual(result.results[1].lintResult.passed, true)
+      assert.strictEqual(result.results[1].lintResult.targets.length, 1)
+      assert.strictEqual(result.results[1].lintResult.targets[0].passed, true)
+      assert.strictEqual(result.results[1].lintResult.targets[0].path, 'lint-tests.js')
     })
 
     it('returns the correct results for a YAML config', async () => {
@@ -46,25 +41,21 @@ describe('package', () => {
         path.resolve('tests/package/repolinter-yaml.yml')
       )
 
-      expect(result.results).to.have.length(2)
-      // readme-file-exists rule
-      expect(result.results[0].ruleInfo.name).to.equal('readme-file-exists')
-      expect(result.results[0].ruleInfo.ruleType).to.equal('file-existence')
-      expect(result.results[0].ruleInfo.fixType).to.equal(undefined)
-      expect(result.results[0].lintResult.passed).to.equal(false)
-      // test-file-exists rule
-      expect(result.results[1].ruleInfo.name).to.equal('test-file-exists')
-      expect(result.results[1].ruleInfo.ruleType).to.equal('file-existence')
-      expect(result.results[1].ruleInfo.fixType).to.equal(undefined)
-      expect(result.results[1].lintResult.passed).to.equal(true)
-      expect(result.results[1].lintResult.targets).to.have.length(1)
-      expect(result.results[1].lintResult.targets[0].passed).to.equal(true)
-      expect(result.results[1].lintResult.targets[0].path).to.equal(
-        'lint-tests.js'
-      )
+      assert.strictEqual(result.results.length, 2)
+      assert.strictEqual(result.results[0].ruleInfo.name, 'readme-file-exists')
+      assert.strictEqual(result.results[0].ruleInfo.ruleType, 'file-existence')
+      assert.strictEqual(result.results[0].ruleInfo.fixType, undefined)
+      assert.strictEqual(result.results[0].lintResult.passed, false)
+      assert.strictEqual(result.results[1].ruleInfo.name, 'test-file-exists')
+      assert.strictEqual(result.results[1].ruleInfo.ruleType, 'file-existence')
+      assert.strictEqual(result.results[1].ruleInfo.fixType, undefined)
+      assert.strictEqual(result.results[1].lintResult.passed, true)
+      assert.strictEqual(result.results[1].lintResult.targets.length, 1)
+      assert.strictEqual(result.results[1].lintResult.targets[0].passed, true)
+      assert.strictEqual(result.results[1].lintResult.targets[0].path, 'lint-tests.js')
     })
 
-    it('outputs the same results for new and old-style config', async function () {
+    it('outputs the same results for new and old-style config', async () => {
       const expected = await repolinter.lint(
         path.resolve('tests/package'),
         [],
@@ -76,10 +67,10 @@ describe('package', () => {
         path.resolve('tests/package/default-legacy.json')
       )
 
-      expect(expected.errored).to.equal(false)
-      expect(actual.errored).to.equal(false)
-      expect(actual.passed).to.equal(expected.passed)
-      expect(actual.results).to.deep.equal(expected.results)
+      assert.strictEqual(expected.errored, false)
+      assert.strictEqual(actual.errored, false)
+      assert.strictEqual(actual.passed, expected.passed)
+      assert.deepStrictEqual(actual.results, expected.results)
     })
 
     it('ignores failed axioms', async () => {
@@ -88,17 +79,17 @@ describe('package', () => {
         { myAxiom: new Result('', [], false) },
         false
       )
-      expect(actual).to.have.length(1)
-      expect(actual[0].status).to.equal('IGNORED')
+      assert.strictEqual(actual.length, 1)
+      assert.strictEqual(actual[0].status, 'IGNORED')
     })
 
-    it('passes through formatOptions', async function () {
+    it('passes through formatOptions', async () => {
       const actual = await repolinter.lint(
         path.resolve('tests/package'),
         [],
         path.resolve('tests/package/repolinter-formatter-opts.json')
       )
-      expect(actual.formatOptions).to.deep.equal({ hello: 'world' })
+      assert.deepStrictEqual(actual.formatOptions, { hello: 'world' })
     })
-  })
+  }, { timeout: 30_000 })
 })

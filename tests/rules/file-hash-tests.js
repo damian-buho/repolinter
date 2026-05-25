@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileContents from '../../dist/rules/file-hash.js'
 
 describe('rule', () => {
@@ -24,11 +25,12 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Matches hash'
       })
     })
 
@@ -51,11 +53,12 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Matches hash'
       })
     })
 
@@ -78,11 +81,12 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Matches hash'
       })
     })
 
@@ -104,11 +108,12 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: false,
-        path: 'README.md'
+        path: 'README.md',
+        message: "Doesn't match hash"
       })
     })
 
@@ -128,7 +133,7 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(false)
+      assert.strictEqual(actual.passed, false)
     })
 
     it('returns success if file does not exist with success flag', async () => {
@@ -149,7 +154,7 @@ describe('rule', () => {
 
       const actual = await fileContents(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
+      assert.strictEqual(actual.passed, true)
     })
 
     it('respect the legacy configuration format', async () => {
@@ -170,11 +175,12 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'README.md'
+        path: 'README.md',
+        message: 'Matches hash'
       })
     })
   })

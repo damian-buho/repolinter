@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import * as repolinter from '../../dist/index.js'
 
 describe('api', () => {
@@ -16,7 +17,7 @@ describe('api', () => {
         }
       }
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
-      expect(actual).to.deep.equal({
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(actual)), {
         package: { passed: true, targets: [{ passed: true, path: 'npm' }] }
       })
     })
@@ -25,7 +26,7 @@ describe('api', () => {
       const mockconfig = {}
       const mockFs = {}
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
-      expect(actual).to.deep.equal({})
+      assert.deepStrictEqual(actual, {})
     })
 
     it('returns a failing result if an invalid axiom is specified', async () => {
@@ -34,7 +35,7 @@ describe('api', () => {
       }
       const mockFs = {}
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
-      expect(actual).to.deep.equal({
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(actual)), {
         banana: {
           passed: false,
           message: 'invalid axiom name notanaxiom',

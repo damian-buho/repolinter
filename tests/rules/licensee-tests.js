@@ -3,7 +3,8 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
 import licenseDetectable from '../../dist/rules/license-detectable-by-licensee.js'
@@ -20,30 +21,24 @@ describe('rule', () => {
         const testFs = new FileSystem(`${targetDirectory}/no-license`)
 
         const actual = await licenseDetectable(testFs)
-        expect(actual.passed).to.equal(false)
-        expect(actual.message).to.equal(
-          'Licensee did not identify a license for project'
-        )
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.message, 'Licensee did not identify a license for project')
       })
 
       it('rule passes if license is detectable, but unknown', async () => {
         const testFs = new FileSystem(`${targetDirectory}/unknown-license`)
 
         const actual = await licenseDetectable(testFs)
-        expect(actual.passed).to.equal(true)
-        expect(actual.message).to.equal(
-          'Licensee identified the license for project: NOASSERTION'
-        )
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.message, 'Licensee identified the license for project: NOASSERTION')
       })
 
       it('rule passes if license is detectable and recognized', async () => {
         const testFs = new FileSystem(`${targetDirectory}/0bsd`)
 
         const actual = await licenseDetectable(testFs)
-        expect(actual.passed).to.equal(true)
-        expect(actual.message).to.equal(
-          'Licensee identified the license for project: 0BSD'
-        )
+        assert.strictEqual(actual.passed, true)
+        assert.strictEqual(actual.message, 'Licensee identified the license for project: 0BSD')
       })
     } else {
       it.skip('tests license-detectable-by-licensee functionality', () => {})

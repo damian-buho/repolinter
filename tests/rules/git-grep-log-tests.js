@@ -1,17 +1,13 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect, use as chaiUse } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file_system.js'
 import gitGrepLog from '../../dist/rules/git-grep-log.js'
-import chaiString from 'chai-string'
-
-chaiUse(chaiString)
 
 describe('rule', () => {
-  describe('git_grep_log', function () {
-    this.timeout(30_000) // Calling external Git might take some time.
-
+  describe('git_grep_log', () => {
     const LOG_WRONG_CASE =
       'THE GIT RULESET CONTAINS TWO NEW RULES THAT SEARCH THE COMMIT MESSAGES'
 
@@ -23,9 +19,9 @@ describe('rule', () => {
 
       const actual = gitGrepLog(new FileSystem(), ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(0)
-      expect(actual.message).to.contain(ruleopts.denylist[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 0)
+      assert.ok(actual.message.includes(ruleopts.denylist[0]))
     })
 
     it('is backwards compatible with blacklist', () => {
@@ -36,9 +32,9 @@ describe('rule', () => {
 
       const actual = gitGrepLog(new FileSystem(), ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(0)
-      expect(actual.message).to.contain(ruleopts.blacklist[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 0)
+      assert.ok(actual.message.includes(ruleopts.blacklist[0]))
     })
 
     it('fails if the denylist pattern matches a commit message', () => {
@@ -49,10 +45,10 @@ describe('rule', () => {
 
       const actual = gitGrepLog(new FileSystem(), ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].passed).to.equal(false)
-      expect(actual.targets[0].message).to.contain(ruleopts.denylist[0])
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].passed, false)
+      assert.ok(actual.targets[0].message.includes(ruleopts.denylist[0]))
     })
   })
-})
+}, { timeout: 30_000 })

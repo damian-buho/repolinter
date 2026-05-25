@@ -3,36 +3,38 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect } from 'chai'
+import { describe, it, before, after } from 'node:test'
+import assert from 'node:assert/strict'
 import realFs from 'node:fs'
 import FileSystem from '../../dist/lib/file_system.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 describe('lib', () => {
-  describe('file_system', function () {
-    this.timeout(10_000)
-
+  describe('file_system', () => {
     describe('fileExists', () => {
       it('should return pass if the file exists', async () => {
         const index = 'text_file_for_test.txt'
-        expect(
-          await FileSystem.fileExists(path.resolve(__dirname, index))
-        ).to.equals(true)
+        assert.strictEqual(
+          await FileSystem.fileExists(path.resolve(__dirname, index)),
+          true
+        )
       })
 
       it('should return pass if the directory exists', async () => {
         const directory = '../lib'
-        expect(
-          await FileSystem.fileExists(path.resolve(__dirname, directory))
-        ).to.equals(true)
+        assert.strictEqual(
+          await FileSystem.fileExists(path.resolve(__dirname, directory)),
+          true
+        )
       })
 
       it('should return fail if the file does not exist', async () => {
         const file = 'notAFile'
-        expect(
-          await FileSystem.fileExists(path.resolve(__dirname, file))
-        ).to.equals(false)
+        assert.strictEqual(
+          await FileSystem.fileExists(path.resolve(__dirname, file)),
+          false
+        )
       })
     })
 
@@ -41,36 +43,37 @@ describe('lib', () => {
 
       it('should return pass if the file exists', async () => {
         const index = 'text_file_for_test.txt'
-        expect(
-          await fs.relativeFileExists(path.resolve(__dirname, index))
-        ).to.equals(true)
+        assert.strictEqual(
+          await fs.relativeFileExists(path.resolve(__dirname, index)),
+          true
+        )
       })
 
       it('should return pass if the directory exists', async () => {
         const directory = '../lib'
-        expect(
-          await fs.relativeFileExists(path.resolve(__dirname, directory))
-        ).to.equals(true)
+        assert.strictEqual(
+          await fs.relativeFileExists(path.resolve(__dirname, directory)),
+          true
+        )
       })
 
       it('should return fail if the file does not exist', async () => {
         const file = 'notAFile'
-        expect(
-          await fs.relativeFileExists(path.resolve(__dirname, file))
-        ).to.equals(false)
+        assert.strictEqual(
+          await fs.relativeFileExists(path.resolve(__dirname, file)),
+          false
+        )
       })
     })
 
-    describe('findFirstFile', function () {
-      it('should return the first element of findAllFiles', async function () {
-        // Not sure why this test is flakey, but for some reason findAll and
-        // findFirst return different results sometimes on MacOS
+    describe('findFirstFile', () => {
+      it('should return the first element of findAllFiles', async () => {
         const includedDirectories = ['lib/', 'rules/']
         const fs = new FileSystem(path.resolve('./tests'), includedDirectories)
         const files = await fs.findAllFiles('**/*', false)
         const file = await fs.findFirstFile('**/*', false)
-        expect(files).to.have.length.greaterThan(0)
-        expect(files).to.contain(file)
+        assert.ok(files.length > 0)
+        assert.ok(files.includes(file))
       })
     })
 
@@ -80,8 +83,8 @@ describe('lib', () => {
         const fs = new FileSystem(path.resolve('./tests'), includedDirectories)
         const files = await fs.findAll('**/*', false)
         const file = await fs.findFirst('**/*', false)
-        expect(files).to.have.length.greaterThan(0)
-        expect(files).to.contain(file)
+        assert.ok(files.length > 0)
+        assert.ok(files.includes(file))
       })
     })
 
@@ -89,10 +92,10 @@ describe('lib', () => {
       it('should ignore symlinks for ** globs', async () => {
         const symlink = './tests/lib/symlink_for_test'
         const stats = realFs.lstatSync(symlink)
-        expect(stats.isSymbolicLink()).to.equal(true)
+        assert.strictEqual(stats.isSymbolicLink(), true)
         const fs = new FileSystem(path.resolve('./tests'))
         const files = await fs.findAllFiles('**/lib/symlink_for_test', false)
-        expect(files).to.have.lengthOf(0)
+        assert.strictEqual(files.length, 0)
       })
     })
 
@@ -112,14 +115,13 @@ describe('lib', () => {
         var ignoredExcluded = files.every(file => {
           return file.search(excludedRegex) === -1
         })
-        expect(foundIncluded).to.equal(true)
-        expect(ignoredExcluded).to.equal(true)
+        assert.strictEqual(foundIncluded, true)
+        assert.strictEqual(ignoredExcluded, true)
       })
 
       it('should honor filtered files', async () => {
         const includedFiles = [
           'dist/index.js',
-          'dist/index.js.map',
           path.join('bin', 'repolinter.bat')
         ]
         const fs = new FileSystem(path.resolve('.'), includedFiles)
@@ -128,7 +130,7 @@ describe('lib', () => {
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.have.deep.members(includedFiles)
+        assert.deepStrictEqual([...files].sort(), [...includedFiles].sort())
       })
 
       it('should honor nocase true', async () => {
@@ -139,7 +141,7 @@ describe('lib', () => {
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.have.deep.members(includedFiles)
+        assert.deepStrictEqual([...files].sort(), [...includedFiles].sort())
       })
 
       it('should honor nocase false', async () => {
@@ -150,7 +152,7 @@ describe('lib', () => {
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.deep.equal([])
+        assert.deepStrictEqual(files, [])
       })
 
       it('should not honor nocase by default', async () => {
@@ -161,7 +163,7 @@ describe('lib', () => {
         const files = filesRaw.map(file => {
           return path.relative(path.resolve('.'), file)
         })
-        expect(files).to.deep.equal([])
+        assert.deepStrictEqual(files, [])
       })
     })
 
@@ -170,12 +172,12 @@ describe('lib', () => {
 
       it('should return true for a non-text file', async () => {
         const actual = await fs.isBinaryFile('image_for_test.png')
-        expect(actual).to.equal(true)
+        assert.strictEqual(actual, true)
       })
 
       it('should return false for a text file', async () => {
         const actual = await fs.isBinaryFile('file-system-tests.js')
-        expect(actual).to.equal(false)
+        assert.strictEqual(actual, false)
       })
     })
 
@@ -184,14 +186,14 @@ describe('lib', () => {
 
       it('should return undefined if the file does not exist', async () => {
         const actual = await fs.getFileContents('notAFile')
-        expect(actual).to.equal(undefined)
+        assert.strictEqual(actual, undefined)
       })
 
       it('should return the contents of a file', async () => {
         const raw = await fs.getFileContents('text_file_for_test.txt')
-        // replace newlines to prevent compatibility issues
         const actual = raw.replaceAll('\r', '')
-        expect(actual).to.equal(
+        assert.strictEqual(
+          actual,
           'The contents of this file\nwill be monitored for quality assurance purposes\n'
         )
       })
@@ -208,7 +210,7 @@ describe('lib', () => {
 
       it('should return undefined if the file does not exist', async () => {
         const actual = await fs.getFileContents('notAFile')
-        expect(actual).to.equal(undefined)
+        assert.strictEqual(actual, undefined)
       })
 
       it('should change the contents of a file', async () => {
@@ -216,15 +218,14 @@ describe('lib', () => {
         await fs.setFileContents('text_file_for_test.txt', expected)
         const fileContents = await realFs.promises.readFile(filePath, 'utf8')
         const realFileContents = fileContents.replaceAll('\r', '')
-        expect(realFileContents).to.equal(expected)
+        assert.strictEqual(realFileContents, expected)
       })
 
       after(async () => {
-        // reset the file contents
         await realFs.promises.writeFile(filePath, contents)
       })
     })
 
     describe('getFileLines', () => {})
   })
-})
+}, { timeout: 10_000 })

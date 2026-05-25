@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import { shouldRuleRun } from '../../dist/index.js'
 
 describe('api', () => {
@@ -11,7 +12,7 @@ describe('api', () => {
         ['language=javascript', 'language=*'],
         ['language=javascript']
       )
-      expect(result).to.deep.equal([])
+      assert.deepStrictEqual(result, [])
     })
 
     it('should allow a rule to run if axioms wildcard match', () => {
@@ -19,7 +20,7 @@ describe('api', () => {
         ['language=javascript', 'language=*'],
         ['language=*']
       )
-      expect(result).to.deep.equal([])
+      assert.deepStrictEqual(result, [])
     })
 
     it('should not allow a rule to run if no axioms match', () => {
@@ -27,7 +28,7 @@ describe('api', () => {
         ['language=javascript', 'language=*'],
         ['language=cheese']
       )
-      expect(result).to.deep.equal(['language=cheese'])
+      assert.deepStrictEqual(result, ['language=cheese'])
     })
 
     it('should not allow non-numerical axioms with numerical comparisons', () => {
@@ -35,7 +36,7 @@ describe('api', () => {
         ['language=javascript', 'language=*'],
         ['language>=3']
       )
-      expect(result).to.deep.equal(['language>=3'])
+      assert.deepStrictEqual(result, ['language>=3'])
     })
 
     it('should not allow invalid operators', () => {
@@ -43,7 +44,7 @@ describe('api', () => {
         ['language=3', 'language=*'],
         ['language=>3']
       )
-      expect(result).to.deep.equal(['language=>3'])
+      assert.deepStrictEqual(result, ['language=>3'])
     })
 
     it('should handle a mix of axoims', () => {
@@ -56,7 +57,7 @@ describe('api', () => {
         ],
         ['commits=hello', 'contributor-count=blah']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'commits=hello',
@@ -66,7 +67,7 @@ describe('api', () => {
         ],
         ['commits=nothello', 'contributor-count=blah']
       )
-      expect(resultFail).to.deep.equal(['commits=nothello'])
+      assert.deepStrictEqual(resultFail, ['commits=nothello'])
     })
 
     it('should handle a numerical = axiom', () => {
@@ -79,7 +80,7 @@ describe('api', () => {
         ],
         ['contributors=7']
       )
-      expect(result).to.deep.equal([])
+      assert.deepStrictEqual(result, [])
     })
 
     it('should handle a numerical > axiom', () => {
@@ -92,7 +93,7 @@ describe('api', () => {
         ],
         ['contributors>6']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'language=javascript',
@@ -102,7 +103,7 @@ describe('api', () => {
         ],
         ['contributors>7']
       )
-      expect(resultFail).to.deep.equal(['contributors>7'])
+      assert.deepStrictEqual(resultFail, ['contributors>7'])
     })
 
     it('should handle a numerical >= axiom', () => {
@@ -115,7 +116,7 @@ describe('api', () => {
         ],
         ['contributors>=7']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'language=javascript',
@@ -125,7 +126,7 @@ describe('api', () => {
         ],
         ['contributors>=8']
       )
-      expect(resultFail).to.deep.equal(['contributors>=8'])
+      assert.deepStrictEqual(resultFail, ['contributors>=8'])
     })
 
     it('should handle a numerical < axiom', () => {
@@ -138,7 +139,7 @@ describe('api', () => {
         ],
         ['contributors<8']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'language=javascript',
@@ -148,7 +149,7 @@ describe('api', () => {
         ],
         ['contributors<7']
       )
-      expect(resultFail).to.deep.equal(['contributors<7'])
+      assert.deepStrictEqual(resultFail, ['contributors<7'])
     })
 
     it('should handle a numerical <= axiom', () => {
@@ -161,7 +162,7 @@ describe('api', () => {
         ],
         ['contributors<=7']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'language=javascript',
@@ -171,7 +172,7 @@ describe('api', () => {
         ],
         ['contributors<=6']
       )
-      expect(resultFail).to.deep.equal(['contributors<=6'])
+      assert.deepStrictEqual(resultFail, ['contributors<=6'])
     })
 
     it('should handle a mix of numerical axoims', () => {
@@ -179,12 +180,12 @@ describe('api', () => {
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=7', 'contributors>4', 'commits>500']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=6', 'contributors>4', 'commits>900']
       )
-      expect(resultFail).to.deep.equal(['contributors<=6', 'commits>900'])
+      assert.deepStrictEqual(resultFail, ['contributors<=6', 'commits>900'])
     })
 
     it('should handle both numerical and regular axioms', () => {
@@ -201,7 +202,7 @@ describe('api', () => {
         ],
         ['contributors<=7', 'contributors>4', 'commits>600', 'git=*']
       )
-      expect(resultPass).to.deep.equal([])
+      assert.deepStrictEqual(resultPass, [])
       const resultFail = shouldRuleRun(
         [
           'commits=700',
@@ -215,7 +216,7 @@ describe('api', () => {
         ],
         ['contributors<=7', 'contributors>4', 'commits>900', 'git=no']
       )
-      expect(resultFail).to.deep.equal(['commits>900', 'git=no'])
+      assert.deepStrictEqual(resultFail, ['commits>900', 'git=no'])
     })
   })
 })

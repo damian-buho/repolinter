@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileNotExists from '../../dist/rules/file-not-exists.js'
 
 describe('rule', () => {
@@ -21,9 +22,9 @@ describe('rule', () => {
 
       const actual = await fileNotExists(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
     it('returns a passed result if no directories or files exist', async () => {
@@ -42,9 +43,9 @@ describe('rule', () => {
 
       const actual = await fileNotExists(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
     it('returns a failure result if requested file exists', async () => {
@@ -62,9 +63,9 @@ describe('rule', () => {
 
       const actual = await fileNotExists(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: false,
         path: 'somefile'
       })
@@ -86,10 +87,10 @@ describe('rule', () => {
 
       const actual = await fileNotExists(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAll[0])
-      expect(actual.message).to.contain(ruleopts['pass-message'])
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
+      assert.ok(actual.message.includes(ruleopts['pass-message']))
     })
   })
 })

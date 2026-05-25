@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import nock from 'nock'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileCreate from '../../dist/fixes/file-create.js'
 
 describe('fixes', () => {
@@ -25,11 +26,11 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, [], false)
 
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[0].passed).to.equal(true)
-      expect(mockContents).to.equal('this is text')
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(mockContents, 'this is text')
     })
 
     it('does nothing if dryRun is true', async () => {
@@ -50,11 +51,11 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, [], true)
 
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[0].passed).to.equal(true)
-      expect(mockContents).to.equal(undefined)
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(mockContents, undefined)
     })
 
     it('returns an error if the targets are supplied and replace is false', async () => {
@@ -75,8 +76,8 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, ['somefile'], false)
 
-      expect(result.passed).to.equal(false)
-      expect(mockContents).to.equal(undefined)
+      assert.strictEqual(result.passed, false)
+      assert.strictEqual(mockContents, undefined)
     })
 
     it('returns an error if the file exists and replace is false', async () => {
@@ -97,8 +98,8 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, [], false)
 
-      expect(result.passed).to.equal(false)
-      expect(mockContents).to.equal(undefined)
+      assert.strictEqual(result.passed, false)
+      assert.strictEqual(mockContents, undefined)
     })
 
     it('pulls text from a file', async () => {
@@ -125,11 +126,11 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, [], false)
 
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[0].passed).to.equal(true)
-      expect(mockContents).to.equal('this is text')
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(mockContents, 'this is text')
     })
 
     it('pulls text from a URL', async () => {
@@ -153,11 +154,11 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, [], false)
 
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[0].passed).to.equal(true)
-      expect(mockContents).to.equal('this is text')
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(mockContents, 'this is text')
 
       scope.done()
     })
@@ -185,14 +186,14 @@ describe('fixes', () => {
 
       const result = await fileCreate(mockFs, options, ['oldfile'], false)
 
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(2)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[1].path).to.equal('oldfile')
-      expect(result.targets[1].passed).to.equal(true)
-      expect(mockContents).to.equal('this is text')
-      expect(mockRemove).to.equal('oldfile')
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 2)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[1].path, 'oldfile')
+      assert.strictEqual(result.targets[1].passed, true)
+      assert.strictEqual(mockContents, 'this is text')
+      assert.strictEqual(mockRemove, 'oldfile')
     })
   })
 })

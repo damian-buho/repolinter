@@ -13,10 +13,13 @@ build-docker:
     docker buildx build -t repolinter:dev --load .
 
 test:
-    npm test
+    node --test 'tests/**/*.js'
+
+test-verbose:
+    node --test --test-reporter spec 'tests/**/*.js'
 
 coverage:
-    npm run coverage
+    node --test --experimental-test-coverage 'tests/**/*.js'
 
 lint:
     npm run lint

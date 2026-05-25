@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileRemove from '../../dist/fixes/file-remove.js'
 
 describe('fixes', () => {
@@ -16,11 +17,11 @@ describe('fixes', () => {
       }
 
       const result = await fileRemove(mockFs, {}, ['myfile'], false)
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(removePaths).to.deep.equal(['myfile'])
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.deepStrictEqual(removePaths, ['myfile'])
     })
 
     it('does nothing if dryRun is true', async () => {
@@ -33,11 +34,11 @@ describe('fixes', () => {
       }
 
       const result = await fileRemove(mockFs, {}, ['myfile'], true)
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(removePaths).to.deep.equal([])
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.deepStrictEqual(removePaths, [])
     })
 
     it('removes multiple files', async () => {
@@ -55,13 +56,13 @@ describe('fixes', () => {
         ['myfile', 'otherfile'],
         false
       )
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(2)
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[0].path).to.equal('myfile')
-      expect(result.targets[1].passed).to.equal(true)
-      expect(result.targets[1].path).to.equal('otherfile')
-      expect(removePaths).to.deep.equal(['myfile', 'otherfile'])
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 2)
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[0].path, 'myfile')
+      assert.strictEqual(result.targets[1].passed, true)
+      assert.strictEqual(result.targets[1].path, 'otherfile')
+      assert.deepStrictEqual(removePaths, ['myfile', 'otherfile'])
     })
 
     it('uses the glob option', async () => {
@@ -82,11 +83,11 @@ describe('fixes', () => {
         [],
         false
       )
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[0].path).to.equal('myfile.txt')
-      expect(removePaths).to.deep.equal(['myfile.txt'])
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[0].path, 'myfile.txt')
+      assert.deepStrictEqual(removePaths, ['myfile.txt'])
     })
 
     it('overrides targets with the glob option', async () => {
@@ -107,11 +108,11 @@ describe('fixes', () => {
         ['otherfile'],
         false
       )
-      expect(result.passed).to.equal(true)
-      expect(result.targets).to.have.length(1)
-      expect(result.targets[0].passed).to.equal(true)
-      expect(result.targets[0].path).to.equal('myfile.txt')
-      expect(removePaths).to.deep.equal(['myfile.txt'])
+      assert.strictEqual(result.passed, true)
+      assert.strictEqual(result.targets.length, 1)
+      assert.strictEqual(result.targets[0].passed, true)
+      assert.strictEqual(result.targets[0].path, 'myfile.txt')
+      assert.deepStrictEqual(removePaths, ['myfile.txt'])
     })
 
     it('returns failure if no files are found', async () => {
@@ -119,8 +120,8 @@ describe('fixes', () => {
       const mockFs = {}
 
       const result = await fileRemove(mockFs, {}, [], false)
-      expect(result.passed).to.equal(false)
-      expect(result.targets).to.have.length(0)
+      assert.strictEqual(result.passed, false)
+      assert.strictEqual(result.targets.length, 0)
     })
   })
 })

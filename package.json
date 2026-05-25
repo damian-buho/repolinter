@@ -24,8 +24,8 @@
     "build": "tsc && chmod +x dist/cli.js && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
     "prebuild": "rm -rf dist",
     "pretest": "npm run lint",
-    "test": "mocha",
-    "coverage": "nyc npm test",
+    "test": "node --test 'tests/**/*.js'",
+    "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
     "lint": "eslint ./",
     "fix": "eslint ./ --fix",
     "apidoc": "documentation build src/index.ts -f html -o apidoc -c documentation.yml"
@@ -77,18 +77,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/chai": "^5.2.3",
     "@types/eslint": "^9.6.1",
-    "@types/mocha": "^10.0.10",
     "@types/nock": "^10.0.3",
     "@types/node": "^25.9.1",
-    "@types/sinon": "^21.0.1",
     "@types/yaml": "^1.9.6",
     "@types/yargs": "^17.0.35",
-    "chai": "^6.2.2",
-    "chai-as-promised": "^8.0.2",
-    "chai-each": "0.0.1",
-    "chai-string": "^2.0.0",
     "documentation": "^14.0.0",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
@@ -100,12 +93,9 @@
     "globals": "^17.6.0",
     "markdown-toc": "^1.2.0",
     "markdownlint": "^0.40.0",
-    "mocha": "^11.7.6",
     "mock-http-server": "^1.4.2",
     "nock": "^14.0.15",
-    "nyc": "^18.0.0",
     "prettier": "^3.8.3",
-    "sinon": "^22.0.0",
     "typescript": "^6.0.3"
   }
 }

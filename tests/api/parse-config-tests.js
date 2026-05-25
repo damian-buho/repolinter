@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import * as repolinter from '../../dist/index.js'
 
 describe('api', () => {
@@ -22,13 +23,13 @@ describe('api', () => {
 
       const parsed = repolinter.parseConfig(mockConfig)
 
-      expect(parsed).to.have.length(1)
-      expect(parsed[0].name).to.equal('my-rule')
-      expect(parsed[0].level).to.equal('error')
-      expect(parsed[0].where).to.have.length(0)
-      expect(parsed[0].ruleType).to.equal('some-rule')
-      expect(parsed[0].ruleConfig).to.deep.equal({})
-      expect(parsed[0].fixType).to.equal(undefined)
+      assert.strictEqual(parsed.length, 1)
+      assert.strictEqual(parsed[0].name, 'my-rule')
+      assert.strictEqual(parsed[0].level, 'error')
+      assert.strictEqual(parsed[0].where.length, 0)
+      assert.strictEqual(parsed[0].ruleType, 'some-rule')
+      assert.deepStrictEqual(parsed[0].ruleConfig, {})
+      assert.strictEqual(parsed[0].fixType, undefined)
     })
 
     it('parses multiple config objects', () => {
@@ -54,19 +55,19 @@ describe('api', () => {
 
       const parsed = repolinter.parseConfig(mockConfig)
 
-      expect(parsed).to.have.length(2)
-      expect(parsed[0].name).to.equal('my-rule')
-      expect(parsed[0].level).to.equal('error')
-      expect(parsed[0].where).to.have.length(0)
-      expect(parsed[0].ruleType).to.equal('some-rule')
-      expect(parsed[0].ruleConfig).to.deep.equal({})
-      expect(parsed[0].fixType).to.equal(undefined)
-      expect(parsed[1].name).to.equal('my-other-rule')
-      expect(parsed[1].level).to.equal('error')
-      expect(parsed[1].where).to.have.length(0)
-      expect(parsed[1].ruleType).to.equal('some-other-rule')
-      expect(parsed[1].ruleConfig).to.deep.equal({})
-      expect(parsed[1].fixType).to.equal(undefined)
+      assert.strictEqual(parsed.length, 2)
+      assert.strictEqual(parsed[0].name, 'my-rule')
+      assert.strictEqual(parsed[0].level, 'error')
+      assert.strictEqual(parsed[0].where.length, 0)
+      assert.strictEqual(parsed[0].ruleType, 'some-rule')
+      assert.deepStrictEqual(parsed[0].ruleConfig, {})
+      assert.strictEqual(parsed[0].fixType, undefined)
+      assert.strictEqual(parsed[1].name, 'my-other-rule')
+      assert.strictEqual(parsed[1].level, 'error')
+      assert.strictEqual(parsed[1].where.length, 0)
+      assert.strictEqual(parsed[1].ruleType, 'some-other-rule')
+      assert.deepStrictEqual(parsed[1].ruleConfig, {})
+      assert.strictEqual(parsed[1].fixType, undefined)
     })
 
     it('parses a where condition', () => {
@@ -86,14 +87,14 @@ describe('api', () => {
 
       const parsed = repolinter.parseConfig(mockConfig)
 
-      expect(parsed).to.have.length(1)
-      expect(parsed[0].name).to.equal('my-rule')
-      expect(parsed[0].level).to.equal('error')
-      expect(parsed[0].where).to.have.length(1)
-      expect(parsed[0].where[0]).to.equal('condition=true')
-      expect(parsed[0].ruleType).to.equal('some-rule')
-      expect(parsed[0].ruleConfig).to.deep.equal({})
-      expect(parsed[0].fixType).to.equal(undefined)
+      assert.strictEqual(parsed.length, 1)
+      assert.strictEqual(parsed[0].name, 'my-rule')
+      assert.strictEqual(parsed[0].level, 'error')
+      assert.strictEqual(parsed[0].where.length, 1)
+      assert.strictEqual(parsed[0].where[0], 'condition=true')
+      assert.strictEqual(parsed[0].ruleType, 'some-rule')
+      assert.deepStrictEqual(parsed[0].ruleConfig, {})
+      assert.strictEqual(parsed[0].fixType, undefined)
     })
 
     it('parses a fix', () => {
@@ -116,14 +117,14 @@ describe('api', () => {
 
       const parsed = repolinter.parseConfig(mockConfig)
 
-      expect(parsed).to.have.length(1)
-      expect(parsed[0].name).to.equal('my-rule')
-      expect(parsed[0].level).to.equal('error')
-      expect(parsed[0].where).to.have.length(0)
-      expect(parsed[0].ruleType).to.equal('some-rule')
-      expect(parsed[0].ruleConfig).to.deep.equal({})
-      expect(parsed[0].fixType).to.equal('some-fix')
-      expect(parsed[0].fixConfig).to.deep.equal({})
+      assert.strictEqual(parsed.length, 1)
+      assert.strictEqual(parsed[0].name, 'my-rule')
+      assert.strictEqual(parsed[0].level, 'error')
+      assert.strictEqual(parsed[0].where.length, 0)
+      assert.strictEqual(parsed[0].ruleType, 'some-rule')
+      assert.deepStrictEqual(parsed[0].ruleConfig, {})
+      assert.strictEqual(parsed[0].fixType, 'some-fix')
+      assert.deepStrictEqual(parsed[0].fixConfig, {})
     })
 
     it('reads the policyInfo and policyUrl', () => {
@@ -143,13 +144,9 @@ describe('api', () => {
 
       const parsed = repolinter.parseConfig(mockConfig)
 
-      expect(parsed).to.have.length(1)
-      expect(parsed[0].policyInfo).to.equal(
-        mockConfig.rules['my-rule'].policyInfo
-      )
-      expect(parsed[0].policyUrl).to.equal(
-        mockConfig.rules['my-rule'].policyUrl
-      )
+      assert.strictEqual(parsed.length, 1)
+      assert.strictEqual(parsed[0].policyInfo, mockConfig.rules['my-rule'].policyInfo)
+      assert.strictEqual(parsed[0].policyUrl, mockConfig.rules['my-rule'].policyUrl)
     })
   })
 })

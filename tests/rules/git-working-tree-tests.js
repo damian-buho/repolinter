@@ -1,20 +1,19 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file_system.js'
 import gitWorkingTree from '../../dist/rules/git-working-tree.js'
 
 describe('rule', () => {
-  describe('git_working_tree', function () {
-    this.timeout(5000) // Calling external Git might take some time.
-
+  describe('git_working_tree', () => {
     it('passes if the specified directory is managed with Git', () => {
       const result = gitWorkingTree(new FileSystem(), {
         allowSubDir: false
       })
 
-      expect(result.passed).to.equal(true)
+      assert.strictEqual(result.passed, true)
     })
 
     it('passes if the specified sub-directory is managed in Git and sub-directories are allowed', () => {
@@ -22,7 +21,7 @@ describe('rule', () => {
         allowSubDir: true
       })
 
-      expect(result.passed).to.equal(true)
+      assert.strictEqual(result.passed, true)
     })
 
     it('fails if the specified sub-directory is managed in Git but sub-directories are not allowed', () => {
@@ -30,7 +29,7 @@ describe('rule', () => {
         allowSubDir: false
       })
 
-      expect(result.passed).to.equal(false)
+      assert.strictEqual(result.passed, false)
     })
 
     it('fails if the specified directory is not managed in Git', () => {
@@ -38,7 +37,7 @@ describe('rule', () => {
         allowSubDir: false
       })
 
-      expect(result.passed).to.equal(false)
+      assert.strictEqual(result.passed, false)
     })
   })
-})
+}, { timeout: 5000 })

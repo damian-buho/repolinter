@@ -3,7 +3,8 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import * as repolinter from '../../dist/index.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import FileSystem from '../../dist/lib/file_system.js'
@@ -26,17 +27,17 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].ruleInfo).to.deep.equal({
+      assert.strictEqual(result.length, 1)
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: {},
         ruleType: 'apache-notice',
         where: []
       })
-      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(result[0].lintResult.passed).to.equal(true)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
+      assert.strictEqual(result[0].lintResult.passed, true)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a failing rule', async () => {
@@ -51,17 +52,17 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].ruleInfo).to.deep.equal({
+      assert.strictEqual(result.length, 1)
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
         ruleType: 'file-existence',
         where: []
       })
-      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
-      expect(result[0].lintResult.passed).to.equal(false)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_ERROR)
+      assert.strictEqual(result[0].lintResult.passed, false)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a failing rule with level warning', async () => {
@@ -76,17 +77,17 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].ruleInfo).to.deep.equal({
+      assert.strictEqual(result.length, 1)
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
         level: 'warning',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
         ruleType: 'file-existence',
         where: []
       })
-      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_WARN)
-      expect(result[0].lintResult.passed).to.equal(false)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_WARN)
+      assert.strictEqual(result[0].lintResult.passed, false)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('disables a rule with level off', async () => {
@@ -101,10 +102,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.IGNORED)
-      expect(result[0].lintResult).to.equal(undefined)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.IGNORED)
+      assert.strictEqual(result[0].lintResult, undefined)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a rule conditionally with axioms', async () => {
@@ -125,10 +126,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(result[0].lintResult.passed).to.equal(true)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
+      assert.strictEqual(result[0].lintResult.passed, true)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a rule conditionally with an axiom wildcard', async () => {
@@ -143,10 +144,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(result[0].lintResult.passed).to.equal(true)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
+      assert.strictEqual(result[0].lintResult.passed, true)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('ignores a rule conditionally with axioms', async () => {
@@ -171,10 +172,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.IGNORED)
-      expect(result[0].lintResult).to.equal(undefined)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.IGNORED)
+      assert.strictEqual(result[0].lintResult, undefined)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a rule conditionally with a numerical axiom', async () => {
@@ -187,10 +188,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(result[0].lintResult.passed).to.equal(true)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
+      assert.strictEqual(result[0].lintResult.passed, true)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('ignores a rule conditionally with a numerical axiom', async () => {
@@ -203,10 +204,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.IGNORED)
-      expect(result[0].lintResult).to.equal(undefined)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.IGNORED)
+      assert.strictEqual(result[0].lintResult, undefined)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('ignores a fix if the rule passes', async () => {
@@ -227,10 +228,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.RULE_PASSED)
-      expect(result[0].lintResult.passed).to.equal(true)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
+      assert.strictEqual(result[0].lintResult.passed, true)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('runs a fix if the rule fails', async () => {
@@ -251,11 +252,11 @@ describe('api', () => {
         realFs,
         true
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.RULE_NOT_PASSED_ERROR)
-      expect(result[0].lintResult.passed).to.equal(false)
-      expect(result[0].fixResult.passed).to.equal(true)
-      expect(result[0].ruleInfo).to.deep.equal({
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_ERROR)
+      assert.strictEqual(result[0].lintResult.passed, false)
+      assert.strictEqual(result[0].fixResult.passed, true)
+      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
@@ -278,10 +279,10 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.ERROR)
-      expect(result[0].lintResult).to.equal(undefined)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.ERROR)
+      assert.strictEqual(result[0].lintResult, undefined)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
 
     it('returns a failing result with an invalid fix', async () => {
@@ -302,9 +303,9 @@ describe('api', () => {
         realFs,
         false
       )
-      expect(result).to.have.length(1)
-      expect(result[0].status).to.equal(FormatResult.ERROR)
-      expect(result[0].fixResult).to.equal(undefined)
+      assert.strictEqual(result.length, 1)
+      assert.strictEqual(result[0].status, FormatResult.ERROR)
+      assert.strictEqual(result[0].fixResult, undefined)
     })
   })
 })

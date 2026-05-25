@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import symbolFormatter from '../../dist/formatters/symbol_formatter.js'
 const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
 import Result from '../../dist/lib/result.js'
@@ -17,21 +18,25 @@ describe('formatters', () => {
       const successResult = symbolFormatter.formatResult(
         result,
         'myrule',
+        undefined,
+        undefined,
         logSymbols.error
       )
-      expect(successResult).to.contain(logSymbols.success)
-      expect(successResult).to.contain(result.message)
-      expect(successResult).to.contain('myrule')
+      assert.ok(successResult.includes(logSymbols.success))
+      assert.ok(successResult.includes(result.message))
+      assert.ok(successResult.includes('myrule'))
 
       result.passed = false
       const errorResult = symbolFormatter.formatResult(
         result,
         'myrule',
+        undefined,
+        undefined,
         logSymbols.error
       )
-      expect(errorResult).to.contain(logSymbols.error)
-      expect(successResult).to.contain(result.message)
-      expect(successResult).to.contain('myrule')
+      assert.ok(errorResult.includes(logSymbols.error))
+      assert.ok(errorResult.includes(result.message))
+      assert.ok(errorResult.includes('myrule'))
     })
 
     it('contains all results in output', () => {
@@ -53,7 +58,6 @@ describe('formatters', () => {
             new RuleInfo('rule2', 'error', [], 'file-existence', {}),
             'ignored'
           ),
-          // eslint-disable-next-line unicorn/throw-new-error
           FormatResult.CreateError(
             new RuleInfo('rule3', 'error', [], 'file-existence', {}),
             'errored'
@@ -62,22 +66,21 @@ describe('formatters', () => {
       }
 
       const formatResult = symbolFormatter.formatOutput(output, false)
-      expect(formatResult).to.contain('rule1')
-      expect(formatResult).to.contain('rule2')
-      expect(formatResult).to.contain('rule3')
-      expect(formatResult).to.contain('did it')
-      expect(formatResult).to.contain('ignored')
-      expect(formatResult).to.contain('errored')
-      expect(formatResult).to.contain('dir')
+      assert.ok(formatResult.includes('rule1'))
+      assert.ok(formatResult.includes('rule2'))
+      assert.ok(formatResult.includes('rule3'))
+      assert.ok(formatResult.includes('did it'))
+      assert.ok(formatResult.includes('ignored'))
+      assert.ok(formatResult.includes('errored'))
+      assert.ok(formatResult.includes('dir'))
     })
 
-    it('does not contain the string undefined', async function () {
-      this.timeout(30_000)
+    it('does not contain the string undefined', async () => {
       const lintres = await repolinter.lint(path.resolve('.'))
 
       const actual = symbolFormatter.formatOutput(lintres, false)
 
-      expect(actual).to.not.contain('undefined')
-    })
+      assert.ok(!actual.includes('undefined'))
+    }, { timeout: 30_000 })
   })
 })

@@ -1,7 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { expect } from 'chai'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
 import fileExistence from '../../dist/rules/file-existence.js'
 
 describe('rule', () => {
@@ -21,11 +22,12 @@ describe('rule', () => {
 
       const actual = await fileExistence(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'LICENSE.md'
+        path: 'LICENSE.md',
+        message: 'Found file'
       })
     })
 
@@ -45,11 +47,12 @@ describe('rule', () => {
 
       const actual = await fileExistence(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(true)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0]).to.deep.include({
+      assert.strictEqual(actual.passed, true)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.deepStrictEqual(actual.targets[0], {
         passed: true,
-        path: 'LICENSE.md'
+        path: 'LICENSE.md',
+        message: 'Found file'
       })
     })
 
@@ -66,7 +69,7 @@ describe('rule', () => {
 
       const actual = await fileExistence(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
+      assert.strictEqual(actual.passed, false)
     })
 
     it("returns a failure result if requested file doesn't exist with a failure message", async () => {
@@ -83,10 +86,10 @@ describe('rule', () => {
 
       const actual = await fileExistence(mockfs, ruleopts)
 
-      expect(actual.passed).to.equal(false)
-      expect(actual.targets).to.have.length(1)
-      expect(actual.targets[0].pattern).to.equal(ruleopts.globsAny[0])
-      expect(actual.message).to.contain(ruleopts['fail-message'])
+      assert.strictEqual(actual.passed, false)
+      assert.strictEqual(actual.targets.length, 1)
+      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAny[0])
+      assert.ok(actual.message.includes(ruleopts['fail-message']))
     })
   })
 })

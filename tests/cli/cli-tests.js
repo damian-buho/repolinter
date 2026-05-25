@@ -2,23 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'node:path'
-import { expect } from 'chai'
+import { describe, it, afterEach } from 'node:test'
+import assert from 'node:assert/strict'
 import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import { exec as cpExec } from 'node:child_process'
 import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
-// eslint-disable-next-line no-control-regex
 const stripAnsi = s => s.replaceAll(/\u001B\[[0-9;]*m/g, '')
 import * as repolinter from '../../dist/index.js'
 
-/**
- * Execute a command in a childprocess asynchronously. Not secure, but good for testing.
- *
- * @param {string} command The command to execute
- * @param {import('child_process').ExecOptions} [opts] Options to execute against.
- * @returns {Promise<{out: string, err: string, code: number}>} The command output
- */
 async function execAsync(command, options = {}) {
   return new Promise((resolve, reject) => {
     cpExec(command, options, (error, outstd, errstd) =>
@@ -33,13 +26,12 @@ async function execAsync(command, options = {}) {
   })
 }
 
-describe('cli', function () {
+describe('cli', () => {
   const repolinterPath =
     process.platform === 'win32'
       ? path.resolve('dist/cli.js')
       : path.resolve('dist/cli.js')
   const selfPath = path.resolve('tests/cli')
-  this.timeout(30_000)
 
   it('runs repolinter from the CLI', async () => {
     const expected = stripAnsi(
@@ -50,8 +42,8 @@ describe('cli', function () {
     )
     const actual = await execAsync(`${repolinterPath} lint ${selfPath}`)
 
-    expect(actual.code).to.equal(0)
-    expect(actual.out.trim()).to.equals(expected.trim())
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual.out.trim(), expected.trim())
   })
 
   it('produces valid JSON with the JSON formatter', async () => {
@@ -60,10 +52,10 @@ describe('cli', function () {
       execAsync(`${repolinterPath} lint ${selfPath} -f json`)
     ])
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(() => JSON.parse(actual.out)).to.not.throw()
-    expect(() => JSON.parse(actual2.out)).to.not.throw()
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.doesNotThrow(() => JSON.parse(actual.out))
+    assert.doesNotThrow(() => JSON.parse(actual2.out))
   })
 
   it('fixes a problem with dryRun disabled', async () => {
@@ -71,12 +63,12 @@ describe('cli', function () {
       `${repolinterPath} lint ${selfPath} --rulesetFile repolinter-other-fix.json`
     )
 
-    expect(actual.code).to.not.equal(0)
+    assert.notStrictEqual(actual.code, 0)
     const fileExists = await realFs.promises
       .access(path.resolve('tests/cli/fixed.txt'))
       .then(() => true)
       .catch(() => false)
-    expect(fileExists).to.equal(true)
+    assert.strictEqual(fileExists, true)
   })
 
   it("doesn't make any changes with dryRun enabled", async () => {
@@ -89,13 +81,13 @@ describe('cli', function () {
       )
     ])
 
-    expect(actual.code).to.not.equal(0)
-    expect(actual2.code).to.not.equal(0)
+    assert.notStrictEqual(actual.code, 0)
+    assert.notStrictEqual(actual2.code, 0)
     const fileExists = await realFs.promises
       .access(path.resolve('tests/cli/fixed.txt'))
       .then(() => true)
       .catch(() => false)
-    expect(fileExists).to.equal(false)
+    assert.strictEqual(fileExists, false)
   })
 
   it('runs repolinter from the CLI using a config file', async () => {
@@ -132,14 +124,14 @@ describe('cli', function () {
         )
       ])
 
-    expect(parameterTest1.code).to.equal(0)
-    expect(parameterTest2.code).to.equal(0)
-    expect(parameterTest3.code).to.equal(0)
-    expect(pathTest1.code).to.equal(0)
-    expect(parameterTest1.out.trim()).to.equals(expectedPath.trim())
-    expect(parameterTest2.out.trim()).to.equals(expectedPath.trim())
-    expect(parameterTest3.out.trim()).to.equals(expectedPath.trim())
-    expect(pathTest1.out.trim()).to.equals(expectedBinPath.trim())
+    assert.strictEqual(parameterTest1.code, 0)
+    assert.strictEqual(parameterTest2.code, 0)
+    assert.strictEqual(parameterTest3.code, 0)
+    assert.strictEqual(pathTest1.code, 0)
+    assert.strictEqual(parameterTest1.out.trim(), expectedPath.trim())
+    assert.strictEqual(parameterTest2.out.trim(), expectedPath.trim())
+    assert.strictEqual(parameterTest3.out.trim(), expectedPath.trim())
+    assert.strictEqual(pathTest1.out.trim(), expectedBinPath.trim())
   })
 
   it('runs repolinter from the CLI using a YAML config file', async () => {
@@ -159,12 +151,12 @@ describe('cli', function () {
       )
     ])
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual3.code).to.equal(0)
-    expect(actual.out.trim()).to.equals(expected.trim())
-    expect(actual2.out.trim()).to.equals(expected.trim())
-    expect(actual3.out.trim()).to.equals(expected.trim())
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.strictEqual(actual3.code, 0)
+    assert.strictEqual(actual.out.trim(), expected.trim())
+    assert.strictEqual(actual2.out.trim(), expected.trim())
+    assert.strictEqual(actual3.out.trim(), expected.trim())
   })
 
   it('runs repolinter on a remote git repository', async () => {
@@ -177,10 +169,10 @@ describe('cli', function () {
       )
     ])
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual.out.trim()).to.contain('Lint:')
-    expect(actual2.out.trim()).to.contain('Lint:')
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.ok(actual.out.trim().includes('Lint:'))
+    assert.ok(actual2.out.trim().includes('Lint:'))
   })
 
   it('runs repolinter using a remote ruleset', async () => {
@@ -225,12 +217,12 @@ describe('cli', function () {
       await new Promise(resolve => server.stop(resolve))
     }
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual3.code).to.equal(0)
-    expect(actual.out.trim()).to.equals(expected.trim())
-    expect(actual2.out.trim()).to.equals(expected.trim())
-    expect(actual3.out.trim()).to.equals(expected.trim())
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.strictEqual(actual3.code, 0)
+    assert.strictEqual(actual.out.trim(), expected.trim())
+    assert.strictEqual(actual2.out.trim(), expected.trim())
+    assert.strictEqual(actual3.out.trim(), expected.trim())
   })
 
   it('runs repolinter using a remote YAML ruleset', async () => {
@@ -275,12 +267,12 @@ describe('cli', function () {
       await new Promise(resolve => server.stop(resolve))
     }
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual3.code).to.equal(0)
-    expect(actual.out.trim()).to.equals(expected.trim())
-    expect(actual2.out.trim()).to.equals(expected.trim())
-    expect(actual3.out.trim()).to.equals(expected.trim())
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.strictEqual(actual3.code, 0)
+    assert.strictEqual(actual.out.trim(), expected.trim())
+    assert.strictEqual(actual2.out.trim(), expected.trim())
+    assert.strictEqual(actual3.out.trim(), expected.trim())
   })
 
   it('runs repolinter using encoded ruleset', async () => {
@@ -291,9 +283,9 @@ describe('cli', function () {
       execAsync(`${repolinterPath} lint --rulesetEncoded ${encodedRuleset}`)
     ])
 
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual.out.trim()).to.contain('Lint:')
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.ok(actual.out.trim().includes('Lint:'))
   })
 
   it('runs repolinter using invalid encoded ruleset', async () => {
@@ -303,10 +295,10 @@ describe('cli', function () {
       execAsync(`${repolinterPath} lint --rulesetEncoded ${encodedRuleset}`)
     ])
 
-    expect(actual.code).to.equal(1)
-    expect(actual2.code).to.equal(1)
-    expect(actual.out.trim()).to.contain('configuration must be object')
-    expect(actual2.out.trim()).to.contain('configuration must be object')
+    assert.strictEqual(actual.code, 1)
+    assert.strictEqual(actual2.code, 1)
+    assert.ok(actual.out.trim().includes('configuration must be object'))
+    assert.ok(actual2.out.trim().includes('configuration must be object'))
   })
 
   it('runs repolinter with ruleset file path too long', async () => {
@@ -317,10 +309,10 @@ describe('cli', function () {
       execAsync(`${repolinterPath} lint --rulesetEncoded ${encodedRuleset}`)
     ])
 
-    expect(actual.code).to.equal(1)
-    expect(actual2.code).to.equal(1)
-    expect(actual.out.trim()).to.contain('configuration must be object')
-    expect(actual2.out.trim()).to.contain('configuration must be object')
+    assert.strictEqual(actual.code, 1)
+    assert.strictEqual(actual2.code, 1)
+    assert.ok(actual.out.trim().includes('configuration must be object'))
+    assert.ok(actual2.out.trim().includes('configuration must be object'))
   })
 
   it('should handle encoded rulesets with encoded extends', async () => {
@@ -330,14 +322,14 @@ describe('cli', function () {
       execAsync(`${repolinterPath} lint -c ${encodedRuleset}`),
       execAsync(`${repolinterPath} lint --rulesetEncoded ${encodedRuleset}`)
     ])
-    expect(actual.code).to.equal(0)
-    expect(actual2.code).to.equal(0)
-    expect(actual.out.trim()).to.contain(
+    assert.strictEqual(actual.code, 0)
+    assert.strictEqual(actual2.code, 0)
+    assert.ok(actual.out.trim().includes(
       `test-file-exists: ignored because level is "off"`
-    )
-    expect(actual2.out.trim()).to.contain(
+    ))
+    assert.ok(actual2.out.trim().includes(
       `test-file-exists: ignored because level is "off"`
-    )
+    ))
   })
 
   afterEach(async () => {
@@ -345,4 +337,4 @@ describe('cli', function () {
       .unlink(path.resolve('tests/cli/fixed.txt'))
       .catch(() => {})
   })
-})
+}, { timeout: 30_000 })
