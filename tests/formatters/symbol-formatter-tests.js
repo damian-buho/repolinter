@@ -58,7 +58,8 @@ describe('formatters', () => {
             new RuleInfo('rule2', 'error', [], 'file-existence', {}),
             'ignored'
           ),
-          new FormatResult.CreateError(
+          // eslint-disable-next-line unicorn/throw-new-error -- static factory, not Error constructor
+          FormatResult.CreateError(
             new RuleInfo('rule3', 'error', [], 'file-existence', {}),
             'errored'
           )

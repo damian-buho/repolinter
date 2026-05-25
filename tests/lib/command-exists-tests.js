@@ -14,7 +14,7 @@ describe('lib', () => {
 
     it("should detect a command doesn't exists", async () => {
       const result = await commandExists('notacommand')
-      assert.strictEqual(result, null)
+      assert.strictEqual(result, undefined)
     })
 
     it('should detect one of the commands exist', async () => {
@@ -24,7 +24,7 @@ describe('lib', () => {
 
     it('should detect none of the commands exist', async () => {
       const result = await commandExists(['notacommand', 'alsonotacommand'])
-      assert.strictEqual(result, null)
+      assert.strictEqual(result, undefined)
     })
 
     it('should detect the first command exists', async () => {

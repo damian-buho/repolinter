@@ -4,7 +4,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import http from 'node:http'
-import { describe, it, beforeEach, afterEach } from 'node:test'
+import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
@@ -14,19 +14,19 @@ import fs from 'node:fs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function createMockServer(responses) {
-  const server = http.createServer((request, res) => {
+  const server = http.createServer((request, response) => {
     const key = `${request.method} ${request.url}`
     const handler = responses[key]
     if (handler) {
       if (handler.error) {
-        res.destroy()
+        response.destroy()
         return
       }
-      res.writeHead(handler.status || 200)
-      res.end(handler.body || '')
+      response.writeHead(handler.status || 200)
+      response.end(handler.body || '')
     } else {
-      res.writeHead(404)
-      res.end('not found')
+      response.writeHead(404)
+      response.end('not found')
     }
   })
   return server
@@ -65,7 +65,7 @@ describe(
           const server = createMockServer({
             'HEAD /something/somethingelse': { status: 200 }
           })
-          await new Promise(r => server.listen(0, r))
+          await new Promise(resolve => server.listen(0, resolve))
           const url = serverUrl(server)
 
           const temporaryFile = path.join(
@@ -87,7 +87,7 @@ describe(
             assert.strictEqual(actual.targets[0].passed, true)
           } finally {
             fs.unlinkSync(temporaryFile)
-            await new Promise(r => server.close(r))
+            await new Promise(resolve => server.close(resolve))
           }
         })
 
@@ -95,7 +95,7 @@ describe(
           const server = createMockServer({
             'HEAD /something/somethingelse': { status: 200 }
           })
-          await new Promise(r => server.listen(0, r))
+          await new Promise(resolve => server.listen(0, resolve))
           const url = serverUrl(server)
 
           const temporaryFile = path.join(
@@ -117,7 +117,7 @@ describe(
             assert.strictEqual(actual.targets[0].passed, false)
           } finally {
             fs.unlinkSync(temporaryFile)
-            await new Promise(r => server.close(r))
+            await new Promise(resolve => server.close(resolve))
           }
         })
 
@@ -125,7 +125,7 @@ describe(
           const server = createMockServer({
             'HEAD /something/somethingelse': { status: 404 }
           })
-          await new Promise(r => server.listen(0, r))
+          await new Promise(resolve => server.listen(0, resolve))
           const url = serverUrl(server)
 
           const temporaryFile = path.join(
@@ -147,7 +147,7 @@ describe(
             assert.strictEqual(actual.targets[0].passed, false)
           } finally {
             fs.unlinkSync(temporaryFile)
-            await new Promise(r => server.close(r))
+            await new Promise(resolve => server.close(resolve))
           }
         })
 
@@ -295,7 +295,7 @@ describe(
             'HEAD /something/somethingelse': { status: 200 },
             'HEAD /something': { status: 200 }
           })
-          await new Promise(r => server.listen(0, r))
+          await new Promise(resolve => server.listen(0, resolve))
           const url = serverUrl(server)
 
           const temporaryFile = path.join(
@@ -317,7 +317,7 @@ describe(
             assert.strictEqual(actual.targets[0].passed, true)
           } finally {
             fs.unlinkSync(temporaryFile)
-            await new Promise(r => server.close(r))
+            await new Promise(resolve => server.close(resolve))
           }
         })
 
@@ -325,7 +325,7 @@ describe(
           const server = createMockServer({
             'HEAD /something/somethingelse': { status: 200 }
           })
-          await new Promise(r => server.listen(0, r))
+          await new Promise(resolve => server.listen(0, resolve))
           const url = serverUrl(server)
 
           const temporaryMd = path.join(targetDirectory, '_test_multi_file.md')
@@ -354,7 +354,7 @@ describe(
           } finally {
             fs.unlinkSync(temporaryMd)
             fs.unlinkSync(temporaryRst)
-            await new Promise(r => server.close(r))
+            await new Promise(resolve => server.close(resolve))
           }
         })
 

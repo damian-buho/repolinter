@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 class GitHubMarkup {
   async renderMarkup(targetFile: string): Promise<string | null> {
     const command = await commandExists(['github-markup'])
-    if (command === null) {
+    if (command === undefined) {
       throw new Error('GitHub markup not installed')
     }
     const gitHubMarkupRes = spawnSync(

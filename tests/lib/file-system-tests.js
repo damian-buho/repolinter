@@ -141,7 +141,10 @@ describe(
           const files = filesRaw.map(file => {
             return path.relative(path.resolve('.'), file)
           })
-          assert.deepStrictEqual([...files].sort(), [...includedFiles].sort())
+          assert.deepStrictEqual(
+            [...files].toSorted(),
+            [...includedFiles].toSorted()
+          )
         })
 
         it('should honor nocase true', async () => {
@@ -152,7 +155,10 @@ describe(
           const files = filesRaw.map(file => {
             return path.relative(path.resolve('.'), file)
           })
-          assert.deepStrictEqual([...files].sort(), [...includedFiles].sort())
+          assert.deepStrictEqual(
+            [...files].toSorted(),
+            [...includedFiles].toSorted()
+          )
         })
 
         it('should honor nocase false', async () => {

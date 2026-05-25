@@ -17,7 +17,7 @@ describe('api', () => {
         }
       }
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(actual)), {
+      assert.deepStrictEqual(structuredClone(actual), {
         package: { passed: true, targets: [{ passed: true, path: 'npm' }] }
       })
     })
@@ -35,7 +35,7 @@ describe('api', () => {
       }
       const mockFs = {}
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(actual)), {
+      assert.deepStrictEqual(structuredClone(actual), {
         banana: {
           passed: false,
           message: 'invalid axiom name notanaxiom',

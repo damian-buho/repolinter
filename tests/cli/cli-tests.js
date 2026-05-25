@@ -9,7 +9,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import { exec as cpExec } from 'node:child_process'
 import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
-const stripAnsi = s => s.replaceAll(/\u001B\[[0-9;]*m/g, '')
+const ESC = '\u001B'
+const ANSI_RE = new RegExp(`${ESC}${String.raw`\[[0-9;]*m`}`, 'g')
+const stripAnsi = s => s.replaceAll(ANSI_RE, '')
 import * as repolinter from '../../dist/index.js'
 
 async function execAsync(command, options = {}) {

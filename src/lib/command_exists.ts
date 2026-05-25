@@ -5,7 +5,7 @@ import commandExistsLib from 'command-exists'
 
 async function commandExists(
   command: string | string[]
-): Promise<string | null> {
+): Promise<string | undefined> {
   const commands = Array.isArray(command) ? command : [command]
   for (const cmd of commands) {
     try {
@@ -15,7 +15,7 @@ async function commandExists(
       // command not found, try next
     }
   }
-  return null
+  return undefined
 }
 
 export { commandExists }

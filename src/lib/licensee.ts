@@ -11,7 +11,7 @@ interface LicenseeJson {
 class Licensee {
   async identifyLicense(targetDir: string): Promise<string[]> {
     const command = await commandExists(['licensee', 'licensee.bat'])
-    if (command === null) {
+    if (command === undefined) {
       throw new Error('Licensee not installed')
     }
     const licenseeOutput = spawnSync(command, [

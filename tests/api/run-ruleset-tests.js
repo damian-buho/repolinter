@@ -28,7 +28,7 @@ describe('api', () => {
         false
       )
       assert.strictEqual(result.length, 1)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
+      assert.deepStrictEqual(structuredClone(result[0].ruleInfo), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: {},
@@ -53,7 +53,7 @@ describe('api', () => {
         false
       )
       assert.strictEqual(result.length, 1)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
+      assert.deepStrictEqual(structuredClone(result[0].ruleInfo), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
@@ -78,7 +78,7 @@ describe('api', () => {
         false
       )
       assert.strictEqual(result.length, 1)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
+      assert.deepStrictEqual(structuredClone(result[0].ruleInfo), {
         level: 'warning',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },
@@ -256,7 +256,7 @@ describe('api', () => {
       assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_ERROR)
       assert.strictEqual(result[0].lintResult.passed, false)
       assert.strictEqual(result[0].fixResult.passed, true)
-      assert.deepStrictEqual(JSON.parse(JSON.stringify(result[0].ruleInfo)), {
+      assert.deepStrictEqual(structuredClone(result[0].ruleInfo), {
         level: 'error',
         name: 'my-rule',
         ruleConfig: { globsAny: ['notafile'] },

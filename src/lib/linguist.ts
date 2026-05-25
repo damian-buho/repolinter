@@ -14,7 +14,7 @@ class Linguist {
       'github-linguist.bat',
       'linguist.bat'
     ])
-    if (command === null) {
+    if (command === undefined) {
       throw new Error('Linguist not installed')
     }
     const output = spawnSync(command, [targetDir, '--json']).stdout
