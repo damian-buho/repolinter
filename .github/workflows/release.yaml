@@ -1,10 +1,16 @@
 name: Release
 # Tag-triggered: re-runs the full validation pipeline against the tagged SHA,
 # then publishes to npm (OIDC trusted publishing) and GHCR (multiarch).
+#
+# Can also be dispatched manually against any ref. In that case the version is
+# read from package.json and the matching tag is created at the dispatched ref
+# before publishing — push by GITHUB_TOKEN does not retrigger this workflow,
+# so there is no double-fire.
 
 on:
   push:
     tags: ['**']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,11 +32,13 @@ jobs:
     needs: pipeline
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # GitHub release creation
+      contents: write  # GitHub release creation + tag push on manual dispatch
       id-token: write  # OIDC for npm provenance + GHCR attestation
       packages: write  # push image to GHCR
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history so we can create / inspect tags
 
       - uses: actions/setup-node@v4
         with:
@@ -40,6 +48,33 @@ jobs:
 
       - run: npm ci
 
+      - name: Resolve release version
+        id: ver
+        # Tag pushes use the tag name as-is; dispatch reads package.json so
+        # `cog bump` (or a manual edit) defines the release version.
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            ver="${GITHUB_REF_NAME}"
+          else
+            ver="$(node -p "require('./package.json').version")"
+          fi
+          echo "Resolved version: ${ver}"
+          echo "version=${ver}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          TAG: ${{ steps.ver.outputs.version }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists at $(git rev-parse "${TAG}") — reusing"
+          else
+            git tag "${TAG}"
+            git push origin "${TAG}"
+          fi
+
       # prepublishOnly runs the build, so no explicit build step is needed.
       - name: Publish to npm
         run: npm publish --provenance
@@ -47,6 +82,7 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.ver.outputs.version }}
           generate_release_notes: true
 
       - uses: docker/setup-qemu-action@v3  # arm64 emulation for multiarch build
@@ -64,12 +100,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
-          # semver tag input drives {{version}}, {{major}}.{{minor}}, {{major}};
-          # `latest` is auto-applied on semver tags by metadata-action's default flavor.
+          # `value=` overrides github.ref-derived input so dispatch works even
+          # when the ref is a branch; `latest` is auto-applied on semver values.
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},value=${{ steps.ver.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.ver.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.ver.outputs.version }}
 
       - name: Build and push multiarch image
         uses: docker/build-push-action@v6
