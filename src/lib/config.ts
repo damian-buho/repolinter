@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import Ajv from 'ajv'
+import { Ajv, type ErrorObject } from 'ajv'
 import findFile from 'find-config'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -12,26 +12,45 @@ import Rules from '../rules/rules.js'
 import RuleInfo from './ruleinfo.js'
 import Fixes from '../fixes/fixes.js'
 
+interface RuleEntry {
+  level: 'off' | 'warning' | 'error'
+  where?: string[]
+  rule: { type: string; options?: Record<string, unknown> }
+  fix?: { type?: string; options?: Record<string, unknown> }
+  policyInfo?: string
+  policyUrl?: string
+}
+
+export interface RulesetConfig {
+  version?: number
+  extends?: string
+  axioms?: Record<string, string>
+  rules?: Record<string, RuleEntry>
+  formatOptions?: Record<string, unknown>
+  [key: string]: unknown
+}
+
+type JsonObject = Record<string, unknown>
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function deepMerge(
-  target: Record<string, any>,
-  ...sources: any[]
-): Record<string, any> {
-  for (const src of sources) {
-    if (src && typeof src === 'object') {
-      for (const key of Object.keys(src)) {
+function deepMerge(target: JsonObject, ...sources: JsonObject[]): JsonObject {
+  for (const source of sources) {
+    if (source && typeof source === 'object') {
+      for (const key of Object.keys(source)) {
+        const sourceValue = source[key]
+        const tgtValue = target[key]
         if (
-          src[key] &&
-          typeof src[key] === 'object' &&
-          !Array.isArray(src[key]) &&
-          target[key] &&
-          typeof target[key] === 'object' &&
-          !Array.isArray(target[key])
+          sourceValue &&
+          typeof sourceValue === 'object' &&
+          !Array.isArray(sourceValue) &&
+          tgtValue &&
+          typeof tgtValue === 'object' &&
+          !Array.isArray(tgtValue)
         ) {
-          deepMerge(target[key], src[key])
+          deepMerge(tgtValue as JsonObject, sourceValue as JsonObject)
         } else {
-          target[key] = src[key]
+          target[key] = sourceValue
         }
       }
     }
@@ -63,15 +82,66 @@ function findConfig(directory?: string): string {
   )
 }
 
+function parseRawRuleset(
+  raw: string,
+  locationDescription: string
+): RulesetConfig {
+  try {
+    return JSON.parse(raw) as RulesetConfig
+  } catch (error: unknown) {
+    try {
+      return YAML.parse(raw) as RulesetConfig
+    } catch (error_: unknown) {
+      throw new Error(
+        `unable to parse ${locationDescription} as either JSON (error: ${error}) or YAML (error: ${error_})`,
+        { cause: error_ }
+      )
+    }
+  }
+}
+
+async function resolveExtension(
+  ruleset: RulesetConfig,
+  sourceLocation: string,
+  processed: string[]
+): Promise<RulesetConfig> {
+  if (!ruleset.extends) return ruleset
+
+  processed.push(sourceLocation)
+  if (processed.length > 20) {
+    throw new Error('exceeded maximum 20 ruleset extensions')
+  }
+
+  let parent: string
+  if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
+    parent = ruleset.extends
+  } else if (isAbsoluteURL(sourceLocation)) {
+    parent = new URL(ruleset.extends, sourceLocation).toString()
+  } else {
+    parent = path.resolve(path.dirname(sourceLocation), ruleset.extends)
+  }
+
+  if (processed.includes(parent)) return ruleset
+
+  const parentRuleset = isBase64(parent)
+    ? await decodeConfig(parent, processed)
+    : await loadConfig(parent, processed)
+  return deepMerge(
+    {},
+    parentRuleset as JsonObject,
+    ruleset as JsonObject
+  ) as RulesetConfig
+}
+
 async function loadConfig(
   configLocation: string,
   processed: string[] = []
-): Promise<any> {
+): Promise<RulesetConfig> {
   if (!configLocation) {
     throw new Error('must specify config location')
   }
 
-  let configData: string | null = null
+  let configData: string
   if (isAbsoluteURL(configLocation)) {
     const response = await fetch(configLocation)
     if (!response.ok) {
@@ -81,187 +151,137 @@ async function loadConfig(
     }
     configData = await response.text()
   } else {
-    configData = await fs.promises.readFile(configLocation, 'utf-8')
+    configData = await fs.promises.readFile(configLocation, 'utf8')
   }
 
-  let ruleset: any
-  try {
-    ruleset = JSON.parse(configData)
-  } catch (je: unknown) {
-    try {
-      ruleset = YAML.parse(configData)
-    } catch (ye: unknown) {
-      throw new Error(
-        `unable to parse ${configLocation} as either JSON (error: ${je}) or YAML (error: ${ye})`
-      )
-    }
-  }
-
-  if (ruleset.extends) {
-    processed.push(configLocation)
-    if (processed.length > 20) {
-      throw new Error('exceeded maximum 20 ruleset extensions')
-    }
-
-    let parent: string
-    if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
-      parent = ruleset.extends
-    } else if (isAbsoluteURL(configLocation)) {
-      parent = new URL(ruleset.extends, configLocation).toString()
-    } else {
-      parent = path.resolve(path.dirname(configLocation), ruleset.extends)
-    }
-    if (!processed.includes(parent)) {
-      let parentRuleset: any
-      if (isBase64(parent)) {
-        parentRuleset = await decodeConfig(parent, processed)
-      } else {
-        parentRuleset = await loadConfig(parent, processed)
-      }
-      ruleset = deepMerge({}, parentRuleset, ruleset)
-    }
-  }
-
-  return ruleset
+  const ruleset = parseRawRuleset(configData, configLocation)
+  return resolveExtension(ruleset, configLocation, processed)
 }
 
 async function validateConfig(
-  config: any
+  config: RulesetConfig
 ): Promise<{ passed: boolean; error?: string }> {
-  const ajvProps = new (Ajv as any)({ strict: false })
-  const parsedRuleSchemas: Promise<any[]> = Promise.all(
-    Object.keys(Rules).map(rs =>
-      fs.promises
-        .readFile(
-          path.resolve(__dirname, '../rules', `${rs}-config.json`),
-          'utf8'
-        )
-        .then(JSON.parse)
-    )
-  )
-  const parsedFixSchemas: Promise<any[]> = Promise.all(
-    Object.keys(Fixes).map(f =>
-      fs.promises
-        .readFile(
-          path.resolve(__dirname, '../fixes', `${f}-config.json`),
-          'utf8'
-        )
-        .then(JSON.parse)
-    )
-  )
-  const allSchemas: any[] = (
-    await Promise.all([parsedFixSchemas, parsedRuleSchemas])
-  ).flat()
-  for (const schema of allSchemas) {
-    ajvProps.addSchema(schema)
-  }
-  const validator = ajvProps.compile(
-    JSON.parse(
-      await fs.promises.readFile(
-        path.resolve(__dirname, '../rulesets/schema.json'),
-        'utf8'
+  const ajvProperties = new Ajv({ strict: false })
+  const loadSchemasFrom = (
+    registry: Record<string, unknown>,
+    subDirectory: string
+  ): Promise<JsonObject[]> =>
+    Promise.all(
+      Object.keys(registry).map(name =>
+        fs.promises
+          .readFile(
+            path.resolve(__dirname, '..', subDirectory, `${name}-config.json`),
+            'utf8'
+          )
+          .then(data => JSON.parse(data) as JsonObject)
       )
     )
-  )
 
-  if (!validator(config)) {
-    return {
-      passed: false,
-      error: `Configuration validation failed with errors: \n${(
-        validator.errors ?? []
-      )
-        .map(
-          (e: any) =>
-            `\tconfiguration${e.instancePath} ${e.message}\n\nIt's likely the rulesetPath or rulesetUrl isn't configured correctly.`
-        )
-        .join('\n')}`
-    }
-  } else {
+  const [fixSchemas, ruleSchemas] = await Promise.all([
+    loadSchemasFrom(Fixes, 'fixes'),
+    loadSchemasFrom(Rules, 'rules')
+  ])
+  for (const schema of [...fixSchemas, ...ruleSchemas]) {
+    ajvProperties.addSchema(schema)
+  }
+
+  const mainSchema = JSON.parse(
+    await fs.promises.readFile(
+      path.resolve(__dirname, '../rulesets/schema.json'),
+      'utf8'
+    )
+  ) as JsonObject
+  const validate = ajvProperties.compile(mainSchema)
+
+  if (validate(config)) {
     return { passed: true }
+  }
+
+  const errorMessages = (validate.errors ?? [])
+    .map(
+      (error: ErrorObject) =>
+        `\tconfiguration${error.instancePath} ${error.message}\n\nIt's likely the rulesetPath or rulesetUrl isn't configured correctly.`
+    )
+    .join('\n')
+
+  return {
+    passed: false,
+    error: `Configuration validation failed with errors: \n${errorMessages}`
   }
 }
 
-function parseConfig(config: any): RuleInfo[] {
+function parseConfig(config: RulesetConfig): RuleInfo[] {
   if (config.version === 2) {
-    return Object.entries<any>(config.rules).map(
+    return Object.entries<RuleEntry>(config.rules ?? {}).map(
       ([name, cfg]) =>
         new RuleInfo(
           name,
           cfg.level,
           cfg.where,
           cfg.rule.type,
-          cfg.rule.options,
-          cfg.fix && cfg.fix.type,
-          cfg.fix && cfg.fix.options,
+          cfg.rule.options ?? {},
+          cfg.fix?.type,
+          cfg.fix?.options,
           cfg.policyInfo,
           cfg.policyUrl
         )
     )
   }
-  return Object.entries<any>(config.rules)
-    .map(([where, rules]) => {
-      return Object.entries<any>(rules).map(([rulename, configray]) => {
-        const [name = '', type] = rulename.split(':')
-        return new RuleInfo(
-          name,
-          configray[0],
-          where === 'all' ? [] : [where],
-          type || name,
-          configray[1] || {}
-        )
-      })
+  const v1Rules = config.rules as unknown as Record<
+    string,
+    Record<string, unknown[]>
+  >
+  return Object.entries(v1Rules).flatMap(([where, rules]) => {
+    return Object.entries(rules).map(([rulename, configray]) => {
+      const [name = '', type] = rulename.split(':')
+      return new RuleInfo(
+        name,
+        configray[0] as 'off' | 'warning' | 'error',
+        where === 'all' ? [] : [where],
+        type || name,
+        (configray[1] as JsonObject | undefined) ?? {}
+      )
     })
-    .flat()
+  })
 }
 
 async function decodeConfig(
   encodedRuleSet: string,
   processed: string[] = []
-): Promise<any> {
+): Promise<RulesetConfig> {
   const configData = Buffer.from(encodedRuleSet, 'base64').toString()
+  const ruleset = parseRawRuleset(configData, 'ruleset')
 
-  let ruleset: any
-  try {
-    ruleset = JSON.parse(configData)
-  } catch (je: unknown) {
-    try {
-      ruleset = YAML.parse(configData)
-    } catch (ye: unknown) {
-      throw new Error(
-        `unable to parse ruleset as either JSON (error: ${je}) or YAML (error: ${ye})`
-      )
-    }
+  if (!ruleset.extends) return ruleset
+
+  processed.push(encodedRuleSet)
+  if (processed.length > 20) {
+    throw new Error('exceeded maximum 20 ruleset extensions')
   }
 
-  if (ruleset.extends) {
-    processed.push(encodedRuleSet)
-    if (processed.length > 20) {
-      throw new Error('exceeded maximum 20 ruleset extensions')
-    }
+  let parent: string | undefined
+  if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
+    parent = ruleset.extends
+  }
 
-    let parent: string | undefined
-    if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
-      parent = ruleset.extends
-    }
-
-    if (parent !== undefined && !processed.includes(parent)) {
-      let parentRuleset: any
-      if (isBase64(parent)) {
-        parentRuleset = await decodeConfig(parent, processed)
-      } else {
-        parentRuleset = await loadConfig(parent, processed)
-      }
-      ruleset = deepMerge({}, parentRuleset, ruleset)
-    }
+  if (parent !== undefined && !processed.includes(parent)) {
+    const parentRuleset = isBase64(parent)
+      ? await decodeConfig(parent, processed)
+      : await loadConfig(parent, processed)
+    return deepMerge(
+      {},
+      parentRuleset as JsonObject,
+      ruleset as JsonObject
+    ) as RulesetConfig
   }
 
   return ruleset
 }
 
-function isBase64(str: string): boolean {
+function isBase64(string_: string): boolean {
   const base64regex =
     /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
-  return base64regex.test(str)
+  return base64regex.test(string_)
 }
 
 export {

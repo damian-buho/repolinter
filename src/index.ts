@@ -1,16 +1,17 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import fs from 'fs'
+import path from 'node:path'
+import fs from 'node:fs'
 import * as config from './lib/config.js'
+import type { RulesetConfig } from './lib/config.js'
 import Result from './lib/result.js'
 import type { ResultTarget } from './lib/result.js'
 import RuleInfo from './lib/ruleinfo.js'
 import FormatResultBase from './lib/formatresult.js'
-import type { FormatResultStatus } from './lib/formatresult.js'
-import FileSystem from './lib/file_system.js'
-import type { GlobOptions } from './lib/file_system.js'
+
+import FileSystem from './lib/file-system.js'
+
 import Rules from './rules/rules.js'
 import Fixes from './fixes/fixes.js'
 import Axioms from './axioms/axioms.js'
@@ -25,143 +26,151 @@ const FormatResult = FormatResultBase as typeof FormatResultBase & {
 
 export interface LintResult {
   params: {
-    targetDir: string
+    targetDirectory: string
     filterPaths: string[]
-    rulesetPath: string | null
-    ruleset: any
+    rulesetPath: string | undefined
+    ruleset: unknown
   }
   passed: boolean
   errored: boolean
   errMsg?: string
-  results: any[]
-  targets: Record<string, any>
-  formatOptions?: Record<string, any>
+  results: InstanceType<typeof FormatResultBase>[]
+  targets: Record<string, Result>
+  formatOptions?: Record<string, unknown>
 }
 
 export interface Formatter {
   formatOutput(output: LintResult, dryRun: boolean): string
 }
 
-import defaultFormatter from './formatters/symbol_formatter.js'
-export { defaultFormatter }
-
-import jsonFormatter from './formatters/json_formatter.js'
-export { jsonFormatter }
-
-import markdownFormatter from './formatters/markdown_formatter.js'
-export { markdownFormatter }
+import defaultFormatter from './formatters/symbol-formatter.js'
 
 export const resultFormatter: Formatter = defaultFormatter
 
 export async function lint(
-  targetDir: string,
+  targetDirectory: string,
   filterPaths: string[] = [],
-  ruleset: any = null,
+  ruleset: unknown = undefined,
   dryRun: boolean = false
 ): Promise<LintResult> {
   const fileSystem = new FileSystem()
-  fileSystem.targetDir = targetDir
+  fileSystem.targetDirectory = targetDirectory
   if (filterPaths.length > 0) {
     fileSystem.filterPaths = filterPaths
   }
 
-  let rulesetPath: string | null = null
-  let isEncoded = false
-  if (ruleset !== undefined && ruleset !== null) {
-    isEncoded = config.isBase64(ruleset)
-  }
+  let rulesetPath: string | undefined = undefined
 
-  if (isEncoded) {
+  if (typeof ruleset === 'string' && config.isBase64(ruleset)) {
     ruleset = await config.decodeConfig(ruleset)
   } else {
     if (typeof ruleset === 'string') {
       if (config.isAbsoluteURL(ruleset)) {
         rulesetPath = ruleset
       } else {
-        if (fs.existsSync(path.resolve(targetDir, ruleset))) {
-          rulesetPath = path.resolve(targetDir, ruleset)
+        if (fs.existsSync(path.resolve(targetDirectory, ruleset))) {
+          rulesetPath = path.resolve(targetDirectory, ruleset)
         } else {
-          const moduleDir = path.dirname(new URL(import.meta.url).pathname)
-          const herePath = path.join(moduleDir, ruleset)
-          const rootPath = path.join(moduleDir, '..', ruleset)
+          const moduleDirectory = path.dirname(
+            new URL(import.meta.url).pathname
+          )
+          const herePath = path.join(moduleDirectory, ruleset)
+          const rootPath = path.join(moduleDirectory, '..', ruleset)
           if (fs.existsSync(herePath)) {
             rulesetPath = herePath
           } else if (fs.existsSync(rootPath)) {
             rulesetPath = rootPath
           } else {
-            rulesetPath = null
+            rulesetPath = undefined
           }
         }
       }
     } else if (!ruleset) {
-      rulesetPath = config.findConfig(targetDir)
+      rulesetPath = config.findConfig(targetDirectory)
     }
 
-    if (rulesetPath !== null) {
+    if (rulesetPath !== null && rulesetPath !== undefined) {
       try {
         ruleset = await config.loadConfig(rulesetPath)
-      } catch (e) {
+      } catch (error) {
         return {
           params: {
-            targetDir,
+            targetDirectory,
             filterPaths,
             rulesetPath,
             ruleset
           },
           passed: false,
           errored: true,
-          errMsg: String(e),
+          errMsg: String(error),
           results: [],
           targets: {},
-          formatOptions: ruleset && ruleset.formatOptions
+          formatOptions:
+            ruleset !== null && typeof ruleset === 'object'
+              ? (ruleset as RulesetConfig).formatOptions
+              : undefined
         }
       }
     }
   }
 
-  const val = await config.validateConfig(ruleset)
-  if (!val.passed) {
+  const value = await config.validateConfig(ruleset as RulesetConfig)
+  if (!value.passed) {
     return {
       params: {
-        targetDir,
+        targetDirectory,
         filterPaths,
         rulesetPath,
         ruleset
       },
       passed: false,
       errored: true,
-      errMsg: val.error,
+      errMsg: value.error,
       results: [],
       targets: {},
-      formatOptions: ruleset.formatOptions
+      formatOptions:
+        ruleset !== null && typeof ruleset === 'object'
+          ? (ruleset as RulesetConfig).formatOptions
+          : undefined
     }
   }
-  const configParsed = config.parseConfig(ruleset)
-  let targetObj: Record<string, any> = {}
-  if (ruleset.axioms) {
-    targetObj = await determineTargets(ruleset.axioms, fileSystem)
+  const parsedRuleset = ruleset as Record<string, unknown>
+  const configParsed = config.parseConfig(parsedRuleset)
+  let targetObject: Record<string, Result> = {}
+  if (parsedRuleset.axioms) {
+    targetObject = await determineTargets(
+      parsedRuleset.axioms as Record<string, string>,
+      fileSystem
+    )
   }
-  const result = await runRuleset(configParsed, targetObj, fileSystem, dryRun)
-  const passed = !result.find(
+  const result = await runRuleset(
+    configParsed,
+    targetObject,
+    fileSystem,
+    dryRun
+  )
+  const passed = !result.some(
     r =>
       r.status === FormatResult.ERROR ||
       (r.status !== FormatResult.IGNORED &&
         r.ruleInfo.level === 'error' &&
-        !r.lintResult.passed)
+        !r.lintResult!.passed)
   )
 
   return {
     params: {
-      targetDir,
+      targetDirectory,
       filterPaths,
       rulesetPath,
-      ruleset
+      ruleset: parsedRuleset
     },
     passed,
     errored: false,
     results: result,
-    targets: targetObj,
-    formatOptions: ruleset.formatOptions
+    targets: targetObject,
+    formatOptions: parsedRuleset.formatOptions as
+      | Record<string, unknown>
+      | undefined
   }
 }
 
@@ -185,13 +194,13 @@ export function shouldRuleRun(
       match[1] &&
       match[2] &&
       match[3] &&
-      !isNaN(parseInt(match[3]))
+      !Number.isNaN(Number.parseInt(match[3]))
     ) {
       numericalRuleAxioms.push({
         axiom: ruleax,
         name: match[1],
         operand: match[2],
-        number: parseInt(match[3])
+        number: Number.parseInt(match[3])
       })
     } else {
       regularRuleAxioms.push(ruleax)
@@ -203,9 +212,9 @@ export function shouldRuleRun(
     .map(r => r.split('='))
     .map(([targetName = '', maybeNumber = '']): [string, number] => [
       targetName,
-      parseInt(maybeNumber)
+      Number.parseInt(maybeNumber)
     ])
-    .filter(([, maybeNumber]) => !isNaN(maybeNumber))
+    .filter(([, maybeNumber]) => !Number.isNaN(maybeNumber))
   const numericalTargetsMap = new Map(numericalTargets)
   const failedNumerical = numericalRuleAxioms
     .filter(({ name, operand, number }) => {
@@ -223,30 +232,31 @@ export function shouldRuleRun(
 }
 
 export async function runRuleset(
-  ruleset: any[],
-  targets: boolean | Record<string, any>,
+  ruleset: RuleInfo[],
+  targets: boolean | Record<string, Result>,
   fileSystem: FileSystem,
   dryRun: boolean
-): Promise<any[]> {
+): Promise<InstanceType<typeof FormatResultBase>[]> {
   let targetArray: string[] = []
   if (typeof targets !== 'boolean') {
     targetArray = Object.entries(targets)
       .filter(([, result]) => result.passed)
       .map(([axiomId, result]): [string, string[]] => [
         axiomId,
-        result.targets.map((t: any) => t.path)
+        result.targets
+          .map((t: ResultTarget) => t.path)
+          .filter((p): p is string => !!p)
       ])
-      .map(([axiomId, paths]: [string, string[]]) => [
+      .flatMap(([axiomId, paths]: [string, string[]]) => [
         `${axiomId}=*`,
         ...paths.map(p => `${axiomId}=${p}`)
       ])
-      .flat()
   }
-  const results = ruleset.map(async (r: any) => {
+  const results = ruleset.map(async (r: RuleInfo) => {
     if (r.level === 'off') {
       return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
     }
-    if (typeof targets !== 'boolean' && r.where && r.where.length) {
+    if (typeof targets !== 'boolean' && r.where && r.where.length > 0) {
       const ignoreReasons = shouldRuleRun(targetArray, r.where)
       if (ignoreReasons.length > 0) {
         return FormatResult.CreateIgnored(
@@ -260,34 +270,42 @@ export async function runRuleset(
     if (!Object.hasOwn(Rules, r.ruleType)) {
       return FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
     }
-    let result: any
+    let result: Result
     try {
-      const ruleFunc = Rules[r.ruleType]!
-      result = await ruleFunc(fileSystem, r.ruleConfig)
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e)
+      const ruleFunction = Rules[r.ruleType]!
+      result = await ruleFunction(fileSystem, r.ruleConfig)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
       return FormatResult.CreateError(
         r,
         `${r.ruleType} threw an error: ${message}`
       )
     }
-    const fixTargets = !result.passed
-      ? result.targets
-          .filter((t: any) => !t.passed && t.path)
-          .map((t: any) => t.path)
-      : []
+    const fixTargets = result.passed
+      ? []
+      : result.targets
+          .filter(
+            (t: ResultTarget): t is ResultTarget & { path: string } =>
+              !t.passed && !!t.path
+          )
+          .map(t => t.path)
     if (!r.fixType || result.passed) {
       return FormatResult.CreateLintOnly(r, result)
     }
     if (!Object.hasOwn(Fixes, r.fixType)) {
       return FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
     }
-    let fixresult: any
+    let fixresult: Result
     try {
-      const fixFunc = Fixes[r.fixType]!
-      fixresult = await fixFunc(fileSystem, r.fixConfig, fixTargets, dryRun)
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e)
+      const fixFunction = Fixes[r.fixType]!
+      fixresult = await fixFunction(
+        fileSystem,
+        r.fixConfig as Record<string, unknown>,
+        fixTargets,
+        dryRun
+      )
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
       return FormatResult.CreateError(
         r,
         `${r.fixType} threw an error: ${message}`
@@ -302,17 +320,17 @@ export async function runRuleset(
 export async function determineTargets(
   axiomconfig: Record<string, string>,
   fs: FileSystem
-): Promise<Record<string, any>> {
+): Promise<Record<string, Result>> {
   const ruleresults = await Promise.all(
     Object.entries(axiomconfig).map(async ([axiomId, axiomName]) => {
       if (!Object.hasOwn(Axioms, axiomId)) {
         return [
           axiomName,
           new Result(`invalid axiom name ${axiomId}`, [], false)
-        ] as [string, any]
+        ] as [string, Result]
       }
       const axiomFunction = Axioms[axiomId]!
-      return [axiomName, await axiomFunction(fs)] as [string, any]
+      return [axiomName, await axiomFunction(fs)] as [string, Result]
     })
   )
   return Object.fromEntries(ruleresults)
@@ -320,4 +338,14 @@ export async function determineTargets(
 
 export const validateConfig = config.validateConfig
 export const parseConfig = config.parseConfig
-export { Result, ResultTarget, RuleInfo, FileSystem, GlobOptions, FormatResultBase as FormatResult, FormatResultStatus }
+
+export {
+  type FormatResultStatus,
+  default as FormatResult
+} from './lib/formatresult.js'
+export { type GlobOptions, default as FileSystem } from './lib/file-system.js'
+export { default as defaultFormatter } from './formatters/symbol-formatter.js'
+export { default as jsonFormatter } from './formatters/json-formatter.js'
+export { default as markdownFormatter } from './formatters/markdown-formatter.js'
+export { default as Result, type ResultTarget } from './lib/result.js'
+export { default as RuleInfo } from './lib/ruleinfo.js'
