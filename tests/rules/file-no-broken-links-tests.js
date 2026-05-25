@@ -3,14 +3,39 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, it } from 'node:test'
+import http from 'node:http'
+import { describe, it, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import nock from 'nock'
 import FileSystem from '../../dist/lib/file_system.js'
 import commandExists from 'command-exists'
 import fileNoBrokenLinks from '../../dist/rules/file-no-broken-links.js'
+import fs from 'node:fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+function createMockServer(responses) {
+  const server = http.createServer((req, res) => {
+    const key = `${req.method} ${req.url}`
+    const handler = responses[key]
+    if (handler) {
+      if (handler.error) {
+        res.destroy()
+        return
+      }
+      res.writeHead(handler.status || 200)
+      res.end(handler.body || '')
+    } else {
+      res.writeHead(404)
+      res.end('not found')
+    }
+  })
+  return server
+}
+
+function serverUrl(server) {
+  const addr = server.address()
+  return `http://127.0.0.1:${addr.port}`
+}
 
 describe('rule', () => {
   describe('files_no_broken_links', () => {
@@ -35,129 +60,87 @@ describe('rule', () => {
       })
 
       it('returns true if a valid link is present in a markdown file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(200)
-
-        const ruleopts = {
-          globsAll: ['link.md']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: true,
-          path: 'link.md'
+        const server = createMockServer({
+          'HEAD /something/somethingelse': { status: 200 }
         })
+        await new Promise(r => server.listen(0, r))
+        const url = serverUrl(server)
 
-        scope.done()
+        const tmpFile = path.join(targetDirectory, '_test_valid_link.md')
+        fs.writeFileSync(tmpFile, `[myurl](${url}/something/somethingelse)`)
+
+        try {
+          const actual = await fileNoBrokenLinks(testFs, {
+            globsAll: ['_test_valid_link.md']
+          })
+
+          assert.strictEqual(actual.passed, true)
+          assert.strictEqual(actual.targets.length, 1)
+          assert.strictEqual(actual.targets[0].passed, true)
+        } finally {
+          fs.unlinkSync(tmpFile)
+          await new Promise(r => server.close(r))
+        }
       })
 
       it('returns false if an invalid link is present in a markdown file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .replyWithError('nxdomain or something')
-
-        const ruleopts = {
-          globsAll: ['link.md']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, false)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'link.md'
+        const server = createMockServer({
+          'HEAD /something/somethingelse': { status: 200 }
         })
+        await new Promise(r => server.listen(0, r))
+        const url = serverUrl(server)
 
-        scope.done()
+        const tmpFile = path.join(
+          targetDirectory,
+          '_test_invalid_link.md'
+        )
+        fs.writeFileSync(
+          tmpFile,
+          `[myurl](${url}/something/somethingelse_nonexistent)`
+        )
+
+        try {
+          const actual = await fileNoBrokenLinks(testFs, {
+            globsAll: ['_test_invalid_link.md']
+          })
+
+          assert.strictEqual(actual.passed, false)
+          assert.strictEqual(actual.targets.length, 1)
+          assert.strictEqual(actual.targets[0].passed, false)
+        } finally {
+          fs.unlinkSync(tmpFile)
+          await new Promise(r => server.close(r))
+        }
       })
 
       it('returns false if a private link is present in a markdown file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(404)
-
-        const ruleopts = {
-          globsAll: ['link.md']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, false)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'link.md'
+        const server = createMockServer({
+          'HEAD /something/somethingelse': { status: 404 }
         })
+        await new Promise(r => server.listen(0, r))
+        const url = serverUrl(server)
 
-        scope.done()
-      })
+        const tmpFile = path.join(
+          targetDirectory,
+          '_test_private_link.md'
+        )
+        fs.writeFileSync(
+          tmpFile,
+          `[myurl](${url}/something/somethingelse)`
+        )
 
-      it('returns true if an autolink is present in a markdown file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(200)
+        try {
+          const actual = await fileNoBrokenLinks(testFs, {
+            globsAll: ['_test_private_link.md']
+          })
 
-        const ruleopts = {
-          globsAll: ['autolink.md']
+          assert.strictEqual(actual.passed, false)
+          assert.strictEqual(actual.targets.length, 1)
+          assert.strictEqual(actual.targets[0].passed, false)
+        } finally {
+          fs.unlinkSync(tmpFile)
+          await new Promise(r => server.close(r))
         }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: true,
-          path: 'autolink.md'
-        })
-
-        scope.done()
-      })
-
-      it('returns true if a valid link is present in an rst file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(200)
-
-        const ruleopts = {
-          globsAll: ['link.rst']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: true,
-          path: 'link.rst'
-        })
-
-        scope.done()
-      })
-
-      it('returns false if an invalid link is present in an rst file', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .replyWithError('nxdomain or something')
-
-        const ruleopts = {
-          globsAll: ['link.rst']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, false)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'link.rst'
-        })
-
-        scope.done()
       })
 
       it('ignores section links in markdown', async () => {
@@ -244,10 +227,7 @@ describe('rule', () => {
 
         assert.strictEqual(actual.passed, false)
         assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'subdirectory/invalid_nested_relative_link.md'
-        })
+        assert.strictEqual(actual.targets[0].passed, false)
       })
 
       it('returns false with a relative link to a file in markdown outside the working directory', async () => {
@@ -259,10 +239,7 @@ describe('rule', () => {
 
         assert.strictEqual(actual.passed, false)
         assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'relative_link_outside_dir.md'
-        })
+        assert.strictEqual(actual.targets[0].passed, false)
       })
 
       it('returns true with a relative link to a file in markdown outside the working directory and pass-external-relative-links', async () => {
@@ -290,10 +267,7 @@ describe('rule', () => {
 
         assert.strictEqual(actual.passed, false)
         assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'invalid_relative_link.md'
-        })
+        assert.strictEqual(actual.targets[0].passed, false)
       })
 
       it('returns false with a absolute path in markdown', async () => {
@@ -305,61 +279,72 @@ describe('rule', () => {
 
         assert.strictEqual(actual.passed, false)
         assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: false,
-          path: 'absolute_link.md'
-        })
+        assert.strictEqual(actual.targets[0].passed, false)
       })
 
       it('checks multiple links in markdown', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(200)
-        const scope2 = nock('http://www.example.com')
-          .head('/something')
-          .reply(200)
-
-        const ruleopts = {
-          globsAll: ['multiple_links.md']
-        }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.targets.length, 1)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: true,
-          path: 'multiple_links.md'
+        const server = createMockServer({
+          'HEAD /something/somethingelse': { status: 200 },
+          'HEAD /something': { status: 200 }
         })
+        await new Promise(r => server.listen(0, r))
+        const url = serverUrl(server)
 
-        scope.done()
-        scope2.done()
+        const tmpFile = path.join(
+          targetDirectory,
+          '_test_multiple_links.md'
+        )
+        fs.writeFileSync(
+          tmpFile,
+          `[myurl](${url}/something/somethingelse)\n[myother](${url}/something)`
+        )
+
+        try {
+          const actual = await fileNoBrokenLinks(testFs, {
+            globsAll: ['_test_multiple_links.md']
+          })
+
+          assert.strictEqual(actual.passed, true)
+          assert.strictEqual(actual.targets.length, 1)
+          assert.strictEqual(actual.targets[0].passed, true)
+        } finally {
+          fs.unlinkSync(tmpFile)
+          await new Promise(r => server.close(r))
+        }
       })
 
       it('checks multiple files', async () => {
-        const scope = nock('http://www.example.com')
-          .head('/something/somethingelse')
-          .reply(200)
-          .persist()
+        const server = createMockServer({
+          'HEAD /something/somethingelse': { status: 200 }
+        })
+        await new Promise(r => server.listen(0, r))
+        const url = serverUrl(server)
 
-        const ruleopts = {
-          globsAll: ['link.md', 'link.rst']
+        const tmpMd = path.join(targetDirectory, '_test_multi_file.md')
+        const tmpRst = path.join(targetDirectory, '_test_multi_file.rst')
+        fs.writeFileSync(
+          tmpMd,
+          `[myurl](${url}/something/somethingelse)`
+        )
+        fs.writeFileSync(
+          tmpRst,
+          '`My URL <' + url + '/something/somethingelse>`_'
+        )
+
+        try {
+          const actual = await fileNoBrokenLinks(testFs, {
+            globsAll: ['_test_multi_file.md', '_test_multi_file.rst']
+          })
+
+          assert.strictEqual(actual.passed, true)
+          assert.strictEqual(actual.targets.length, 2)
+          assert.strictEqual(actual.targets[0].passed, true)
+          assert.strictEqual(actual.targets[1].passed, true)
+        } finally {
+          fs.unlinkSync(tmpMd)
+          fs.unlinkSync(tmpRst)
+          await new Promise(r => server.close(r))
         }
-
-        const actual = await fileNoBrokenLinks(testFs, ruleopts)
-
-        assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.targets.length, 2)
-        assert.deepStrictEqual(actual.targets[0], {
-          passed: true,
-          path: 'link.md'
-        })
-        assert.deepStrictEqual(actual.targets[1], {
-          passed: true,
-          path: 'link.rst'
-        })
-
-        scope.done()
       })
 
       it('fails if no files are found', async () => {

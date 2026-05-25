@@ -1,10 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import blc from 'broken-link-checker'
-const { HtmlChecker } = blc
-import path from 'path'
-import { URL } from 'url'
+import nodeFs from 'node:fs'
+import nodePath from 'node:path'
+import nodeOs from 'node:os'
+import { check, LinkState, type LinkResult } from 'linkinator'
 import GitHubMarkup from '../lib/github_markup.js'
 import type FileSystem from '../lib/file_system.js'
 import Result from '../lib/result.js'
@@ -14,22 +14,152 @@ interface FileNoBrokenLinksOptions {
   nocase?: boolean
   'succeed-on-non-existent'?: boolean
   'pass-external-relative-links'?: boolean
-  excludedKeywords?: string[]
 }
 
-interface BrokenLink {
-  broken: boolean
-  brokenReason?: string
-  url: { original: string; resolved?: string }
-  base: { resolved: string }
-  http: { response?: { status: number } }
+const MD_LINK_RE = /\[[^\]]*\]\(([^)]+)\)/g
+const RST_LINK_RE = /`[^`]+<([^>]+)>`_/g
+const MARKDOWN_EXTS = new Set(['.md', '.markdown', '.mdown', '.mkd', '.mkdn'])
+
+async function checkFile(
+  fileSystem: FileSystem,
+  file: string,
+  options: FileNoBrokenLinksOptions
+): Promise<{ passed: boolean; path: string; message: string }> {
+  const ext = nodePath.extname(file).toLowerCase()
+  if (MARKDOWN_EXTS.has(ext)) {
+    return checkMarkdownFile(fileSystem, file, options)
+  }
+
+  const rendered = await GitHubMarkup.renderMarkup(
+    nodePath.posix.resolve(fileSystem.targetDir, file)
+  )
+  if (rendered === null) {
+    return {
+      passed: true,
+      path: file,
+      message: 'Ignored due to unknown file format.'
+    }
+  }
+
+  return checkRenderedHtml(fileSystem, file, rendered, options)
+}
+
+async function checkMarkdownFile(
+  fileSystem: FileSystem,
+  file: string,
+  options: FileNoBrokenLinksOptions
+): Promise<{ passed: boolean; path: string; message: string }> {
+  const result = await check({
+    path: file,
+    serverRoot: fileSystem.targetDir,
+    markdown: true,
+    recurse: false,
+    timeout: 10000
+  })
+
+  return processResults(result.links, file, fileSystem, options)
+}
+
+async function checkRenderedHtml(
+  fileSystem: FileSystem,
+  file: string,
+  html: string,
+  options: FileNoBrokenLinksOptions
+): Promise<{ passed: boolean; path: string; message: string }> {
+  const tmpDir = await nodeFs.promises.mkdtemp(
+    nodePath.join(nodeOs.tmpdir(), 'repolinter-')
+  )
+  const baseName = nodePath.basename(file, nodePath.extname(file)) + '.html'
+  const tmpFile = nodePath.join(tmpDir, baseName)
+  await nodeFs.promises.writeFile(tmpFile, html)
+
+  try {
+    const result = await check({
+      path: tmpFile,
+      serverRoot: tmpDir,
+      recurse: false,
+      timeout: 10000
+    })
+
+    return processResults(result.links, file, fileSystem, options)
+  } finally {
+    await nodeFs.promises.rm(tmpDir, { recursive: true, force: true })
+  }
+}
+
+async function processResults(
+  links: LinkResult[],
+  file: string,
+  fileSystem: FileSystem,
+  options: FileNoBrokenLinksOptions
+): Promise<{ passed: boolean; path: string; message: string }> {
+  const brokenLinks = links.filter(
+    l => l.state === LinkState.BROKEN && l.parent != null
+  )
+
+  if (options['pass-external-relative-links'] && brokenLinks.length > 0) {
+    const externalTargets = await extractExternalLinkTargets(fileSystem, file)
+    const filtered = brokenLinks.filter(l => !externalTargets.has(l.url))
+    return buildResult(filtered, file)
+  }
+
+  return buildResult(brokenLinks, file)
+}
+
+async function extractExternalLinkTargets(
+  fileSystem: FileSystem,
+  file: string
+): Promise<Set<string>> {
+  const content = await fileSystem.getFileContents(file)
+  if (!content) return new Set()
+
+  const targets = new Set<string>()
+  const linkRe = file.endsWith('.rst') ? RST_LINK_RE : MD_LINK_RE
+  for (const match of content.matchAll(linkRe)) {
+    const target = match[1]
+    if (!target || !target.startsWith('../')) continue
+    const resolved = nodePath.posix.normalize(
+      nodePath.posix.join(nodePath.posix.dirname(file), target)
+    )
+    if (resolved.startsWith('..')) {
+      targets.add(nodePath.posix.basename(target))
+    }
+  }
+  return targets
+}
+
+function buildResult(
+  brokenLinks: LinkResult[],
+  file: string
+): { passed: boolean; path: string; message: string } {
+  if (brokenLinks.length === 0) {
+    return { passed: true, path: file, message: 'All links are valid' }
+  }
+
+  const messages = brokenLinks.map(l => {
+    const status = l.status
+      ? `status code ${l.status}`
+      : l.failureDetails?.[0] instanceof Error
+        ? l.failureDetails[0].message
+        : 'unknown error'
+    return `\`${l.url}\` (${status})`
+  })
+
+  return {
+    passed: false,
+    path: file,
+    message: messages.join(', ')
+  }
 }
 
 async function fileNoBrokenLinks(
-  fs: FileSystem,
+  fileSystem: FileSystem,
   options: FileNoBrokenLinksOptions
 ): Promise<Result> {
-  const files = await fs.findAllFiles(options.globsAll, !!options.nocase)
+  const files = await fileSystem.findAllFiles(
+    options.globsAll,
+    !!options.nocase
+  )
 
   if (files.length === 0) {
     return new Result(
@@ -42,98 +172,10 @@ async function fileNoBrokenLinks(
   }
 
   const results = await Promise.all(
-    files.map(async f => {
-      const absMdPath = path.posix.resolve(fs.targetDir, f)
-      const rendered = await GitHubMarkup.renderMarkup(absMdPath)
-      if (rendered === null) {
-        return {
-          passed: true,
-          path: f,
-          message: 'Ignored due to unknown file format.'
-        }
-      }
-
-      const linkResults = await new Promise<BrokenLink[]>((resolve, reject) => {
-        const linkBuf: BrokenLink[] = []
-        const htmlChecker = new HtmlChecker(
-          {
-            ...options,
-            excludedKeywords: ['#*']
-          },
-          {
-            link: (linkResult: BrokenLink) => linkBuf.push(linkResult),
-            complete: () => resolve(linkBuf)
-          }
-        )
-
-        const didScan = htmlChecker.scan(
-          rendered,
-          new URL(`file://${path.posix.join(fs.targetDir, f)}`)
-        )
-        if (!didScan)
-          reject(Error('Failed to scan HTML with broken link checker'))
-      })
-
-      const brokenLinks = linkResults.filter(link => link.broken)
-      const { failing, invalid } = brokenLinks.reduce(
-        (acc, linkResult) => {
-          linkResult.brokenReason === 'BLC_INVALID'
-            ? acc.invalid.push(linkResult)
-            : acc.failing.push(linkResult)
-          return acc
-        },
-        { failing: [] as BrokenLink[], invalid: [] as BrokenLink[] }
-      )
-      const failingMessages = failing.map(
-        ({ brokenReason, url: { original }, http: { response } }) =>
-          `\`${original}\` (${
-            brokenReason?.includes('HTTP')
-              ? `status code ${response?.status}`
-              : `unknown error ${brokenReason}`
-          })`
-      )
-      const failingInvalidMessagesWithNulls = await Promise.all(
-        invalid.map(async b => {
-          const originalURL = b.url.original
-          const baseURL = b.base.resolved
-          let url: URL
-          try {
-            url = new URL(originalURL, baseURL)
-            if (url.protocol !== 'file:' || !url.pathname)
-              return `\`${originalURL}\` (invalid URL)`
-          } catch {
-            return `\`${originalURL}\` (invalid path)`
-          }
-          if (path.posix.isAbsolute(originalURL))
-            return `\`${originalURL}\` (invalid path)`
-          const targetDir = path.posix.resolve(fs.targetDir)
-          const filePath = path.posix.join('/', url.host, url.pathname)
-          const absPath = path.posix.resolve(targetDir, filePath)
-          const relPath = path.posix.relative(targetDir, absPath)
-          if (relPath.startsWith('..')) {
-            if (options['pass-external-relative-links']) return null
-            else return `\`${originalURL}\` (relative link outside project)`
-          }
-          if (!(await fs.relativeFileExists(relPath)))
-            return `\`${originalURL}\` (file does not exist)`
-          return null
-        })
-      )
-      const failingInvalidMessages = failingInvalidMessagesWithNulls.filter(
-        (m): m is string => m !== null
-      )
-      const allMessages = [...failingInvalidMessages, ...failingMessages]
-      return {
-        passed: allMessages.length === 0,
-        path: f,
-        message:
-          allMessages.length === 0
-            ? 'All links are valid'
-            : allMessages.join(', ')
-      }
-    })
+    files.map(f => checkFile(fileSystem, f, options))
   )
-  const passed = results.every(({ passed }) => passed)
+
+  const passed = results.every(r => r.passed)
   return new Result(passed ? '' : 'Found broken links', results, passed)
 }
 
