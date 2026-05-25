@@ -20,8 +20,8 @@ async function execAsync(command, options = {}) {
       error !== null && error.code === undefined
         ? reject(error)
         : resolve({
-            out: outstd,
-            err: errstd,
+            out: stripAnsi(outstd),
+            err: stripAnsi(errstd),
             code: error === null ? 0 : error.code
           })
     )
