@@ -1,0 +1,26 @@
+{
+  "$schema": "./rulesets/schema.json",
+  "version": 2,
+  "extends": "./rulesets/default.json",
+  "rules": {
+    "license-detectable-by-licensee": {
+      "level": "error",
+      "where": ["license=*"],
+      "rule": {
+        "type": "license-detectable-by-licensee",
+        "options": {}
+      }
+    },
+    "notice-file-exists": {
+      "level": "error",
+      "where": ["license=Apache-2.0"],
+      "rule": {
+        "type": "file-existence",
+        "options": {
+          "globsAny": ["NOTICE*"],
+          "fail-message": "The NOTICE file is described in section 4.4 of the Apache License version 2.0. Its presence is not mandated by the license itself, but by ASF policy."
+        }
+      }
+    }
+  }
+}
