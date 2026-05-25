@@ -1,7 +1,7 @@
 name: Release
-# Tag-triggered pipeline: smoke-test the tagged SHA, build/push the Docker image,
-# publish to npm via OIDC trusted publishing. Split from ci.yaml so that a
-# `git push --follow-tags` updates two refs without re-running the full CI matrix.
+# Tag-triggered: re-runs the full validation pipeline against the tagged SHA,
+# then publishes to npm (OIDC trusted publishing) and GHCR (multiarch).
+
 on:
   push:
     tags: ['**']
@@ -9,148 +9,75 @@ on:
 permissions:
   contents: read
 
-# Same Node 24 opt-in rationale as ci.yaml: silences the Node 20 deprecation
-# warning for JS-based actions ahead of the 2026-06-02 forced switch.
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+concurrency:
+  # Never cancel an in-flight release — a half-published tag is worse than a delay.
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  smoke:
-    # Single-config gate before publish. The full matrix already ran on the
-    # commit being tagged when it landed on main; this is the release safety net.
-    runs-on: ubuntu-latest
-    name: Smoke (Node 24, Linux)
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # rule tests grep against historical commits; shallow clone breaks them
+  pipeline:
+    name: Pipeline
+    uses: ./.github/workflows/pipeline.yaml
+    permissions:
+      contents: read
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Get NPM Cache Directory
-        id: npm-cache
-        shell: bash
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
-      - name: Cache NPM
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.npm-cache.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install NPM Dependencies
-        run: npm ci
-
-      - name: Setup Python for Github-Markup
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install docutils for Github-Markup
-        run: |
-          python -m pip install --upgrade pip
-          pip install docutils
-
-      - name: Setup Licensee, Linguist, and Github-Markup Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libicu-dev libcurl4-openssl-dev libldap2-dev libidn11-dev
-
-      - name: Build
-        run: npm run build
-
-      - name: Run Test
-        run: npm test
-
-  test-docker:
-    # Build the image locally and run it once before pushing to ghcr.io —
-    # catches Dockerfile regressions that smoke (npm-only) would miss.
-    runs-on: ubuntu-latest
-    name: Docker sample
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Docker Build
-        uses: docker/build-push-action@v6
-        with:
-          tags: ghcr.io/${{ github.repository }}:latest
-          load: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Docker Run
-        run: docker run -t -v ${{ github.workspace }}:/src -w /src ghcr.io/${{ github.repository }}:latest .
-
-  publish-release:
-    name: Publish a Release
-    needs: [smoke, test-docker]
+  publish:
+    name: Publish
+    needs: pipeline
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # create GitHub release
-      id-token: write  # OIDC for npm trusted publishing + provenance
-      packages: write  # push image to ghcr.io
+      contents: write  # GitHub release creation
+      id-token: write  # OIDC for npm provenance + GHCR attestation
+      packages: write  # push image to GHCR
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '24'  # npm 11 ships here; trusted publishing (OIDC) needs npm >= 11.5.1
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '24'  # npm 11.5+ ships here; trusted publishing requires it
+          registry-url: https://registry.npmjs.org
+          cache: npm
 
-      - name: Install NPM Dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Build
-        run: npm run build
-
+      # prepublishOnly runs the build, so no explicit build step is needed.
       - name: Publish to npm
         run: npm publish --provenance
 
-      - name: Create GitHub Release
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-qemu-action@v3  # arm64 emulation for multiarch build
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Gather Docker Labels
-        id: docker_meta
+      - name: Image metadata
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
+          # semver tag input drives {{version}}, {{major}}.{{minor}}, {{major}};
+          # `latest` is auto-applied on semver tags by metadata-action's default flavor.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
 
-      - name: Build and Push to GitHub Container Registry
+      - name: Build and push multiarch image
         uses: docker/build-push-action@v6
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

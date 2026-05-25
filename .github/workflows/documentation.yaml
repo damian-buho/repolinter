@@ -1,0 +1,53 @@
+name: Documentation
+# Builds typedoc and deploys to GitHub Pages using the native Pages deployment
+# (no third-party push-to-gh-pages action). Requires repo Pages source to be
+# set to "GitHub Actions" in Settings → Pages.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write  # OIDC attestation for the Pages artifact
+
+concurrency:
+  # Only one Pages deployment at a time; never cancel mid-deploy.
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - uses: actions/configure-pages@v5
+
+      - run: npm ci
+
+      - name: Generate typedoc
+        run: npm run generate-docs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/generated
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

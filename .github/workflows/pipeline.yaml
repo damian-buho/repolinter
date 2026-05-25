@@ -1,0 +1,107 @@
+name: Pipeline
+# Validation pipeline. Runs on PRs and pushes to main, and is reused by
+# release.yaml so a tagged commit gets re-validated against the exact tag SHA
+# before publishing.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # PRs collapse to one in-flight run per branch; main pushes never cancel each
+  # other so we keep a full history of green/red on the default branch.
+  group: pipeline-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+  test:
+    name: Test (Node ${{ matrix.node-version }} / ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['22', '24']
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # rule tests grep historical commits; a shallow clone breaks them
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      # github-markup needs docutils for .rst rendering. Skip on Windows; the
+      # github-markup test path is gated to *nix in the rule suite.
+      - name: Setup Python
+        if: runner.os != 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install docutils
+        if: runner.os != 'Windows'
+        run: pip install --upgrade pip docutils
+
+      - name: System deps (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cmake pkg-config icu4c libidn
+
+      - name: System deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libicu-dev libcurl4-openssl-dev libldap2-dev libidn11-dev
+
+      - run: npm run build
+
+      - run: npm test
+
+  docker:
+    name: Docker smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ghcr.io/${{ github.repository }}:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run image against this repo
+        run: docker run --rm -t -v ${{ github.workspace }}:/src -w /src ghcr.io/${{ github.repository }}:ci .
