@@ -1,5 +1,7 @@
 pre-commit:
   commands:
+    format:
+      run: just format
     lint:
       run: just lint
     test:

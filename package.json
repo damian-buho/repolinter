@@ -18,7 +18,7 @@
     "dist/"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "build": "tsc && chmod +x dist/cli.js && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
@@ -28,6 +28,8 @@
     "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
     "lint": "eslint ./",
     "fix": "eslint ./ --fix",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.js'",
+    "format:check": "prettier --check 'src/**/*.ts' 'tests/**/*.js'",
     "generate-docs": "typedoc"
   },
   "keywords": [
@@ -86,7 +88,6 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.16.2",
     "eslint-plugin-n": "18.0.1",
-    "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-tsdoc": "0.5.2",
     "eslint-plugin-unicorn": "64.0.0",
@@ -98,6 +99,7 @@
     "prettier": "3.8.3",
     "typedoc": "0.28.19",
     "typedoc-rhineai-theme": "1.2.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.59.4"
   }
 }

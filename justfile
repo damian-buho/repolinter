@@ -27,10 +27,13 @@ lint:
 fix:
     npm run fix
 
-generate-docs:
-    npm run generate-docs
+format:
+    npm run format
 
-pipeline: fix lint test build
+format-check:
+    npm run format:check
+
+pipeline: format lint test build
 
 publish:
     npm publish

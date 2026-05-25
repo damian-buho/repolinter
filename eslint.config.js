@@ -6,11 +6,12 @@ import nPlugin from 'eslint-plugin-n'
 import { flatConfigs } from 'eslint-plugin-import-x'
 import promisePlugin from 'eslint-plugin-promise'
 import unicornPlugin from 'eslint-plugin-unicorn'
-import prettierRecommended from 'eslint-plugin-prettier/recommended'
+import prettierConfig from 'eslint-config-prettier'
 import tsdocPlugin from 'eslint-plugin-tsdoc'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
-export default [
+export default tseslint.config(
   {
     ignores: [
       '.nyc_output/',
@@ -24,13 +25,14 @@ export default [
     ]
   },
   js.configs.recommended,
+  ...tseslint.configs.recommended,
   nPlugin.configs['flat/recommended-module'],
   flatConfigs.recommended,
   promisePlugin.configs['flat/recommended'],
   unicornPlugin.configs['flat/recommended'],
-  prettierRecommended,
+  prettierConfig,
   {
-    files: ['**/*.js'],
+    files: ['**/*.js', '**/*.ts'],
     ignores: ['eslint.config.js'],
     plugins: {
       tsdoc: tsdocPlugin
@@ -48,10 +50,21 @@ export default [
       'n/no-unsupported-features/node-builtins': [
         'error',
         {
-          allowExperimental: true
+          allowExperimental: true,
+          ignores: ['util.styleText']
         }
       ],
-      'import-x/no-unresolved': 'off'
+      'import-x/no-unresolved': 'off',
+      'n/hashbang': 'off',
+      'unicorn/throw-new-error': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ]
     }
   },
   {
@@ -67,5 +80,11 @@ export default [
       'n/no-missing-import': 'off',
       'import-x/no-named-as-default-member': 'off'
     }
+  },
+  {
+    files: ['src/types/**/*.d.ts'],
+    rules: {
+      'n/no-missing-import': 'off'
+    }
   }
-]
+)
