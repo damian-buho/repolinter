@@ -27,8 +27,8 @@ lint:
 fix:
     npm run fix
 
-apidoc:
-    npm run apidoc
+generate-docs:
+    npm run generate-docs
 
 pipeline: fix lint test build
 

@@ -7,7 +7,7 @@ import fs from 'node:fs'
 
 const glob = matched
 
-interface GlobOptions {
+export interface GlobOptions {
   cwd?: string
   nocase?: boolean
   nodir?: boolean

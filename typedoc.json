@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs/generated",
+  "name": "@damian-buho/repolinter",
+  "readme": "README.md",
+  "projectDocuments": ["docs/*.md"],
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "disableSources": false,
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "plugin": ["typedoc-rhineai-theme"]
+}

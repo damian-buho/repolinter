@@ -28,7 +28,7 @@ Below is a complete list of rules that Repolinter can run, along with their conf
 
 ## Reference
 
-### `apache-notice`
+### apache-notice
 
 No inputs. Checks for the presence of a `NOTICE` file in the root of the repository. This rule is equivalent to the following:
 
@@ -39,7 +39,7 @@ No inputs. Checks for the presence of a `NOTICE` file in the root of the reposit
 }
 ```
 
-### `directory-existence`
+### directory-existence
 
 Checks the existence of a given directory.
 
@@ -49,7 +49,7 @@ Checks the existence of a given directory.
 | `nocase`       | No       | `boolean`  | `false` | Set to `true` to perform a case insensitive search.                                               |
 | `fail-message` | No       | `string`   | `""`    | The string to print if the directory does not exist, used to create human-readable error messages. |
 
-### `file-contents`
+### file-contents
 
 Checks if the contents of a file match a given regular expression.
 
@@ -62,7 +62,7 @@ Checks if the contents of a file match a given regular expression.
 | `human-readable-content` | No       | `string`   | The regular expression in `content` | The string to print instead of the regular expression when generating human-readable output.                                                                                                                                     |
 | `fail-on-non-existent`      | No       | `boolean`  | `false`                             | Set to `true` to disable passing if no files are found from `globsAll`.                                                                                                                                                          |
 
-### `file-existence`
+### file-existence
 
 Checks the existence of a given file.
 
@@ -73,7 +73,7 @@ Checks the existence of a given file.
 | `dirs`         | No       | `boolean`  | `false` | Set to `true` to include directories in the search (equivalent to `directory-exists`)              |
 | `fail-message` | No       | `string`   | `""`    | The string to print if the directory does not exist, used to create human-readable error messages. |
 
-### `file-hash`
+### file-hash
 
 Checks that a given file matches a provided hash.
 
@@ -85,7 +85,7 @@ Checks that a given file matches a provided hash.
 | `nocase`               | No       | `boolean`  | `false`  | Set to `true` to perform a case insensitive search.                                                                                                                         |
 | `succeed-on-non-existent` | No       | `boolean`  | `false`  | Set to `true` to enable passing if no files are found from `globsAll`.                                                                                                       |
 
-### `file-hashes-not-exist`
+### file-hashes-not-exist
 
 Check files’ hashes not included in a list of certain cryptographic hashes.
 
@@ -96,11 +96,11 @@ Check files’ hashes not included in a list of certain cryptographic hashes.
 | `algorithm`            | No       | `string`   | `sha256` | The hash algorithm to use. Repolinter supports any algorithm supported by [crypto.createHash](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm_options) |
 | `nocase`               | No       | `boolean`  | `false`  | Set to `true` to perform a case insensitive search.                                                                                                                         |
 
-### `file-no-broken-links`
+### file-no-broken-links
 
-Scans a set of markup files for broken links. Links are tested by first rendering the markup file to HTML using [github-markup](https://github.com/github/markup), then each `<a>` tag in the HTML is extracted and tested using [broken-link-checker](https://github.com/prototypicalpro/broken-link-checker)--as a result, this rule only supports checking markup formats supported by [github-markup](https://github.com/github/markup). Absolute URLs are checked using a HTTP request, and relative URLs are checked by accessing the file specified.
+Scans a set of markup files for broken links using [linkinator](https://github.com/JustinBeckwith/linkinator). Markdown files are checked directly by linkinator. For other markup formats, files are first rendered to HTML using [github-markup](https://github.com/github/markup), then each link is tested by linkinator. Absolute URLs are checked using an HTTP request, and relative URLs are checked by accessing the file specified.
 
-[github-markup](https://github.com/github/markup) and its dependencies must be installed and available in `PATH` to use this rule.
+For non-Markdown files, [github-markup](https://github.com/github/markup) and its dependencies must be installed and available in `PATH`.
 
 | Input                          | Required | Type       | Default | Description                                                                                                                                                              |
 | ------------------------------ | -------- | ---------- | ------- |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -110,7 +110,7 @@ Scans a set of markup files for broken links. Links are tested by first renderin
 | `pass-external-relative-links` | No       | `boolean`  | `false` | Set to `true` to allow relative URLs outside of the target directory. As there is no good way to check these URLs, they will automatically pass if this setting is true. |
 
 
-### `file-not-contents`
+### file-not-contents
 
 Checks none of a given list of files match a given regular expression.
 
@@ -126,7 +126,7 @@ Note: provide either `content` or `contents`
 | `human-readable-content` | No                                 | `string`   | The regular expression in `content` | The string to print instead of the regular expression when generating human-readable output.                                                                                                                                     |
 | `fail-on-non-existent`   | No                                 | `boolean`  | `false`                             | Set to `true` to disable passing if no files are found from `globsAll`.                                                                                                                                                          |
 
-### `file-not-exists`
+### file-not-exists
 
 Checks that a file doesn’t exist.
 
@@ -137,7 +137,7 @@ Checks that a file doesn’t exist.
 | `dirs`         | No       | `boolean`  | `false` | Set to `true` to include directories in the search.                                           |
 | `pass-message` | No       | `string`   | `""`    | The string to print if the file does not exist, used to create human-readable error messages. |
 
-### `file-starts-with`
+### file-starts-with
 
 Checks that the first lines of a file contain a set of regular expressions.
 
@@ -152,7 +152,7 @@ Checks that the first lines of a file contain a set of regular expressions.
 | `skip-binary-files`    | No       | `boolean`                                                        | `false` | Set to `true` to exclude binary files from `globsAll`.                                                                                                                                                                              |
 | `skip-paths-matching`  | No       | `{ extensions?: string[], patterns?: string[], flags?: string }` | `{}`    | Use this option to exclude paths from `globsAll`, either by file extension or by regular expression.                                                                                                                                |
 
-### `file-type-exclusion`
+### file-type-exclusion
 
 Checks that no files exist of a certain file type.
 
@@ -160,7 +160,7 @@ Checks that no files exist of a certain file type.
 | ------ | -------- | ---------- | ------- | ---------------------------------------------------------------------- |
 | `type` | **Yes**  | `string[]` |         | A list of globs to search for. This rule passes if no files are found. |
 
-### `git-grep-commits`
+### git-grep-commits
 
 Searches Git commits for configurable blacklisted words. These checks can be
 a bit time consuming, depending on the size of the Git history.
@@ -170,7 +170,7 @@ a bit time consuming, depending on the size of the Git history.
 | `denylist`   | **Yes**  | `string[]` |         | A list of patterns to search for.                |
 | `ignoreCase` | No       | `boolean`  | `false` | Set to true to make `denylist` case insensitive. |
 
-### `git-grep-log`
+### git-grep-log
 
 Searches Git commit messages for configurable blacklisted words. These checks can be
 a bit time consuming, depending on the size of the Git history.
@@ -180,7 +180,7 @@ a bit time consuming, depending on the size of the Git history.
 | `denylist`   | **Yes**  | `string[]` |         | A list of patterns to search for.                |
 | `ignoreCase` | No       | `boolean`  | `false` | Set to true to make `denylist` case insensitive. |
 
-### `git-list-tree`
+### git-list-tree
 
 Check for blacklisted filepaths in Git.
 
@@ -189,7 +189,7 @@ Check for blacklisted filepaths in Git.
 | `denylist`   | **Yes**  | `string[]` |         | A list of patterns to search against all paths in the Git history. |
 | `ignoreCase` | No       | `boolean`  | `false` | Set to true to make `denylist` case insensitive.                   |
 
-### `git-working-tree`
+### git-working-tree
 
 Checks whether the directory is managed with Git.
 
@@ -197,7 +197,7 @@ Checks whether the directory is managed with Git.
 | ------------- | -------- | --------- | ------- | ------------------------------------------------------------- |
 | `allowSubDir` | No       | `boolean` |         | Whether or not to search subdirectories for a Git repository. |
 
-### `large-file`
+### large-file
 
 Check if a list of files’ size on the file system that is larger than provided size.
 
@@ -206,7 +206,7 @@ Check if a list of files’ size on the file system that is larger than provided
 | `globsAll`               | **Yes**  | `string[]` |                        | A list of globs to get files for. This rule passes if all of the files returned by the globs match are smaller than *size* or if no files are returned. |
 | `size`                   | **Yes**  | `number`   |                        | files sizes larger than this number (bytes) will fail this rule.                                                                                        |
 
-### `json-schema-passes`
+### json-schema-passes
 
 Checks if a given file matches a provided [JSON schema](https://json-schema.org/). This check is performed using [AJV](https://ajv.js.org/).
 
@@ -218,11 +218,11 @@ Checks if a given file matches a provided [JSON schema](https://json-schema.org/
 | `human-readable-message` | No       | `string`    | The schema in `schema` | The string to print instead of the schema when generating human-readable output.                     |
 | `succeed-on-non-existent`   | No       | `boolean`   | `false`                | Set to `true` to enable passing if no files are found from `glob`.                                   |
 
-### `license-detectable-by-licensee`
+### license-detectable-by-licensee
 
 Fails if Licensee doesn’t detect the repository’s license. This rule takes no inputs, but requires `licensee` in the path, see [command line dependencies](#command-line-dependencies) for details.
 
-### `best-practices-badge-present`
+### best-practices-badge-present
 
 Check Best Practices Badge is present in readme. Optionally check a certain badge level is accomplished.
 

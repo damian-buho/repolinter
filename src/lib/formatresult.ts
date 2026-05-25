@@ -4,7 +4,7 @@
 import type Result from './result.js'
 import type RuleInfo from './ruleinfo.js'
 
-type FormatResultStatus =
+export type FormatResultStatus =
   | 'PASSED'
   | 'NOT_PASSED_ERROR'
   | 'NOT_PASSED_WARN'

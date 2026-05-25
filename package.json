@@ -28,7 +28,7 @@
     "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
     "lint": "eslint ./",
     "fix": "eslint ./ --fix",
-    "apidoc": "documentation build src/index.ts -f html -o apidoc -c documentation.yml"
+    "generate-docs": "typedoc"
   },
   "keywords": [
     "lint",
@@ -82,13 +82,13 @@
     "@types/node": "25.9.1",
     "@types/yaml": "1.9.6",
     "@types/yargs": "17.0.35",
-    "documentation": "14.0.0",
     "eslint": "10.4.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.16.2",
     "eslint-plugin-n": "18.0.1",
     "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-promise": "7.3.0",
+    "eslint-plugin-tsdoc": "0.5.2",
     "eslint-plugin-unicorn": "64.0.0",
     "globals": "17.6.0",
     "markdown-toc": "1.2.0",
@@ -96,6 +96,8 @@
     "mock-http-server": "1.4.2",
     "nock": "14.0.15",
     "prettier": "3.8.3",
+    "typedoc": "0.28.19",
+    "typedoc-rhineai-theme": "1.2.0",
     "typescript": "6.0.3"
   }
 }

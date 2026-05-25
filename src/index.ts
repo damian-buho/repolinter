@@ -5,9 +5,12 @@ import path from 'path'
 import fs from 'fs'
 import * as config from './lib/config.js'
 import Result from './lib/result.js'
+import type { ResultTarget } from './lib/result.js'
 import RuleInfo from './lib/ruleinfo.js'
 import FormatResultBase from './lib/formatresult.js'
+import type { FormatResultStatus } from './lib/formatresult.js'
 import FileSystem from './lib/file_system.js'
+import type { GlobOptions } from './lib/file_system.js'
 import Rules from './rules/rules.js'
 import Fixes from './fixes/fixes.js'
 import Axioms from './axioms/axioms.js'
@@ -317,4 +320,4 @@ export async function determineTargets(
 
 export const validateConfig = config.validateConfig
 export const parseConfig = config.parseConfig
-export { Result, RuleInfo, FileSystem, FormatResultBase as FormatResult }
+export { Result, ResultTarget, RuleInfo, FileSystem, GlobOptions, FormatResultBase as FormatResult, FormatResultStatus }

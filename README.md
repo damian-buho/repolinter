@@ -1,14 +1,18 @@
-# Archived
+# Revived
 
-The Repolinter project has been archived. If you are a TodoGroup member and wish to see the repository unarchived, please bring this up within the TodoGroup.
+The original Repolinter project has been archived.
 
-# ![Repo Linter](https://raw.githubusercontent.com/todogroup/repolinter/master/docs/images/P_RepoLinter01_logo_only.png) ![Build Status](https://github.com/todogroup/repolinter/workflows/Build/badge.svg)
+This fork is a heavily modernized version, that will be supported by [me](https://github.com/damian-buho).
+
+# ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-logo-600.png)
+![Build Status](https://github.com/damian-buho/repolinter/workflows/Build/badge.svg)
 
 Lint open source repositories for common issues.
 
 ## Installation
 
-Repolinter requires [Node.JS](https://nodejs.org/en/) >= v12 to function properly. Once Node.js is installed, you can install Repolinter using `npm`:
+Repolinter requires [Node.JS](https://nodejs.org/en/) >= v22 to function properly.
+Once Node.js is installed, you can install Repolinter using `npm`:
 
 ```sh
 npm install -g repolinter
@@ -43,7 +47,7 @@ repolinter % echo $?
 Repolinter also supports linting a Git repository using the `--git` flag. With this flag enabled, the directory input will be interpreted as a Git URL which Repolinter will automatically clone into a temporary directory.
 
 ```sh
-repolinter lint -g https://github.com/todogroup/repolinter.git
+repolinter lint -g https://github.com/damian-buho/repolinter.git
 ```
 
 ## Formatting the Output
@@ -109,7 +113,7 @@ Any ruleset starts with the following base, shown in both JSON and YAML format:
 
 ```JSON
 {
-  "$schema": "https://raw.githubusercontent.com/todogroup/repolinter/master/rulesets/schema.json",
+  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
   "version": 2,
   "axioms": {},
   "rules": {}
@@ -125,7 +129,7 @@ rules:
 Where:
 
 - **`$schema`**- points to the [JSON schema](./rulesets/schema.json) for all Repolinter rulesets. This schema both validates the ruleset and makes the ruleset creation process a bit easier.
-- **`version`** - specifies the ruleset version Repolinter should expect. Currently there are two versions: omitted for legacy config ([example](https://github.com/todogroup/repolinter/blob/1a66d77e3a744222a049bdb4041437cbcf26a308/rulesets/default.json)) and `2` for all others. Use `2` unless you know what you’re doing.
+- **`version`** - specifies the ruleset version Repolinter should expect. Currently there are two versions: omitted for legacy config ([example](https://github.com/damian-buho/repolinter/blob/1a66d77e3a744222a049bdb4041437cbcf26a308/rulesets/default.json)) and `2` for all others. Use `2` unless you know what you’re doing.
 - **`axiom`** - The axiom functionality, covered in [Axioms](#axioms).
 - **`rules`** - The actual ruleset, covered in [Rules](#rules).
 
@@ -269,7 +273,7 @@ An example configuration using an axiom to detect the packaging system for a pro
 
 ```JavaScript
 {
-  "$schema": "https://raw.githubusercontent.com/todogroup/repolinter/master/rulesets/schema.json",
+  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
   "version": 2,
   "axioms": {
     "packagers": "package-type"
@@ -335,7 +339,7 @@ or file path:
 
 ```JavaScript
 {
-  "extends": "https://raw.githubusercontent.com/todogroup/repolinter/master/rulesets/default.json"
+  "extends": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json"
   "rules": {
     # disable CI check
     "integrates-with-ci": {
@@ -346,7 +350,7 @@ or file path:
 ```
 
 ```YAML
-extends: https://raw.githubusercontent.com/todogroup/repolinter/master/rulesets/default.json
+extends: https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json
 rules:
   # disable CI check
   integrates-with-ci
@@ -383,14 +387,14 @@ const repolinter = require('repolinter')
 const result = await repolinter.lint('.')
 ```
 
-This API allows the developer to have complete control over the configuration and formatting Repolinter should use. Documentation for this library can be found under [API Documentation](https://todogroup.github.io/repolinter/#api-reference).
+This API allows the developer to have complete control over the configuration and formatting Repolinter should use. Documentation for this library can be found under [API Documentation](https://damian-buho.github.io/repolinter/#api-reference).
 
 ## Going Further
 
 - [Rule Reference](./docs/rules.md)
 - [Fix Reference](./docs/fixes.md)
 - [Axiom Reference](./docs/axioms.md)
-- [API Reference](https://todogroup.github.io/repolinter/#api-reference)
+- [API Reference](https://damian-buho.github.io/repolinter/#api-reference)
 - [Developer Guide](./docs/development.md)
 
 ## License

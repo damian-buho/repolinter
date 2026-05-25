@@ -7,6 +7,7 @@ import { flatConfigs } from 'eslint-plugin-import-x'
 import promisePlugin from 'eslint-plugin-promise'
 import unicornPlugin from 'eslint-plugin-unicorn'
 import prettierRecommended from 'eslint-plugin-prettier/recommended'
+import tsdocPlugin from 'eslint-plugin-tsdoc'
 import globals from 'globals'
 
 export default [
@@ -18,6 +19,7 @@ export default [
       'tmp/',
       'out/',
       'apidoc/',
+      'docs/generated/',
       'dist/'
     ]
   },
@@ -30,6 +32,9 @@ export default [
   {
     files: ['**/*.js'],
     ignores: ['eslint.config.js'],
+    plugins: {
+      tsdoc: tsdocPlugin
+    },
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
@@ -38,6 +43,7 @@ export default [
       }
     },
     rules: {
+      'tsdoc/syntax': 'warn',
       'n/no-unpublished-import': 'off',
       'n/no-unsupported-features/node-builtins': [
         'error',
@@ -56,6 +62,7 @@ export default [
       }
     },
     rules: {
+      'tsdoc/syntax': 'off',
       'n/no-unpublished-import': 'off',
       'n/no-missing-import': 'off',
       'import-x/no-named-as-default-member': 'off'

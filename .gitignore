@@ -8,3 +8,4 @@ vendor/
 out
 .vscode/
 dist/
+docs/generated/

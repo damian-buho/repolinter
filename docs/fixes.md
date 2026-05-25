@@ -12,7 +12,7 @@ Below is a complete list of fixes that Repolinter can run, along with their conf
 
 ## Reference
 
-### `file-create`
+### file-create
 
 Creates a file. Optionally removes or replaces files that failed.
 
@@ -22,7 +22,7 @@ Creates a file. Optionally removes or replaces files that failed.
 | `text`    | **Yes**  | `string` \| `{ url: string }` \| `{ file: string }` |         | The text to create the file with. Specify an object with the `url` or `file` property to pull text from a URL or file. |
 | `replace` | No       | `boolean`                                           | `false` | Set to `true` to remove all failing files, as indicated by the rule.                                                   |
 
-### `file-modify`
+### file-modify
 
 Modify a file that failed a rule.
 
@@ -34,7 +34,7 @@ Modify a file that failed a rule.
 | `write_mode`          | No       | `"prepend"` \| `"append"`                                        | `"append"`                          | How file-modify should edit the file.                                                                                                                                       |
 | `newlines`            | No       | `{ begin?: number, end?: number }`                               | `{ begin: 0, end: 0 }`              | How many newlines should be added to the start or end of `text`. This property allows formatters to print `text` without these newlines, creating a better user experience. |
 
-### `file-remove`
+### file-remove
 
 Removes a file or files.
 
