@@ -11,7 +11,9 @@ const GitHelper: GitHelper = {
   gitAllCommits(targetDirectory: string): string[] {
     const arguments_ = ['-C', targetDirectory, 'rev-list', '--all']
     const result = spawnSync('git', arguments_)
-    return (result.stdout?.toString() ?? '').split('\n')
+    // git output ends in '\n'; trim before split so we don't return a phantom '' entry
+    const stdout = (result.stdout?.toString() ?? '').trimEnd()
+    return stdout === '' ? [] : stdout.split('\n')
   }
 }
 
