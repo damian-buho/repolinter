@@ -20,9 +20,13 @@
   "engines": {
     "node": ">=22.13.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc && chmod +x dist/cli.js && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
     "prebuild": "rm -rf dist",
+    "prepublishOnly": "npm run build",
     "pretest": "npm run lint",
     "test": "node --test 'tests/**/*.js'",
     "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
