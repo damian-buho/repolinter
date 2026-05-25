@@ -9,6 +9,9 @@ default:
 build:
     npm run build
 
+build-docker:
+    docker buildx build -t repolinter:dev --load .
+
 test:
     npm test
 
