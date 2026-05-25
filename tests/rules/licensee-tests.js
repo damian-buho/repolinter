@@ -22,7 +22,10 @@ describe('rule', () => {
 
         const actual = await licenseDetectable(testFs)
         assert.strictEqual(actual.passed, false)
-        assert.strictEqual(actual.message, 'Licensee did not identify a license for project')
+        assert.strictEqual(
+          actual.message,
+          'Licensee did not identify a license for project'
+        )
       })
 
       it('rule passes if license is detectable, but unknown', async () => {
@@ -30,7 +33,10 @@ describe('rule', () => {
 
         const actual = await licenseDetectable(testFs)
         assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.message, 'Licensee identified the license for project: NOASSERTION')
+        assert.strictEqual(
+          actual.message,
+          'Licensee identified the license for project: NOASSERTION'
+        )
       })
 
       it('rule passes if license is detectable and recognized', async () => {
@@ -38,7 +44,10 @@ describe('rule', () => {
 
         const actual = await licenseDetectable(testFs)
         assert.strictEqual(actual.passed, true)
-        assert.strictEqual(actual.message, 'Licensee identified the license for project: 0BSD')
+        assert.strictEqual(
+          actual.message,
+          'Licensee identified the license for project: 0BSD'
+        )
       })
     } else {
       it.skip('tests license-detectable-by-licensee functionality', () => {})

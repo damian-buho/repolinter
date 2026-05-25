@@ -91,10 +91,7 @@ describe('rule', () => {
         }
       }
 
-      await assert.rejects(
-        () => jsonSchemaPasses(mockfs, ruleopts),
-        Error
-      )
+      await assert.rejects(() => jsonSchemaPasses(mockfs, ruleopts), Error)
     })
 
     it('returns fail if the file had invalid JSON', async () => {
@@ -219,7 +216,9 @@ describe('rule', () => {
       assert.strictEqual(actual.targets[0].passed, false)
       assert.strictEqual(actual.targets[0].path, mockfs.findFirstFile())
       assert.strictEqual(actual.targets[0].pattern, ruleopts.glob)
-      assert.ok(actual.targets[0].message.includes(ruleopts['human-readable-message']))
+      assert.ok(
+        actual.targets[0].message.includes(ruleopts['human-readable-message'])
+      )
     })
   })
 })

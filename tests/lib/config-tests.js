@@ -22,149 +22,155 @@ const serveDirectory = directory => ({
   }
 })
 
-describe('lib', () => {
-  describe('config', () => {
-    describe('isAbsoluteURL', () => {
-      it('should identify absolute URLs', async () => {
-        assert.strictEqual(Config.isAbsoluteURL('http://example.com/'), true)
-        assert.strictEqual(Config.isAbsoluteURL('https://example.com/'), true)
-        assert.strictEqual(Config.isAbsoluteURL('ftp://example.com/'), true)
+describe(
+  'lib',
+  () => {
+    describe('config', () => {
+      describe('isAbsoluteURL', () => {
+        it('should identify absolute URLs', async () => {
+          assert.strictEqual(Config.isAbsoluteURL('http://example.com/'), true)
+          assert.strictEqual(Config.isAbsoluteURL('https://example.com/'), true)
+          assert.strictEqual(Config.isAbsoluteURL('ftp://example.com/'), true)
+        })
+
+        it('should identify relative URLs', async () => {
+          assert.strictEqual(Config.isAbsoluteURL('foo'), false)
+          assert.strictEqual(Config.isAbsoluteURL('/foo'), false)
+          assert.strictEqual(Config.isAbsoluteURL('file:/foo'), false)
+          assert.strictEqual(Config.isAbsoluteURL('file:///foo'), false)
+          assert.strictEqual(Config.isAbsoluteURL(String.raw`c:\foo`), false)
+        })
       })
 
-      it('should identify relative URLs', async () => {
-        assert.strictEqual(Config.isAbsoluteURL('foo'), false)
-        assert.strictEqual(Config.isAbsoluteURL('/foo'), false)
-        assert.strictEqual(Config.isAbsoluteURL('file:/foo'), false)
-        assert.strictEqual(Config.isAbsoluteURL('file:///foo'), false)
-        assert.strictEqual(Config.isAbsoluteURL(String.raw`c:\foo`), false)
-      })
-    })
-
-    describe('findConfig', () => {
-      it('should find config file in directory', async () => {
-        const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'repolinter-test-'))
-        fs.copyFileSync(
-          path.join(__dirname, 'repolinter.yaml'),
-          path.join(tmpdir, 'repolinter.yaml')
-        )
-        const origCwd = process.cwd()
-        process.chdir(tmpdir)
-        try {
-          const localConfig = path.join(tmpdir, 'repolinter.yaml')
-          assert.strictEqual(Config.findConfig(tmpdir), localConfig)
-        } finally {
-          process.chdir(origCwd)
-          fs.rmSync(tmpdir, { recursive: true })
-        }
-      })
-      it('should return default file when no config present', async () => {
-        const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'repolinter-test-'))
-        const origCwd = process.cwd()
-        process.chdir(tmpdir)
-        try {
-          const defaultConfig = path.join(
-            __dirname,
-            '../../dist/rulesets/default.json'
+      describe('findConfig', () => {
+        it('should find config file in directory', async () => {
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
           )
-          assert.strictEqual(Config.findConfig(tmpdir), defaultConfig)
-        } finally {
-          process.chdir(origCwd)
-          fs.rmSync(tmpdir, { recursive: true })
-        }
+          fs.copyFileSync(
+            path.join(__dirname, 'repolinter.yaml'),
+            path.join(tmpdir, 'repolinter.yaml')
+          )
+          const origCwd = process.cwd()
+          process.chdir(tmpdir)
+          try {
+            const localConfig = path.join(tmpdir, 'repolinter.yaml')
+            assert.strictEqual(Config.findConfig(tmpdir), localConfig)
+          } finally {
+            process.chdir(origCwd)
+            fs.rmSync(tmpdir, { recursive: true })
+          }
+        })
+        it('should return default file when no config present', async () => {
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
+          )
+          const origCwd = process.cwd()
+          process.chdir(tmpdir)
+          try {
+            const defaultConfig = path.join(
+              __dirname,
+              '../../dist/rulesets/default.json'
+            )
+            assert.strictEqual(Config.findConfig(tmpdir), defaultConfig)
+          } finally {
+            process.chdir(origCwd)
+            fs.rmSync(tmpdir, { recursive: true })
+          }
+        })
       })
+
+      describe('loadConfig', async () => {
+        const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
+        beforeEach(() => new Promise(resolve => server.start(resolve)))
+        afterEach(() => new Promise(resolve => server.stop(resolve)))
+
+        it('should load local config file', async () => {
+          const actual = await Config.loadConfig(
+            path.join(__dirname, 'default.json')
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
+        })
+
+        it('should load URL config file', async () => {
+          server.on(serveDirectory(__dirname))
+          const actual = await Config.loadConfig(
+            'http://localhost:9000/default.json'
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
+        })
+
+        it('should handle relative file extends', async () => {
+          const actual = await Config.loadConfig(
+            path.join(__dirname, 'repolinter.yaml')
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
+        })
+
+        it('should handle relative URL extends', async () => {
+          server.on(serveDirectory(__dirname))
+          const actual = await Config.loadConfig(
+            'http://localhost:9000/repolinter.yaml'
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
+        })
+
+        it('should handle absolute URL extends', async () => {
+          server.on(serveDirectory(__dirname))
+          const actual = await Config.loadConfig(
+            path.join(__dirname, 'absolute-override.yaml')
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
+        })
+
+        it('should handle encoded rulesets extends', async () => {
+          server.on(serveDirectory(__dirname))
+          const actual = await Config.loadConfig(
+            path.join(__dirname, 'override-encoded.yaml')
+          )
+          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+          assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
+        })
+
+        it('should detect loops in extended rulesets', async () => {
+          const loopSelf = await Config.loadConfig(
+            path.join(__dirname, 'loop-self.yaml')
+          )
+          assert.ok(Object.hasOwn(loopSelf.rules, 'test-file-exists'))
+          assert.strictEqual(loopSelf.rules['test-file-exists'].level, 'error')
+
+          const loopB = await Config.loadConfig(
+            path.join(__dirname, 'loop-b.yaml')
+          )
+          assert.ok(Object.hasOwn(loopB.rules, 'test-file-exists'))
+          assert.strictEqual(loopB.rules['test-file-exists'].level, 'off')
+        })
+
+        it('should throw error on non existant file', async () => {
+          await assert.rejects(
+            () => Config.loadConfig('/does-not-exist'),
+            /ENOENT/
+          )
+        })
+
+        it('should throw error on non existant URL', async () => {
+          server.on(serveDirectory(__dirname))
+          await assert.rejects(
+            () => Config.loadConfig('http://localhost:9000/404'),
+            /404/
+          )
+        })
+      })
+
+      describe('validateConfig', () => {})
+
+      describe('parseConfig', () => {})
     })
-
-    describe('loadConfig', async () => {
-      const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
-      beforeEach(() => new Promise(resolve => server.start(resolve)))
-      afterEach(() => new Promise(resolve => server.stop(resolve)))
-
-      it('should load local config file', async () => {
-        const actual = await Config.loadConfig(
-          path.join(__dirname, 'default.json')
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
-      })
-
-      it('should load URL config file', async () => {
-        server.on(serveDirectory(__dirname))
-        const actual = await Config.loadConfig(
-          'http://localhost:9000/default.json'
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
-      })
-
-      it('should handle relative file extends', async () => {
-        const actual = await Config.loadConfig(
-          path.join(__dirname, 'repolinter.yaml')
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
-      })
-
-      it('should handle relative URL extends', async () => {
-        server.on(serveDirectory(__dirname))
-        const actual = await Config.loadConfig(
-          'http://localhost:9000/repolinter.yaml'
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
-      })
-
-      it('should handle absolute URL extends', async () => {
-        server.on(serveDirectory(__dirname))
-        const actual = await Config.loadConfig(
-          path.join(__dirname, 'absolute-override.yaml')
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
-      })
-
-      it('should handle encoded rulesets extends', async () => {
-        server.on(serveDirectory(__dirname))
-        const actual = await Config.loadConfig(
-          path.join(__dirname, 'override-encoded.yaml')
-        )
-        assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-        assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
-      })
-
-      it('should detect loops in extended rulesets', async () => {
-        const loopSelf = await Config.loadConfig(
-          path.join(__dirname, 'loop-self.yaml')
-        )
-        assert.ok(Object.hasOwn(loopSelf.rules, 'test-file-exists'))
-        assert.strictEqual(loopSelf.rules['test-file-exists'].level, 'error')
-
-        const loopB = await Config.loadConfig(
-          path.join(__dirname, 'loop-b.yaml')
-        )
-        assert.ok(Object.hasOwn(loopB.rules, 'test-file-exists'))
-        assert.strictEqual(loopB.rules['test-file-exists'].level, 'off')
-      })
-
-      it('should throw error on non existant file', async () => {
-        await assert.rejects(
-          () => Config.loadConfig('/does-not-exist'),
-          /ENOENT/
-        )
-      })
-
-      it('should throw error on non existant URL', async () => {
-        server.on(serveDirectory(__dirname))
-        await assert.rejects(
-          () => Config.loadConfig('http://localhost:9000/404'),
-          /404/
-        )
-      })
-    })
-
-    describe('validateConfig', () => {
-    })
-
-    describe('parseConfig', () => {
-    })
-  })
-}, { timeout: 10_000 })
+  },
+  { timeout: 10_000 }
+)

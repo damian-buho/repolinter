@@ -145,8 +145,14 @@ describe('api', () => {
       const parsed = repolinter.parseConfig(mockConfig)
 
       assert.strictEqual(parsed.length, 1)
-      assert.strictEqual(parsed[0].policyInfo, mockConfig.rules['my-rule'].policyInfo)
-      assert.strictEqual(parsed[0].policyUrl, mockConfig.rules['my-rule'].policyUrl)
+      assert.strictEqual(
+        parsed[0].policyInfo,
+        mockConfig.rules['my-rule'].policyInfo
+      )
+      assert.strictEqual(
+        parsed[0].policyUrl,
+        mockConfig.rules['my-rule'].policyUrl
+      )
     })
   })
 })

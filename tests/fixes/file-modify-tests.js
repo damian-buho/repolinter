@@ -276,7 +276,8 @@ describe('fixes', () => {
       const result = await fileModify(mockFs, options, [], false)
 
       assert.strictEqual(result.passed, true)
-      assert.strictEqual(mockContents,
+      assert.strictEqual(
+        mockContents,
         'the file contents\n\n\nthis is text\n\n\n\n'
       )
     })

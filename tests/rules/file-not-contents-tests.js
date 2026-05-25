@@ -146,7 +146,10 @@ describe('rule', () => {
       console.log(actual)
       assert.strictEqual(actual.passed, true)
       assert.strictEqual(actual.targets.length, 0)
-      assert.strictEqual(actual.message, 'Did not find content matching specified patterns')
+      assert.strictEqual(
+        actual.message,
+        'Did not find content matching specified patterns'
+      )
     })
 
     it('returns fails if requested file contents exists', async () => {

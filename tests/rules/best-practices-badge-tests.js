@@ -37,7 +37,10 @@ describe('rule', () => {
       const actual = await BestpracticesBadgePresent(mockfs)
       assert.strictEqual(actual.passed, false)
       assert.strictEqual(actual.targets.length, 1)
-      assert.strictEqual(actual.targets[0].message, "Doesn't contain Best Practices Badge")
+      assert.strictEqual(
+        actual.targets[0].message,
+        "Doesn't contain Best Practices Badge"
+      )
     })
 
     it('passes if readme contains the Best Practices badge (URL with locale)', async () => {

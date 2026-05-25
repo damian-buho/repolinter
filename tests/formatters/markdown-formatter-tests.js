@@ -89,23 +89,33 @@ describe('formatters', () => {
       assert.ok(output.includes(result.formatOptions.disclaimer))
     })
 
-    it('generates valid markdown when running against itself', async () => {
-      const lintres = await repolinter.lint(path.resolve(projectRoot))
+    it(
+      'generates valid markdown when running against itself',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve(projectRoot))
 
-      const actual = formatter.formatOutput(lintres, false)
-      const options = Object.assign(lintOptions, { strings: { test: actual } })
+        const actual = formatter.formatOutput(lintres, false)
+        const options = Object.assign(lintOptions, {
+          strings: { test: actual }
+        })
 
-      const result = await markdownlint(options)
+        const result = await markdownlint(options)
 
-      assert.deepStrictEqual(result.test, [])
-    }, { timeout: 30_000 })
+        assert.deepStrictEqual(result.test, [])
+      },
+      { timeout: 30_000 }
+    )
 
-    it('does not contain the string "undefined"', async () => {
-      const lintres = await repolinter.lint(path.resolve(projectRoot))
+    it(
+      'does not contain the string "undefined"',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve(projectRoot))
 
-      const actual = formatter.formatOutput(lintres, false)
+        const actual = formatter.formatOutput(lintres, false)
 
-      assert.ok(!actual.includes('undefined'))
-    }, { timeout: 30_000 })
+        assert.ok(!actual.includes('undefined'))
+      },
+      { timeout: 30_000 }
+    )
   })
 })

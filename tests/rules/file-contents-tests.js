@@ -122,7 +122,9 @@ describe('rule', () => {
         path: 'README.md',
         message: 'Contains actually foo'
       })
-      assert.ok(actual.targets[0].message.includes(ruleopts['human-readable-content']))
+      assert.ok(
+        actual.targets[0].message.includes(ruleopts['human-readable-content'])
+      )
     })
 
     it('returns fails if requested file contents does not exist', async () => {

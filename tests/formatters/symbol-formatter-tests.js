@@ -58,7 +58,7 @@ describe('formatters', () => {
             new RuleInfo('rule2', 'error', [], 'file-existence', {}),
             'ignored'
           ),
-          FormatResult.CreateError(
+          new FormatResult.CreateError(
             new RuleInfo('rule3', 'error', [], 'file-existence', {}),
             'errored'
           )
@@ -75,12 +75,16 @@ describe('formatters', () => {
       assert.ok(formatResult.includes('dir'))
     })
 
-    it('does not contain the string undefined', async () => {
-      const lintres = await repolinter.lint(path.resolve('.'))
+    it(
+      'does not contain the string undefined',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve('.'))
 
-      const actual = symbolFormatter.formatOutput(lintres, false)
+        const actual = symbolFormatter.formatOutput(lintres, false)
 
-      assert.ok(!actual.includes('undefined'))
-    }, { timeout: 30_000 })
+        assert.ok(!actual.includes('undefined'))
+      },
+      { timeout: 30_000 }
+    )
   })
 })
