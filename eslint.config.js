@@ -1,3 +1,6 @@
+// Copyright 2026 Damián Búho
+// SPDX-License-Identifier: Apache-2.0
+
 import js from '@eslint/js'
 import nPlugin from 'eslint-plugin-n'
 import { flatConfigs } from 'eslint-plugin-import-x'
