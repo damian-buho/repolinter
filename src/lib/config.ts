@@ -151,7 +151,7 @@ async function validateConfig(
   )
   const allSchemas: any[] = (
     await Promise.all([parsedFixSchemas, parsedRuleSchemas])
-  ).reduce((a, c) => a.concat(c), [])
+  ).flat()
   for (const schema of allSchemas) {
     ajvProps.addSchema(schema)
   }
@@ -211,7 +211,7 @@ function parseConfig(config: any): RuleInfo[] {
         )
       })
     })
-    .reduce((a, c) => a.concat(c))
+    .flat()
 }
 
 async function decodeConfig(

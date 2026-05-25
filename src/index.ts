@@ -204,7 +204,7 @@ export function shouldRuleRun(
     ])
     .filter(([, maybeNumber]) => !isNaN(maybeNumber))
   const numericalTargetsMap = new Map(numericalTargets)
-  return numericalRuleAxioms
+  const failedNumerical = numericalRuleAxioms
     .filter(({ name, operand, number }) => {
       const target = numericalTargetsMap.get(name)
       if (target === undefined) return true
@@ -216,7 +216,7 @@ export function shouldRuleRun(
       )
     })
     .map(({ axiom }) => axiom)
-    .concat(failedRuleAxioms)
+  return [...failedNumerical, ...failedRuleAxioms]
 }
 
 export async function runRuleset(
@@ -237,7 +237,7 @@ export async function runRuleset(
         `${axiomId}=*`,
         ...paths.map(p => `${axiomId}=${p}`)
       ])
-      .reduce((a: string[], c: string[]) => a.concat(c), [])
+      .flat()
   }
   const results = ruleset.map(async (r: any) => {
     if (r.level === 'off') {
@@ -312,10 +312,7 @@ export async function determineTargets(
       return [axiomName, await axiomFunction(fs)] as [string, any]
     })
   )
-  return ruleresults.reduce<Record<string, any>>((a, [k, v]) => {
-    a[k] = v
-    return a
-  }, {})
+  return Object.fromEntries(ruleresults)
 }
 
 export const validateConfig = config.validateConfig

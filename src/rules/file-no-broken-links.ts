@@ -122,7 +122,7 @@ async function fileNoBrokenLinks(
       const failingInvalidMessages = failingInvalidMessagesWithNulls.filter(
         (m): m is string => m !== null
       )
-      const allMessages = failingInvalidMessages.concat(failingMessages)
+      const allMessages = [...failingInvalidMessages, ...failingMessages]
       return {
         passed: allMessages.length === 0,
         path: f,

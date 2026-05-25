@@ -56,16 +56,8 @@ async function fileNotContents(
   const filteredResults = results.filter(r => r !== null)
   const passed = !filteredResults.find(r => !r.passed)
   const aggregatedTargets = filteredResults
-    .reduce<
-      Array<{
-        passed: boolean
-        path?: string
-        pattern?: string
-        message?: string
-      }>
-    >((previous, current) => {
-      return previous.concat(current.targets)
-    }, [])
+    .map(r => r.targets)
+    .flat()
     .filter(r => !r.passed)
 
   if (passed) {

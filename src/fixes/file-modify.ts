@@ -103,15 +103,11 @@ async function fileModify(
         if (!dryRun) {
           const startNewlines =
             options.newlines && options.newlines.begin
-              ? Array.from({ length: options.newlines.begin }, () => '\n').join(
-                  ''
-                )
+              ? '\n'.repeat(options.newlines.begin)
               : ''
           const endNewlines =
             options.newlines && options.newlines.end
-              ? Array.from({ length: options.newlines.end }, () => '\n').join(
-                  ''
-                )
+              ? '\n'.repeat(options.newlines.end)
               : ''
           const fileContent = startNewlines + content! + endNewlines
           if (options.write_mode === 'prepend') {
