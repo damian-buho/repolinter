@@ -123,7 +123,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'  # npm 11 ships here; trusted publishing (OIDC) needs npm >= 11.5.1
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install NPM Dependencies
