@@ -1,6 +1,6 @@
 {
   "name": "@damian-buho/repolinter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lint open source repositories (fork)",
   "type": "module",
   "main": "dist/index.js",
