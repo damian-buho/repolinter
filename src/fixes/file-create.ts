@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
 interface FileCreateOptions {
   file: string
@@ -48,15 +48,15 @@ async function fileCreate(
     content = options.text
   } else if (typeof options.text === 'object') {
     if (options.text.url) {
-      const req = await fetch(options.text.url)
-      if (!req.ok) {
+      const request = await fetch(options.text.url)
+      if (!request.ok) {
         return new Result(
-          `Could not fetch from ${options.text.url}, received status code ${req.status}`,
+          `Could not fetch from ${options.text.url}, received status code ${request.status}`,
           [],
           false
         )
       }
-      content = await req.text()
+      content = await request.text()
     } else if (options.text.file) {
       const file = await fs.findFirstFile(
         [options.text.file],

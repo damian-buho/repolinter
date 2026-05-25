@@ -5,7 +5,7 @@ import licensee from './licensee.js'
 import linguist from './linguist.js'
 import packagers from './packagers.js'
 import contributorCount from './contributor-count.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import type Result from '../lib/result.js'
 
 type AxiomFunction = (fileSystem: FileSystem) => Promise<Result>

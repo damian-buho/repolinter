@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import symbolFormatter from '../../dist/formatters/symbol_formatter.js'
+import symbolFormatter from '../../dist/formatters/symbol-formatter.js'
 const logSymbols = { info: 'ℹ', success: '✔', warning: '⚠', error: '✖' }
 import Result from '../../dist/lib/result.js'
 import FormatResult from '../../dist/lib/formatresult.js'
@@ -58,7 +58,7 @@ describe('formatters', () => {
             new RuleInfo('rule2', 'error', [], 'file-existence', {}),
             'ignored'
           ),
-          // eslint-disable-next-line unicorn/throw-new-error -- static factory, not Error constructor
+
           FormatResult.CreateError(
             new RuleInfo('rule3', 'error', [], 'file-existence', {}),
             'errored'

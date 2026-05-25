@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { slug } from '../../dist/lib/github_slugger.js'
+import { slug } from '../../dist/lib/github-slugger.js'
 
 describe('lib', () => {
   describe('github_slugger', () => {

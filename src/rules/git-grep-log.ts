@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { spawnSync } from 'child_process'
-import type FileSystem from '../lib/file_system.js'
+import { spawnSync } from 'node:child_process'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface GitGrepLogOptions {
@@ -21,9 +21,9 @@ function grepLog(
   options: GitGrepLogOptions
 ): CommitInfo[] {
   const denylist = options.denylist ?? options.blacklist ?? []
-  const args = [
+  const arguments_ = [
     '-C',
-    fileSystem.targetDir,
+    fileSystem.targetDirectory,
     'log',
     '--all',
     '--format=full',
@@ -31,9 +31,9 @@ function grepLog(
     ...denylist.map(pattern => `--grep=${pattern}`)
   ]
   if (options.ignoreCase) {
-    args.push('-i')
+    arguments_.push('-i')
   }
-  const log = spawnSync('git', args).stdout.toString()
+  const log = spawnSync('git', arguments_).stdout.toString()
   return parseLog(log)
 }
 
@@ -44,10 +44,12 @@ function parseLog(log: string): CommitInfo[] {
 }
 
 function extractInfo(commit: string): CommitInfo {
-  const [hash, , , ...message] = commit.split('\n')
+  const lines = commit.split('\n')
+  const hash = lines[0]
+  const message = lines.slice(3).join('\n')
   return {
     hash: (hash ?? '').split(' ')[1],
-    message: message.join('\n')
+    message
   }
 }
 
@@ -58,7 +60,7 @@ function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
 
   const targets = commits.map(commit => {
     const message = [
-      `The commit message for commit ${commit.hash?.substr(
+      `The commit message for commit ${commit.hash?.slice(
         0,
         7
       )} contains denylisted words.\n`,

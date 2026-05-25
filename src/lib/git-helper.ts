@@ -4,13 +4,13 @@
 import { spawnSync } from 'node:child_process'
 
 interface GitHelper {
-  gitAllCommits(targetDir: string): string[]
+  gitAllCommits(targetDirectory: string): string[]
 }
 
 const GitHelper: GitHelper = {
-  gitAllCommits(targetDir: string): string[] {
-    const args = ['-C', targetDir, 'rev-list', '--all']
-    const result = spawnSync('git', args)
+  gitAllCommits(targetDirectory: string): string[] {
+    const arguments_ = ['-C', targetDirectory, 'rev-list', '--all']
+    const result = spawnSync('git', arguments_)
     return (result.stdout?.toString() ?? '').split('\n')
   }
 }

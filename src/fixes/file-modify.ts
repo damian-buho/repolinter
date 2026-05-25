@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
 interface SkipPathsMatching {
   extensions?: string[]
@@ -40,8 +40,8 @@ async function fileModify(
     let regexes: RegExp[] = []
     const extensions = options['skip-paths-matching'].extensions
     if (extensions && extensions.length > 0) {
-      const extJoined = extensions.join('|')
-      regexes.push(new RegExp('.(' + extJoined + ')$', 'i'))
+      const extensionJoined = extensions.join('|')
+      regexes.push(new RegExp('.(' + extensionJoined + ')$', 'i'))
     }
 
     const patterns = options['skip-paths-matching'].patterns
@@ -59,15 +59,15 @@ async function fileModify(
     content = options.text
   } else if (typeof options.text === 'object') {
     if (options.text.url) {
-      const req = await fetch(options.text.url)
-      if (!req.ok) {
+      const request = await fetch(options.text.url)
+      if (!request.ok) {
         return new Result(
-          `Could not fetch from ${options.text.url}, received status code ${req.status}`,
+          `Could not fetch from ${options.text.url}, received status code ${request.status}`,
           [],
           false
         )
       }
-      content = await req.text()
+      content = await request.text()
     } else if (options.text.file) {
       const file = await fs.findFirstFile(
         [options.text.file],
@@ -91,7 +91,7 @@ async function fileModify(
     )
   }
 
-  const resTargets = await Promise.all(
+  const resultTargets = await Promise.all(
     files.map(
       async (
         file
@@ -110,17 +110,15 @@ async function fileModify(
               ? '\n'.repeat(options.newlines.end)
               : ''
           const fileContent = startNewlines + content! + endNewlines
-          if (options.write_mode === 'prepend') {
-            await fs.setFileContents(
-              file,
-              fileContent + (await fs.getFileContents(file))
-            )
-          } else {
-            await fs.setFileContents(
-              file,
-              (await fs.getFileContents(file)) + fileContent
-            )
-          }
+          await (options.write_mode === 'prepend'
+            ? fs.setFileContents(
+                file,
+                fileContent + (await fs.getFileContents(file))
+              )
+            : fs.setFileContents(
+                file,
+                (await fs.getFileContents(file)) + fileContent
+              ))
         }
         const message =
           typeof options.text === 'object'
@@ -140,7 +138,7 @@ async function fileModify(
     )
   )
 
-  return new Result('', resTargets, true)
+  return new Result('', resultTargets, true)
 }
 
 export default fileModify

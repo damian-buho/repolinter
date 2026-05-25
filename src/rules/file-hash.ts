@@ -1,9 +1,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 interface FileHashOptions {
   globsAny?: string[]
@@ -34,7 +34,7 @@ async function fileHash(
   const algorithm = options.algorithm ?? 'sha256'
   const digester = crypto.createHash(algorithm)
 
-  let contents = (await fs.getFileContents(file)) ?? ''
+  const contents = (await fs.getFileContents(file)) ?? ''
   digester.update(contents)
   const hashResult = digester.digest('hex')
 

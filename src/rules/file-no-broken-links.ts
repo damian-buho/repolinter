@@ -5,8 +5,8 @@ import nodeFs from 'node:fs'
 import nodePath from 'node:path'
 import nodeOs from 'node:os'
 import { check, LinkState, type LinkResult } from 'linkinator'
-import GitHubMarkup from '../lib/github_markup.js'
-import type FileSystem from '../lib/file_system.js'
+import GitHubMarkup from '../lib/github-markup.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface FileNoBrokenLinksOptions {
@@ -25,15 +25,15 @@ async function checkFile(
   file: string,
   options: FileNoBrokenLinksOptions
 ): Promise<{ passed: boolean; path: string; message: string }> {
-  const ext = nodePath.extname(file).toLowerCase()
-  if (MARKDOWN_EXTS.has(ext)) {
+  const extension = nodePath.extname(file).toLowerCase()
+  if (MARKDOWN_EXTS.has(extension)) {
     return checkMarkdownFile(fileSystem, file, options)
   }
 
   const rendered = await GitHubMarkup.renderMarkup(
-    nodePath.posix.resolve(fileSystem.targetDir, file)
+    nodePath.posix.resolve(fileSystem.targetDirectory, file)
   )
-  if (rendered === null) {
+  if (rendered === undefined) {
     return {
       passed: true,
       path: file,
@@ -51,10 +51,10 @@ async function checkMarkdownFile(
 ): Promise<{ passed: boolean; path: string; message: string }> {
   const result = await check({
     path: file,
-    serverRoot: fileSystem.targetDir,
+    serverRoot: fileSystem.targetDirectory,
     markdown: true,
     recurse: false,
-    timeout: 10000
+    timeout: 10_000
   })
 
   return processResults(result.links, file, fileSystem, options)
@@ -66,24 +66,27 @@ async function checkRenderedHtml(
   html: string,
   options: FileNoBrokenLinksOptions
 ): Promise<{ passed: boolean; path: string; message: string }> {
-  const tmpDir = await nodeFs.promises.mkdtemp(
+  const temporaryDirectory = await nodeFs.promises.mkdtemp(
     nodePath.join(nodeOs.tmpdir(), 'repolinter-')
   )
   const baseName = nodePath.basename(file, nodePath.extname(file)) + '.html'
-  const tmpFile = nodePath.join(tmpDir, baseName)
-  await nodeFs.promises.writeFile(tmpFile, html)
+  const temporaryFile = nodePath.join(temporaryDirectory, baseName)
+  await nodeFs.promises.writeFile(temporaryFile, html)
 
   try {
     const result = await check({
-      path: tmpFile,
-      serverRoot: tmpDir,
+      path: temporaryFile,
+      serverRoot: temporaryDirectory,
       recurse: false,
-      timeout: 10000
+      timeout: 10_000
     })
 
     return processResults(result.links, file, fileSystem, options)
   } finally {
-    await nodeFs.promises.rm(tmpDir, { recursive: true, force: true })
+    await nodeFs.promises.rm(temporaryDirectory, {
+      recursive: true,
+      force: true
+    })
   }
 }
 
@@ -94,7 +97,7 @@ async function processResults(
   options: FileNoBrokenLinksOptions
 ): Promise<{ passed: boolean; path: string; message: string }> {
   const brokenLinks = links.filter(
-    l => l.state === LinkState.BROKEN && l.parent != null
+    l => l.state === LinkState.BROKEN && l.parent != undefined
   )
 
   if (options['pass-external-relative-links'] && brokenLinks.length > 0) {

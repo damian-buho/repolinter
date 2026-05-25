@@ -18,7 +18,7 @@ declare class FileSystem {
     globs: string | string[],
     nocase?: boolean
   ): Promise<undefined | string[]>
-  glob (globs: string | string[], options: any): Promise<string[]>
+  glob (globs: string | string[], options: Record<string, unknown>): Promise<string[]>
   findAll (
     globs: string | string[],
     nocase?: boolean
@@ -26,7 +26,7 @@ declare class FileSystem {
   isBinaryFile (relativeFile: string): Promise<boolean>
   shouldInclude (path: string): boolean
   getFileContents (relativeFile: string): Promise<string | undefined>
-  setFileContents (relativeFile: string, contents: string): Promise<any>
+  setFileContents (relativeFile: string, contents: string): Promise<void>
   getFileLines (relativeFile: string, lineCount: number): Promise<string>
 }
 
@@ -46,9 +46,9 @@ declare class RuleInfo {
   level: 'off' | 'error' | 'warning'
   where: string[]
   ruleType: string
-  ruleConfig: any
+  ruleConfig: Record<string, unknown>
   fixType?: string
-  fixConfig?: any
+  fixConfig?: Record<string, unknown>
   policyInfo?: string
   policyUrl?: string
 }
@@ -66,14 +66,14 @@ declare class LintResult {
     targetDir: string
     filterPaths: string[]
     rulesetPath?: string
-    ruleset: any
+    ruleset: Record<string, unknown>
   }
   passed: boolean
   errored: boolean
   errMsg?: string
   results: FormatResult[]
   targets: { [key: string]: Result }
-  formatOptions?: { [key: string]: any }
+  formatOptions?: Record<string, unknown>
 }
 
 declare interface Formatter {
@@ -81,9 +81,9 @@ declare interface Formatter {
 }
 
 export declare function lint (
-  targetDir: string,
+  targetDirectory: string,
   filterPaths?: string[],
-  ruleset?: any,
+  ruleset?: Record<string, unknown> | string,
   dryRun?: boolean
 ): Promise<LintResult>
 export declare function runRuleset (
@@ -92,13 +92,13 @@ export declare function runRuleset (
   dryRun: boolean
 ): Promise<FormatResult[]>
 export declare function determineTargets (
-  axiomconfig: any,
+  axiomconfig: Record<string, string>,
   fs: FileSystem
 ): Promise<{ [key: string]: Result }>
 export declare function validateConfig (
-  config: any
+  config: Record<string, unknown>
 ): Promise<{ passed: boolean; error?: string }>
-export declare function parseConfig (config: any): RuleInfo[]
+export declare function parseConfig (config: Record<string, unknown>): RuleInfo[]
 export declare function shouldRuleRun (
   validTargets: string[],
   ruleAxioms: string[]

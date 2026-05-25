@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import jsonFormatter from '../../dist/formatters/json_formatter.js'
+import jsonFormatter from '../../dist/formatters/json-formatter.js'
 import FormatResult from '../../dist/lib/formatresult.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'

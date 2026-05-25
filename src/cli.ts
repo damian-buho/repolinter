@@ -2,9 +2,9 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import path from 'path'
-import fs from 'fs'
-import os from 'os'
+import path from 'node:path'
+import fs from 'node:fs'
+import os from 'node:os'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import { simpleGit } from 'simple-git'
@@ -74,23 +74,27 @@ yargs(hideBin(process.argv))
         .conflicts('rulesetEncoded', 'rulesetUrl')
     },
     async argv => {
-      let tmpDir: string | null = null
+      let temporaryDirectory: string | undefined
       if (argv.git) {
-        tmpDir = await fs.promises.mkdtemp(
+        temporaryDirectory = await fs.promises.mkdtemp(
           path.join(os.tmpdir(), 'repolinter-')
         )
-        const result = await git.clone(argv.directory as string, tmpDir)
+        const result = await git.clone(
+          argv.directory as string,
+          temporaryDirectory
+        )
         if (result) {
           console.error(result)
           process.exitCode = 1
           fs.promises
-            .rm(tmpDir, { recursive: true, force: true })
+            .rm(temporaryDirectory, { recursive: true, force: true })
             .catch(() => {})
           return
         }
       }
       const output = await repolinter.lint(
-        tmpDir || path.resolve(process.cwd(), argv.directory as string),
+        temporaryDirectory ??
+          path.resolve(process.cwd(), argv.directory as string),
         argv.allowPaths as string[],
         argv.rulesetUrl || argv.rulesetFile || argv.rulesetEncoded,
         argv.dryRun as boolean
@@ -112,8 +116,10 @@ yargs(hideBin(process.argv))
       )
       console.log(formattedOutput)
       process.exitCode = output.passed ? 0 : 1
-      if (tmpDir) {
-        fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(() => {})
+      if (temporaryDirectory) {
+        fs.promises
+          .rm(temporaryDirectory, { recursive: true, force: true })
+          .catch(() => {})
       }
     }
   )

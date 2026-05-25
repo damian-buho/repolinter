@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface FileExistenceOptions {
@@ -33,9 +33,9 @@ async function fileExistence(
       )
     : new Result(
         `${
-          options['fail-message'] !== undefined
-            ? options['fail-message'] + '. '
-            : ''
+          options['fail-message'] === undefined
+            ? ''
+            : options['fail-message'] + '. '
         }Did not find a file matching the specified patterns`,
         fileList.map(f => {
           return { passed: false, pattern: f }

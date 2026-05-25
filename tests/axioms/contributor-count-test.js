@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import path from 'node:path'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 import axioms from '../../dist/axioms/axioms.js'
 
 const contributors = axioms['contributor-count']

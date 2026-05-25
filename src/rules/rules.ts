@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import type Result from '../lib/result.js'
 import apacheNotice from './apache-notice.js'
 import bestPracticesBadgePresent from './best-practices-badge-present.js'
@@ -23,7 +23,10 @@ import largeFile from './large-file.js'
 import licenseDetectableByLicensee from './license-detectable-by-licensee.js'
 import jsonSchemaPasses from './json-schema-passes.js'
 
-type RuleFunction = (fs: FileSystem, options: any) => Promise<Result> | Result
+type RuleFunction = (
+  fs: FileSystem,
+  options: unknown
+) => Promise<Result> | Result
 
 const rules: Record<string, RuleFunction> = {
   'apache-notice': apacheNotice as RuleFunction,

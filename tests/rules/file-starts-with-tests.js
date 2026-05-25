@@ -5,7 +5,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 import fileStartsWith from '../../dist/rules/file-starts-with.js'
 
 describe('rule', () => {

@@ -3,10 +3,16 @@
 
 import gitlog from 'gitlog'
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
-export default async function (fileSystem: FileSystem): Promise<Result> {
-  const gitlogOptions = { repo: fileSystem.targetDir, all: true, number: 10000 }
+export default async function contributorCount(
+  fileSystem: FileSystem
+): Promise<Result> {
+  const gitlogOptions = {
+    repo: fileSystem.targetDirectory,
+    all: true,
+    number: 10_000
+  }
   const commits = await gitlog(gitlogOptions)
   if (!commits) {
     return new Result(

@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import fileExistence from './file-existence.js'
 
 export default function apacheNotice(

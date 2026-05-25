@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import GitHubMarkup from '../../dist/lib/github_markup.js'
+import GitHubMarkup from '../../dist/lib/github-markup.js'
 import commandExists from 'command-exists'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

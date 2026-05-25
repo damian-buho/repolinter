@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { commandExists } from '../../dist/lib/command_exists.js'
+import { commandExists } from '../../dist/lib/command-exists.js'
 
 describe('lib', () => {
   describe('command_exists', () => {

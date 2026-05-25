@@ -3,12 +3,14 @@
 
 import licensee from '../lib/licensee.js'
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
-export default async function (fileSystem: FileSystem): Promise<Result> {
-  let licenses: string[] = []
+export default async function licenseeAxiom(
+  fileSystem: FileSystem
+): Promise<Result> {
+  let licenses: string[]
   try {
-    licenses = await licensee.identifyLicense(fileSystem.targetDir)
+    licenses = await licensee.identifyLicense(fileSystem.targetDirectory)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return new Result(message, [], false)

@@ -1,8 +1,8 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { spawnSync } from 'child_process'
-import type FileSystem from '../lib/file_system.js'
+import { spawnSync } from 'node:child_process'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface GitWorkingTreeOptions {
@@ -13,8 +13,8 @@ function gitWorkingTree(
   fs: FileSystem,
   options: GitWorkingTreeOptions
 ): Result {
-  const args = ['-C', fs.targetDir, 'rev-parse', '--show-prefix']
-  const gitResult = spawnSync('git', args)
+  const arguments_ = ['-C', fs.targetDirectory, 'rev-parse', '--show-prefix']
+  const gitResult = spawnSync('git', arguments_)
   const result = new Result('', [], true)
   if (gitResult.status === 0) {
     const prefix = gitResult.stdout.toString().trim()

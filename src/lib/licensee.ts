@@ -1,7 +1,7 @@
 // Copyright 2018 TODO Group. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 
-import { commandExists } from './command_exists.js'
+import { commandExists } from './command-exists.js'
 import { spawnSync } from 'node:child_process'
 
 interface LicenseeJson {
@@ -9,7 +9,7 @@ interface LicenseeJson {
 }
 
 class Licensee {
-  async identifyLicense(targetDir: string): Promise<string[]> {
+  async identifyLicense(targetDirectory: string): Promise<string[]> {
     const command = await commandExists(['licensee', 'licensee.bat'])
     if (command === undefined) {
       throw new Error('Licensee not installed')
@@ -17,9 +17,9 @@ class Licensee {
     const licenseeOutput = spawnSync(command, [
       'detect',
       '--json',
-      targetDir
+      targetDirectory
     ]).stdout
-    if (licenseeOutput == null) {
+    if (licenseeOutput == undefined) {
       throw new Error('Error executing licensee')
     }
     const json: LicenseeJson = JSON.parse(licenseeOutput.toString())

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { spawnSync } from 'node:child_process'
-import { commandExists } from './command_exists.js'
+import { commandExists } from './command-exists.js'
 
 class Linguist {
   async identifyLanguages(
-    targetDir: string
+    targetDirectory: string
   ): Promise<Record<string, string[]>> {
     const command = await commandExists([
       'github-linguist',
@@ -17,11 +17,11 @@ class Linguist {
     if (command === undefined) {
       throw new Error('Linguist not installed')
     }
-    const output = spawnSync(command, [targetDir, '--json']).stdout
-    if (output !== null) {
-      return JSON.parse(output.toString())
-    } else {
+    const output = spawnSync(command, [targetDirectory, '--json']).stdout
+    if (output === null) {
       throw new Error('Execution of linguist failed!')
+    } else {
+      return JSON.parse(output.toString())
     }
   }
 }

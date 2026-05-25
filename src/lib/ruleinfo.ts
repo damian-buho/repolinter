@@ -6,9 +6,9 @@ export default class RuleInfo {
   level: 'off' | 'error' | 'warning'
   where: string[]
   ruleType: string
-  ruleConfig: any
+  ruleConfig: Record<string, unknown>
   declare fixType?: string
-  declare fixConfig?: any
+  declare fixConfig?: Record<string, unknown>
   declare policyInfo?: string
   declare policyUrl?: string
 
@@ -17,9 +17,9 @@ export default class RuleInfo {
     level: 'off' | 'error' | 'warning',
     where: string[] | undefined,
     ruleType: string,
-    ruleConfig: any,
+    ruleConfig: Record<string, unknown>,
     fixType?: string,
-    fixConfig?: any,
+    fixConfig?: Record<string, unknown>,
     policyInfo?: string,
     policyUrl?: string
   ) {

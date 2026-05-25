@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0.
 
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
-export default async function (fileSystem: FileSystem): Promise<Result> {
+export default async function packagersAxiom(
+  fileSystem: FileSystem
+): Promise<Result> {
   const packageManagerPatterns: Record<string, string> = {
     'pom.xml': 'maven',
     'project.xml': 'maven1',
@@ -22,13 +24,13 @@ export default async function (fileSystem: FileSystem): Promise<Result> {
     'build.gradle': 'gradle'
   }
 
-  const packagers = (
-    await Promise.all(
-      Object.entries(packageManagerPatterns).map(async ([pattern, packager]) =>
-        (await fileSystem.findFirst(pattern)) ? packager : null
-      )
-    )
-  ).filter((p): p is string => p !== null)
+  const allPackagers = await Promise.all(
+    Object.entries(packageManagerPatterns).map(async ([pattern, packager]) => {
+      const found = await fileSystem.findFirst(pattern)
+      return found ? packager : undefined
+    })
+  )
+  const packagers = allPackagers.filter((p): p is string => p !== undefined)
   return new Result(
     '',
     packagers.map(p => ({

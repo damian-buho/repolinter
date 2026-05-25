@@ -5,7 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 import commandExists from 'command-exists'
 import licenseDetectable from '../../dist/rules/license-detectable-by-licensee.js'
 

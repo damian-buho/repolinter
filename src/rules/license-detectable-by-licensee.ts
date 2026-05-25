@@ -1,7 +1,7 @@
 // Copyright 2018 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import licensee from '../lib/licensee.js'
 import Result from '../lib/result.js'
 
@@ -10,7 +10,7 @@ async function licenceDetect(fs: FileSystem): Promise<Result> {
 
   let licenses: string[] = []
   try {
-    licenses = await licensee.identifyLicense(fs.targetDir)
+    licenses = await licensee.identifyLicense(fs.targetDirectory)
   } catch (error) {
     result.message = (error as Error).message
     return result

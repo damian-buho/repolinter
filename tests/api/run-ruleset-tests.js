@@ -7,7 +7,7 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import * as repolinter from '../../dist/index.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 import FormatResult from '../../dist/lib/formatresult.js'
 import Result from '../../dist/lib/result.js'
 

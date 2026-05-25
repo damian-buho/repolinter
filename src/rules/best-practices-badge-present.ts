@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 import fileContents from './file-contents.js'
 
@@ -9,8 +9,7 @@ interface BestPracticesBadgeOptions {
   minPercentage?: number
 }
 
-const bestPracticesRegExp =
-  'https://bestpractices\\.coreinfrastructure\\.org(/\\w+)?/projects/\\d+'
+const bestPracticesRegExp = String.raw`https://bestpractices\.coreinfrastructure\.org(/\w+)?/projects/\d+`
 
 export default async function bestPracticesBadgePresent(
   fileSystem: FileSystem,

@@ -1,10 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { spawnSync } from 'child_process'
-import type FileSystem from '../lib/file_system.js'
+import { spawnSync } from 'node:child_process'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import GitHelper from '../lib/git_helper.js'
+import GitHelper from '../lib/git-helper.js'
 
 interface GitListTreeOptions {
   denylist?: string[]
@@ -17,9 +17,16 @@ interface FileEntry {
   commits: string[]
 }
 
-function gitFilesAtCommit(targetDir: string, commit: string): string[] {
-  const args = ['-C', targetDir, 'ls-tree', '-r', '--name-only', commit]
-  return spawnSync('git', args).stdout.toString().split('\n')
+function gitFilesAtCommit(targetDirectory: string, commit: string): string[] {
+  const arguments_ = [
+    '-C',
+    targetDirectory,
+    'ls-tree',
+    '-r',
+    '--name-only',
+    commit
+  ]
+  return spawnSync('git', arguments_).stdout.toString().split('\n')
 }
 
 function listFiles(
@@ -33,20 +40,20 @@ function listFiles(
     '(' + denylist.join('|') + ')',
     options.ignoreCase ? 'i' : ''
   )
-  const commits = GitHelper.gitAllCommits(fileSystem.targetDir)
-  commits.forEach(commit => {
-    const includedFiles = gitFilesAtCommit(fileSystem.targetDir, commit)
+  const commits = GitHelper.gitAllCommits(fileSystem.targetDirectory)
+  for (const commit of commits) {
+    const includedFiles = gitFilesAtCommit(fileSystem.targetDirectory, commit)
       .filter(file => file.match(pattern))
       .filter(file => fileSystem.shouldInclude(file))
-    includedFiles.forEach(filePath => {
+    for (const filePath of includedFiles) {
       const existingFile = files.find(f => f.path === filePath)
       if (existingFile) {
         existingFile.commits.push(commit)
       } else {
         files.push({ path: filePath, commits: [commit] })
       }
-    })
-  })
+    }
+  }
 
   return files
 }
@@ -62,7 +69,7 @@ function gitListTree(fs: FileSystem, options: GitListTreeOptions): Result {
       rest.length > 0 ? `, and ${rest.length} more commits` : ''
 
     const message = [
-      `denylisted path (${file.path}) found in commit ${firstCommit!.substr(
+      `denylisted path (${file.path}) found in commit ${firstCommit!.slice(
         0,
         7
       )}${restMessage}.`,

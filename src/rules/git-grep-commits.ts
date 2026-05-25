@@ -1,10 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { spawnSync } from 'child_process'
-import type FileSystem from '../lib/file_system.js'
+import { spawnSync } from 'node:child_process'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import GitHelper from '../lib/git_helper.js'
+import GitHelper from '../lib/git-helper.js'
 
 interface GitGrepCommitsOptions {
   denylist?: string[]
@@ -34,13 +34,13 @@ function listCommitsWithLines(
   const denylist = options.denylist ?? options.blacklist ?? []
   const pattern = '(' + denylist.join('|') + ')'
 
-  const commits = GitHelper.gitAllCommits(fileSystem.targetDir)
+  const commits = GitHelper.gitAllCommits(fileSystem.targetDirectory)
   return commits
     .map(commit => {
       return {
         hash: commit,
         lines: gitLinesAtCommit(
-          fileSystem.targetDir,
+          fileSystem.targetDirectory,
           pattern,
           !!options.ignoreCase,
           commit
@@ -51,36 +51,40 @@ function listCommitsWithLines(
 }
 
 function gitGrep(
-  targetDir: string,
+  targetDirectory: string,
   pattern: string,
   ignoreCase: boolean,
   commit: string
 ): string[] {
-  const args = [
+  const arguments_ = [
     '-C',
-    targetDir,
+    targetDirectory,
     'grep',
     '-E',
     ignoreCase ? '-i' : '',
     pattern,
     commit
   ]
-  return spawnSync('git', args)
+  return spawnSync('git', arguments_)
     .stdout.toString()
     .split('\n')
     .filter(x => !!x)
 }
 
 function gitLinesAtCommit(
-  targetDir: string,
+  targetDirectory: string,
   pattern: string,
   ignoreCase: boolean,
   commit: string
 ): LineEntry[] {
-  const lines = gitGrep(targetDir, pattern, ignoreCase, commit).map(entry => {
-    const [filePath, ...rest] = entry.substring(commit.length + 1).split(':')
-    return { path: filePath!, content: rest.join(':') }
-  })
+  const lines = gitGrep(targetDirectory, pattern, ignoreCase, commit).map(
+    entry => {
+      const [filePath, ...rest] = entry
+        .slice(Math.max(0, commit.length + 1))
+        .split(':')
+      return { path: filePath!, content: rest.join(':') }
+    }
+  )
 
   return lines
 }
@@ -92,8 +96,8 @@ function listFiles(
   const files: FileWithCommits[] = []
 
   const commits = listCommitsWithLines(fileSystem, options)
-  commits.forEach(commit => {
-    commit.lines.forEach(line => {
+  for (const commit of commits) {
+    for (const line of commit.lines) {
       const existingFile = files.find(f => f.path === line.path)
 
       if (existingFile) {
@@ -115,8 +119,8 @@ function listFiles(
           commits: [{ hash: commit.hash, lines: [line.content] }]
         })
       }
-    })
-  })
+    }
+  }
 
   return files
 }
@@ -136,7 +140,7 @@ function gitGrepCommits(
     const message = [
       `(${
         file.path
-      }) contains denylisted words in commit ${firstCommit!.hash.substr(
+      }) contains denylisted words in commit ${firstCommit!.hash.slice(
         0,
         7
       )}${restMessage}.`,

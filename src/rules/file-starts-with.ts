@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface SkipPathsMatching {
@@ -39,8 +39,8 @@ async function fileStartsWith(
     let regexes: RegExp[] = []
     const extensions = options['skip-paths-matching'].extensions
     if (extensions && extensions.length > 0) {
-      const extJoined = extensions.join('|')
-      regexes.push(new RegExp('.(' + extJoined + ')$', 'i'))
+      const extensionJoined = extensions.join('|')
+      regexes.push(new RegExp('.(' + extensionJoined + ')$', 'i'))
     }
 
     const patterns = options['skip-paths-matching'].patterns
@@ -51,7 +51,7 @@ async function fileStartsWith(
       regexes = [...regexes, ...filteredPatterns]
     }
     filteredFiles = filteredFiles.filter(
-      file => !regexes.some(regex => file.match(regex))
+      file => !regexes.some(regex => regex.test(file))
     )
   }
 
@@ -59,22 +59,20 @@ async function fileStartsWith(
     filteredFiles.map(async file => {
       const lines = await fs.getFileLines(file, options.lineCount)
       if (!lines) {
-        return null
+        return
       }
       const misses = options.patterns.filter(pattern => {
         const regexp = new RegExp(pattern, options.flags)
-        return !lines.match(regexp)
+        return !regexp.test(lines)
       })
 
       let message = `The first ${options.lineCount} lines`
       const passed = misses.length === 0
-      if (passed) {
-        message += ' contain all of the requested patterns.'
-      } else {
-        message += ` do not contain the pattern(s): ${
-          options['human-readable-pattern'] || misses.join(', ')
-        }`
-      }
+      message += passed
+        ? ' contain all of the requested patterns.'
+        : ` do not contain the pattern(s): ${
+            options['human-readable-pattern'] || misses.join(', ')
+          }`
 
       return {
         passed,
@@ -84,7 +82,8 @@ async function fileStartsWith(
     })
   )
   const targets = targetsUnfiltered.filter(
-    (t): t is { passed: boolean; path: string; message: string } => t !== null
+    (t): t is { passed: boolean; path: string; message: string } =>
+      t !== undefined
   )
 
   if (targets.length === 0) {
@@ -97,7 +96,7 @@ async function fileStartsWith(
     )
   }
 
-  const passed = !targets.find(t => !t.passed)
+  const passed = !targets.some(t => !t.passed)
   return new Result('', targets, passed)
 }
 

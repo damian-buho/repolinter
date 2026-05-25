@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 import fileContents from './file-contents.js'
 
@@ -54,10 +54,9 @@ async function fileNotContents(
   )
 
   const filteredResults = results.filter(r => r !== null)
-  const passed = !filteredResults.find(r => !r.passed)
+  const passed = !filteredResults.some(r => !r.passed)
   const aggregatedTargets = filteredResults
-    .map(r => r.targets)
-    .flat()
+    .flatMap(r => r.targets)
     .filter(r => !r.passed)
 
   if (passed) {

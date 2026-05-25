@@ -4,7 +4,7 @@ declare module 'command-exists' {
 }
 
 declare module 'find-config' {
-  export function obj(
+  export function object(
     name: string,
     options?: { dir?: string }
   ): { path: string } | undefined
@@ -77,7 +77,6 @@ declare module 'chai-as-promised' {
 }
 
 declare module 'mock-http-server' {
-  import type { Server } from 'http'
   export default class MockHttpServer {
     constructor(options?: Record<string, unknown>)
     start(callback: () => void): void

@@ -7,12 +7,12 @@ import { lint as markdownlint } from 'markdownlint/promise'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import toc from 'markdown-toc'
-import { slug as slugger } from '../../dist/lib/github_slugger.js'
+import { slug as slugger } from '../../dist/lib/github-slugger.js'
 import FormatResult from '../../dist/lib/formatresult.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'
 import * as repolinter from '../../dist/index.js'
-import formatter from '../../dist/formatters/markdown_formatter.js'
+import formatter from '../../dist/formatters/markdown-formatter.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(__dirname, '../..')

@@ -26,20 +26,20 @@ export default class FormatResult {
 
   constructor(
     ruleInfo: RuleInfo,
-    message: string | null,
+    message: string | undefined,
     status: FormatResultStatus,
-    lintRes: Result | null,
-    fixRes: Result | null
+    lintResult: Result | undefined,
+    fixResult: Result | undefined
   ) {
     this.ruleInfo = ruleInfo
     if (message) this.runMessage = message
     this.status = status
-    if (lintRes) this.lintResult = lintRes
-    if (fixRes) this.fixResult = fixRes
+    if (lintResult) this.lintResult = lintResult
+    if (fixResult) this.fixResult = fixResult
   }
 
-  static getStatus(ruleInfo: RuleInfo, lintRes: Result): FormatResultStatus {
-    if (lintRes.passed) {
+  static getStatus(ruleInfo: RuleInfo, lintResult: Result): FormatResultStatus {
+    if (lintResult.passed) {
       return FormatResult.RULE_PASSED
     }
     if (ruleInfo.level === 'warning') {
@@ -62,34 +62,46 @@ export default class FormatResult {
   }
 
   static CreateIgnored(ruleInfo: RuleInfo, message: string): FormatResult {
-    return new FormatResult(ruleInfo, message, FormatResult.IGNORED, null, null)
+    return new FormatResult(
+      ruleInfo,
+      message,
+      FormatResult.IGNORED,
+      undefined,
+      undefined
+    )
   }
 
   static CreateError(ruleInfo: RuleInfo, message: string): FormatResult {
-    return new FormatResult(ruleInfo, message, FormatResult.ERROR, null, null)
-  }
-
-  static CreateLintOnly(ruleInfo: RuleInfo, lintRes: Result): FormatResult {
     return new FormatResult(
       ruleInfo,
-      null,
-      FormatResult.getStatus(ruleInfo, lintRes),
-      lintRes,
-      null
+      message,
+      FormatResult.ERROR,
+      undefined,
+      undefined
+    )
+  }
+
+  static CreateLintOnly(ruleInfo: RuleInfo, lintResult: Result): FormatResult {
+    return new FormatResult(
+      ruleInfo,
+      undefined,
+      FormatResult.getStatus(ruleInfo, lintResult),
+      lintResult,
+      undefined
     )
   }
 
   static CreateLintAndFix(
     ruleInfo: RuleInfo,
-    lintRes: Result,
-    fixRes: Result
+    lintResult: Result,
+    fixResult: Result
   ): FormatResult {
     return new FormatResult(
       ruleInfo,
-      null,
-      FormatResult.getStatus(ruleInfo, lintRes),
-      lintRes,
-      fixRes
+      undefined,
+      FormatResult.getStatus(ruleInfo, lintResult),
+      lintResult,
+      fixResult
     )
   }
 }

@@ -3,15 +3,16 @@
 
 import linguist from '../lib/linguist.js'
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
-export default async function (fileSystem: FileSystem): Promise<Result> {
+export default async function linguistAxiom(
+  fileSystem: FileSystem
+): Promise<Result> {
   const languages: string[] = []
   try {
-    const jsonObj: Record<string, unknown> = await linguist.identifyLanguages(
-      fileSystem.targetDir
-    )
-    for (const language in jsonObj) {
+    const jsonObject: Record<string, unknown> =
+      await linguist.identifyLanguages(fileSystem.targetDirectory)
+    for (const language in jsonObject) {
       languages.push(language.toLowerCase())
     }
   } catch (error) {

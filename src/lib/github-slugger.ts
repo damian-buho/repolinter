@@ -12,9 +12,9 @@ function slug(string: unknown): string {
   return string
     .toLowerCase()
     .trim()
-    .replace(specials, '')
-    .replace(emojiRegex, '')
-    .replace(whitespace, '-')
+    .replaceAll(specials, '')
+    .replaceAll(emojiRegex, '')
+    .replaceAll(whitespace, '-')
 }
 
 export { slug }

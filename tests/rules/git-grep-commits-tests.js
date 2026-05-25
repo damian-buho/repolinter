@@ -3,8 +3,8 @@
 
 import { describe, it, before, after, mock } from 'node:test'
 import assert from 'node:assert/strict'
-import FileSystem from '../../dist/lib/file_system.js'
-import GitHelper from '../../dist/lib/git_helper.js'
+import FileSystem from '../../dist/lib/file-system.js'
+import GitHelper from '../../dist/lib/git-helper.js'
 import gitGrepCommits from '../../dist/rules/git-grep-commits.js'
 
 describe('rule', () => {

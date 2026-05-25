@@ -16,11 +16,11 @@ export interface GlobOptions {
 }
 
 class FileSystem {
-  targetDir: string
+  targetDirectory: string
   filterPaths: string[]
 
-  constructor(targetDir = '.', filterPaths: string[] = []) {
-    this.targetDir = targetDir
+  constructor(targetDirectory = '.', filterPaths: string[] = []) {
+    this.targetDirectory = targetDirectory
     this.filterPaths = filterPaths
   }
 
@@ -32,7 +32,7 @@ class FileSystem {
   }
 
   async relativeFileExists(file: string): Promise<boolean> {
-    return FileSystem.fileExists(path.resolve(this.targetDir, file))
+    return FileSystem.fileExists(path.resolve(this.targetDirectory, file))
   }
 
   async findFirst(
@@ -57,7 +57,7 @@ class FileSystem {
   ): Promise<string[]> {
     const symlinks: Record<string, boolean> = {}
     const filePaths = await this.glob(globs, {
-      cwd: this.targetDir,
+      cwd: this.targetDirectory,
       nocase: !!nocase,
       nodir: true,
       symlinks
@@ -67,7 +67,7 @@ class FileSystem {
     for (const fullPath in symlinks) {
       if (symlinks[fullPath]) {
         const relativeToRepoPath = this.normalizePath(
-          path.relative(this.targetDir, fullPath)
+          path.relative(this.targetDirectory, fullPath)
         )
         onlySymlinks[relativeToRepoPath] = true
       }
@@ -86,7 +86,8 @@ class FileSystem {
       typeof globs === 'string'
         ? this.normalizePath(globs)
         : globs.map(g => this.normalizePath(g))
-    return (await glob(fixedGlobs, options))
+    const globbed = await glob(fixedGlobs, options)
+    return globbed
       .map(p => this.normalizePath(p))
       .filter(p => this.shouldInclude(p))
   }
@@ -97,21 +98,21 @@ class FileSystem {
         ? this.normalizePath(globs)
         : globs.map(g => this.normalizePath(g))
     return this.glob(fixedGlobs, {
-      cwd: this.targetDir,
+      cwd: this.targetDirectory,
       nocase: !!nocase
     })
   }
 
   async isBinaryFile(relativeFile: string): Promise<boolean> {
-    const file = path.resolve(this.targetDir, relativeFile)
+    const file = path.resolve(this.targetDirectory, relativeFile)
     try {
       const { isBinaryFile } = await import('isbinaryfile')
       return isBinaryFile(file)
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message.includes('ENOENT')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('ENOENT')) {
         return false
       }
-      throw e
+      throw error
     }
   }
 
@@ -120,7 +121,10 @@ class FileSystem {
       return true
     }
     const resolvedPath = this.normalizePath(
-      path.relative(this.targetDir, path.resolve(this.targetDir, filePath))
+      path.relative(
+        this.targetDirectory,
+        path.resolve(this.targetDirectory, filePath)
+      )
     )
     return this.filterPaths
       .map(p => this.normalizePath(p))
@@ -135,7 +139,7 @@ class FileSystem {
   }
 
   async getFileContents(relativeFile: string): Promise<string | undefined> {
-    const file = path.resolve(this.targetDir, relativeFile)
+    const file = path.resolve(this.targetDirectory, relativeFile)
     try {
       return await fs.promises.readFile(file, 'utf8')
     } catch {
@@ -145,29 +149,29 @@ class FileSystem {
 
   async setFileContents(relativeFile: string, contents: string): Promise<void> {
     return fs.promises.writeFile(
-      path.resolve(this.targetDir, relativeFile),
+      path.resolve(this.targetDirectory, relativeFile),
       contents
     )
   }
 
   async removeFile(relativeFile: string): Promise<void> {
-    return fs.promises.unlink(path.resolve(this.targetDir, relativeFile))
+    return fs.promises.unlink(path.resolve(this.targetDirectory, relativeFile))
   }
 
   async getFileLines(
     relativeFile: string,
     lineCount: number
   ): Promise<string | undefined> {
-    const file = path.resolve(this.targetDir, relativeFile)
+    const file = path.resolve(this.targetDirectory, relativeFile)
     let fd: fs.promises.FileHandle | undefined
     try {
       fd = await fs.promises.open(file, 'r')
-    } catch (e: unknown) {
+    } catch (error: unknown) {
       if (fd) await fd.close()
-      if (e instanceof Error && e.message.includes('ENOENT')) {
+      if (error instanceof Error && error.message.includes('ENOENT')) {
         return undefined
       }
-      throw e
+      throw error
     }
     const bufferSize = 1024
     const buffer = Buffer.alloc(bufferSize)
@@ -175,27 +179,27 @@ class FileSystem {
     let lineNumber = 0
 
     let leftOver = ''
-    let idxStart = 0
-    let idx: number
+    let indexStart: number
+    let index: number
     while (true) {
-      const ret = await fd.read(buffer, 0, bufferSize, null)
-      const read = ret.bytesRead
+      const returnValue = await fd.read(buffer, 0, bufferSize)
+      const read = returnValue.bytesRead
       if (read === 0) {
         break
       }
       leftOver += buffer.toString('utf8', 0, read)
-      idxStart = 0
-      while ((idx = leftOver.indexOf('\n', idxStart)) !== -1) {
+      indexStart = 0
+      while ((index = leftOver.indexOf('\n', indexStart!)) !== -1) {
         lineNumber++
-        lines += leftOver.substring(idxStart, idx) + '\n'
-        idxStart = idx + 1
+        lines += leftOver.slice(indexStart!, index) + '\n'
+        indexStart = index + 1
 
         if (lineNumber >= lineCount) {
           await fd.close()
           return lines
         }
       }
-      leftOver = leftOver.substring(idxStart)
+      leftOver = leftOver.slice(Math.max(0, indexStart))
     }
     await fd.close()
     return lines

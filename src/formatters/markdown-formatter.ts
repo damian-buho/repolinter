@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import FormatResultBase from '../lib/formatresult.js'
-import { slug as slugger } from '../lib/github_slugger.js'
+import type FormatResultType from '../lib/formatresult.js'
+import type { ResultTarget } from '../lib/result.js'
+import { slug as slugger } from '../lib/github-slugger.js'
 import type { LintResult } from '../index.js'
 
 const FormatResult = FormatResultBase as typeof FormatResultBase & {
@@ -30,25 +32,29 @@ const COLLAPSE_TOP = `<details>
 const COLLAPSE_BOTTOM = '</details>'
 
 function opWrap(
-  pre: string | null,
-  base: string | undefined | false,
-  suf: string | null
+  pre: string | undefined,
+  base: string | number | undefined | false,
+  suf: string | undefined
 ): string {
   if (base) return (pre || '') + base + (suf || '')
   return ''
 }
 
-class MarkdownFormatter {
-  static formatRuleHeading(name: string, symbol: string): string {
-    return `${opWrap(null, symbol, ' ')}\`${name}\``
-  }
+const MarkdownFormatter = {
+  formatRuleHeading(name: string, symbol: string): string {
+    return `${opWrap(undefined, symbol, ' ')}\`${name}\``
+  },
 
-  static makeHeaderLink(name: string): string {
+  makeHeaderLink(name: string): string {
     const s = slugger(name)
     return `<a href="#user-content-${s}" id="user-content-${s}">#</a>`
-  }
+  },
 
-  static formatResult(result: any, symbol: string, dryRun: boolean): string {
+  formatResult(
+    result: FormatResultType,
+    symbol: string,
+    dryRun: boolean
+  ): string {
     const header = MarkdownFormatter.formatRuleHeading(
       result.ruleInfo.name,
       symbol
@@ -81,24 +87,24 @@ class MarkdownFormatter {
           )}`
         )
       }
-    } else if (result.lintResult.targets.length <= 1 && !result.fixResult) {
+    } else if (result.lintResult!.targets.length <= 1 && !result.fixResult) {
       const body =
         '\n\n' +
-        opWrap(null, result.lintResult.message, '. ') +
+        opWrap(undefined, result.lintResult!.message, '. ') +
         opWrap(
-          null,
-          result.lintResult.targets.length &&
-            result.lintResult.targets[0].message,
+          undefined,
+          result.lintResult!.targets.length > 0 &&
+            result.lintResult!.targets[0]!.message,
           ' '
         ) +
         opWrap(
           '(`',
-          result.lintResult.targets.length &&
-            (result.lintResult.targets[0].path ||
-              result.lintResult.targets[0].pattern),
+          result.lintResult!.targets.length > 0 &&
+            (result.lintResult!.targets[0]!.path ||
+              result.lintResult!.targets[0]!.pattern),
           '`). '
         ) +
-        opWrap(null, result.ruleInfo.policyInfo, '. ') +
+        opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
         opWrap(
           'For more information please visit ',
           result.ruleInfo.policyUrl,
@@ -108,33 +114,33 @@ class MarkdownFormatter {
     } else {
       const start =
         '\n\n' +
-        opWrap(null, result.ruleInfo.policyInfo, '. ') +
+        opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
         opWrap(
           'For more information please visit ',
           result.ruleInfo.policyUrl,
           '. '
         ) +
-        opWrap(null, result.lintResult.message, '. ')
+        opWrap(undefined, result.lintResult!.message, '. ')
       formatBase.push(start)
-      const failedList = result.lintResult.targets.filter(
-        (t: any) => t.passed === false
+      const failedList = result.lintResult!.targets.filter(
+        (t: ResultTarget) => t.passed === false
       )
       if (failedList.length === 0) {
         formatBase.push('All files passed this test.')
       } else {
         formatBase.push('Below is a list of files or patterns that failed:\n\n')
         const list = failedList
-          .map((t: any) =>
+          .map((t: ResultTarget) =>
             result.fixResult && t.path
-              ? [
+              ? ([
                   t,
                   result.fixResult.targets.find(
-                    (f: any) => f.path === t.path
-                  ) || null
-                ]
-              : [t, null]
+                    (f: ResultTarget) => f.path === t.path
+                  )
+                ] as [ResultTarget, ResultTarget | undefined])
+              : ([t, undefined] as [ResultTarget, ResultTarget | undefined])
           )
-          .map(([lintTarget, fixTarget]: [any, any]) => {
+          .map(([lintTarget, fixTarget]) => {
             const base = `- \`${
               lintTarget.path || lintTarget.pattern
             }\`${opWrap(': ', lintTarget.message, '.')}`
@@ -144,7 +150,7 @@ class MarkdownFormatter {
             return (
               base +
               `\n  - ${dryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
-                fixTarget.message || result.fixResult.message
+                fixTarget.message || result.fixResult!.message
               }`
             )
           })
@@ -154,11 +160,13 @@ class MarkdownFormatter {
     }
     if (result.fixResult && result.fixResult.passed) {
       const unassociatedFixList = result.fixResult.targets.filter(
-        (t: any) =>
+        (t: ResultTarget) =>
           !t.path ||
-          !result.lintResult.targets.find((l: any) => l.path === t.path)
+          !result.lintResult!.targets.some(
+            (l: ResultTarget) => l.path === t.path
+          )
       )
-      if (result.fixResult.message || unassociatedFixList.length !== 0) {
+      if (result.fixResult.message || unassociatedFixList.length > 0) {
         const fixSuggest = `\n\n${dryRun ? SUGGESTED_FIX : APPLIED_FIX}${opWrap(
           ' ',
           result.fixResult.message,
@@ -166,42 +174,38 @@ class MarkdownFormatter {
         )}`
         formatBase.push(fixSuggest)
         const fixList = unassociatedFixList.map(
-          (f: any) =>
+          (f: ResultTarget) =>
             `\n- \`${f.path || f.pattern}\`${opWrap(': ', f.message, '.')}`
         )
-        if (fixList.length) {
+        if (fixList.length > 0) {
           formatBase.push('\n')
         }
         formatBase.push(...fixList)
       }
     }
     return formatBase.join('')
-  }
+  },
 
-  static sortResults(results: any[]): Record<string, any[]> {
-    const out: Record<string, any[]> = {}
+  sortResults(results: FormatResultType[]): Record<string, FormatResultType[]> {
+    const out: Record<string, FormatResultType[]> = {}
     for (const key of FormatResult.getAllStatus()) {
       out[key] = []
     }
-    return results.reduce((a: Record<string, any[]>, c: any) => {
-      a[c.status]!.push(c)
-      return a
-    }, out)
-  }
+    for (const result of results) {
+      out[result.status]!.push(result)
+    }
+    return out
+  },
 
-  static createSection(
-    name: string,
-    body: string,
-    collapse: boolean = false
-  ): string {
+  createSection(name: string, body: string, collapse: boolean = false): string {
     const section = `\n\n## ${name} ${MarkdownFormatter.makeHeaderLink(name)}
 ${collapse ? `\n${COLLAPSE_TOP}\n` : ''}
 ${body}
 ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     return section
-  }
+  },
 
-  static formatOutput(output: LintResult, dryRun: boolean): string {
+  formatOutput(output: LintResult, dryRun: boolean): string {
     const formatBase = [
       `# Repolinter Report\n\n${
         (output.formatOptions && output.formatOptions.disclaimer) || DISCLAIMER
@@ -225,13 +229,13 @@ ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
       'Total'
     ]
     const dataCells = values.map(String)
-    const colWidths = headCells.map((h, i) =>
-      Math.max(h.length, dataCells[i]!.length)
+    const colWidths = headCells.map((h, index) =>
+      Math.max(h.length, dataCells[index]!.length)
     )
     const tableHead = headCells.join('|')
-    const tableSep = colWidths.map(w => '-'.repeat(w)).join('|')
+    const tableSeparator = colWidths.map(w => '-'.repeat(w)).join('|')
     const tableData = dataCells.join('|')
-    const summary = `\n\nThis Repolinter run generated the following results:\n\n|${tableHead}|\n|${tableSep}|\n|${tableData}|`
+    const summary = `\n\nThis Repolinter run generated the following results:\n\n|${tableHead}|\n|${tableSeparator}|\n|${tableData}|`
     formatBase.push(summary)
     const sectionConfig = [
       {
@@ -291,9 +295,8 @@ ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
         cfg.collapse
       )
     )
-    formatBase.push(...allSections)
-    formatBase.push('\n')
-    return formatBase.join('').replace(/[^\S\r\n]+$/gm, '')
+    formatBase.push(...allSections, '\n')
+    return formatBase.join('').replaceAll(/[^\S\r\n]+$/gm, '')
   }
 }
 

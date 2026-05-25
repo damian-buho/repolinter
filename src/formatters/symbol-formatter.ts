@@ -1,8 +1,10 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { styleText } from 'util'
+import { styleText } from 'node:util'
 import FormatResultBase from '../lib/formatresult.js'
+import type { ResultTarget } from '../lib/result.js'
+import type Result from '../lib/result.js'
 import type { LintResult } from '../index.js'
 
 const FormatResult = FormatResultBase as typeof FormatResultBase & {
@@ -14,10 +16,10 @@ const FormatResult = FormatResultBase as typeof FormatResultBase & {
 }
 
 const logSymbols = {
-  info:     'i',
-  success:  '✔',
-  warning:  '⚠',
-  error:    '🗙'
+  info: 'i',
+  success: '✔',
+  warning: '⚠',
+  error: '🗙'
 }
 
 function frontSpace(string: string | undefined): string {
@@ -25,14 +27,12 @@ function frontSpace(string: string | undefined): string {
 }
 
 function colorSymbol(symbol: string, passed: boolean): string {
-  return passed
-    ? styleText('green', symbol)
-    : styleText('red', symbol)
+  return passed ? styleText('green', symbol) : styleText('red', symbol)
 }
 
-class SymbolFormatter {
-  static formatResult(
-    result: any,
+const SymbolFormatter = {
+  formatResult(
+    result: Result,
     ruleName: string,
     rulePolicyUrl: string | undefined = undefined,
     rulePolicyInfo: string | undefined = undefined,
@@ -47,62 +47,65 @@ class SymbolFormatter {
         policyLines += `\n\t${styleText('gray', logSymbols.info)} PolicyInfo: ${rulePolicyInfo}`
     }
     const formatbase = `\n${colorSymbol(
-      result.passed ? okSymbol : errorSymbol, result.passed
+      result.passed ? okSymbol : errorSymbol,
+      result.passed
     )} ${ruleName}:${frontSpace(result.message)}${
-      !result.passed ? policyLines : ''
+      result.passed ? '' : policyLines
     }`
     if (result.targets.length === 0) {
       return formatbase
     }
     if (result.targets.length === 1) {
+      const target = result.targets[0]!
       return (
         formatbase +
-        `${frontSpace(result.targets[0].message)} (${
-          result.targets[0].path || result.targets[0].pattern
-        })`
+        `${frontSpace(target.message)} (${target.path || target.pattern})`
       )
     }
     return (
       formatbase +
       result.targets
         .map(
-          (t: any) =>
+          (t: ResultTarget) =>
             `\n\t${colorSymbol(
-              t.passed ? okSymbol : errorSymbol, t.passed
-            )} ${t.path || t.pattern}${
-              t.message ? ': ' + t.message : ''
-            }`
+              t.passed ? okSymbol : errorSymbol,
+              t.passed
+            )} ${t.path || t.pattern}${t.message ? ': ' + t.message : ''}`
         )
         .join('')
     )
-  }
+  },
 
-  static getSymbol(level: string): string {
+  getSymbol(level: string): string {
     switch (level) {
-      case 'info':
+      case 'info': {
         return logSymbols.info
-      case 'warning':
+      }
+      case 'warning': {
         return logSymbols.warning
-      case 'error':
+      }
+      case 'error': {
         return logSymbols.error
-      default:
+      }
+      default: {
         return logSymbols.error
+      }
     }
-  }
+  },
 
-  static formatOutput(output: LintResult, dryRun: boolean): string {
-    const ret = [`Target directory: ${output.params.targetDir}`]
-    if (output.params.filterPaths.length) {
-      ret.push(
+  formatOutput(output: LintResult, dryRun: boolean): string {
+    const returnValue = [`Target directory: ${output.params.targetDirectory}`]
+    if (output.params.filterPaths.length > 0) {
+      returnValue.push(
         `\nPaths to include in checks:\n\t${output.params.filterPaths.join(
           '\n\t'
         )}`
       )
     }
     if (output.errored) {
-      return ret.join('') + `\n${styleText('red', output.errMsg!)}`
+      return returnValue.join('') + `\n${styleText('red', output.errMsg!)}`
     }
-    ret.push(
+    returnValue.push(
       Object.entries(output.targets)
         .filter(([, v]) => v.passed !== true)
         .map(([k, v]) =>
@@ -111,9 +114,7 @@ class SymbolFormatter {
             `\nAxiom ${k} failed to run with error: ${v.message}`
           )
         )
-        .join('')
-    )
-    ret.push(
+        .join(''),
       styleText('bold', '\nLint:') +
         output.results
           .map(result => {
@@ -130,7 +131,7 @@ class SymbolFormatter {
               )}`
             }
             return SymbolFormatter.formatResult(
-              result.lintResult,
+              result.lintResult!,
               result.ruleInfo.name,
               result.ruleInfo.policyUrl,
               result.ruleInfo.policyInfo,
@@ -141,11 +142,11 @@ class SymbolFormatter {
     )
     const fixresults = output.results.filter(r => r.fixResult)
     if (fixresults.length > 0) {
-      ret.push(
+      returnValue.push(
         styleText('bold', `\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
           fixresults.map(result =>
             SymbolFormatter.formatResult(
-              result.fixResult,
+              result.fixResult!,
               result.ruleInfo.name,
               result.ruleInfo.policyUrl,
               result.ruleInfo.policyInfo,
@@ -155,7 +156,7 @@ class SymbolFormatter {
           )
       )
     }
-    return ret.join('')
+    return returnValue.join('')
   }
 }
 

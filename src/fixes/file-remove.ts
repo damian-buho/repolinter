@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Result from '../lib/result.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 
 interface FileRemoveOptions {
   globsAll?: string[]
@@ -16,7 +16,7 @@ async function fileRemove(
   dryRun: boolean = false
 ): Promise<Result> {
   let resolvedTargets = targets
-  if (options.globsAll && options.globsAll.length) {
+  if (options.globsAll && options.globsAll.length > 0) {
     resolvedTargets = await fs.findAllFiles(options.globsAll, !!options.nocase)
   }
   if (resolvedTargets.length === 0) {

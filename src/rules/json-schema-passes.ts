@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 import { Ajv } from 'ajv'
 
@@ -39,7 +39,7 @@ async function jsonSchemaPasses(
   let parsed: unknown
   try {
     parsed = JSON.parse(fileContents)
-  } catch (e) {
+  } catch (error) {
     return new Result(
       '',
       [
@@ -47,7 +47,7 @@ async function jsonSchemaPasses(
           path: file,
           pattern: fileName,
           passed: false,
-          message: `Failed to parse JSON with error ${(e as Error).toString()}`
+          message: `Failed to parse JSON with error ${(error as Error).toString()}`
         }
       ],
       false
@@ -57,7 +57,10 @@ async function jsonSchemaPasses(
   if (validator.errors) {
     throw new Error(
       `Failed to parse JSON schema with errors ${validator.errors
-        .map((e: JsonSchemaError) => `root${e.instancePath} ${e.message}`)
+        .map(
+          (error: JsonSchemaError) =>
+            `root${error.instancePath} ${error.message}`
+        )
         .join(', ')}`
     )
   }
@@ -71,7 +74,10 @@ async function jsonSchemaPasses(
     message = result
       ? 'JSON validation passed'
       : `JSON validation failed with errors: ${(validator.errors ?? [])
-          .map((e: JsonSchemaError) => `root${e.instancePath} ${e.message}`)
+          .map(
+            (error: JsonSchemaError) =>
+              `root${error.instancePath} ${error.message}`
+          )
           .join(', ')}`
   }
   return new Result(

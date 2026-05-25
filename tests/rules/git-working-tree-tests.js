@@ -3,7 +3,7 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 import gitWorkingTree from '../../dist/rules/git-working-tree.js'
 
 describe(

@@ -4,20 +4,20 @@
 import fileCreate from './file-create.js'
 import fileModify from './file-modify.js'
 import fileRemove from './file-remove.js'
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import type Result from '../lib/result.js'
 
 type FixFunction = (
   fs: FileSystem,
-  options: any,
+  options: unknown,
   targets: string[],
   dryRun: boolean
 ) => Promise<Result>
 
 const fixes: Record<string, FixFunction> = {
-  'file-create': fileCreate,
-  'file-modify': fileModify,
-  'file-remove': fileRemove
+  'file-create': fileCreate as unknown as FixFunction,
+  'file-modify': fileModify as unknown as FixFunction,
+  'file-remove': fileRemove as unknown as FixFunction
 }
 
 export default fixes

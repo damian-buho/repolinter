@@ -1,7 +1,7 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import type FileSystem from '../lib/file_system.js'
+import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
 
 interface FileTypeExclusionOptions {
@@ -37,7 +37,7 @@ async function fileTypeExclusion(
     )
   }
 
-  const passed = !targets.find(t => !t.passed)
+  const passed = !targets.some(t => !t.passed)
   return new Result('', targets, passed)
 }
 

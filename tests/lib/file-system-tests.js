@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import realFs from 'node:fs'
-import FileSystem from '../../dist/lib/file_system.js'
+import FileSystem from '../../dist/lib/file-system.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
