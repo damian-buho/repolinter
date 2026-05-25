@@ -71,7 +71,7 @@
     "isbinaryfile": "6.0.0",
     "linkinator": "7.6.1",
     "matched": "5.0.1",
-    "simple-git": "3.16.0",
+    "simple-git": "3.36.0",
     "yaml": "2.9.0",
     "yargs": "18.0.0"
   },
@@ -93,7 +93,7 @@
     "globals": "17.6.0",
     "markdown-toc": "1.2.0",
     "markdownlint": "0.40.0",
-    "mock-http-server": "1.4.2",
+    "mock-http-server": "1.4.5",
     "nock": "14.0.15",
     "prettier": "3.8.3",
     "typedoc": "0.28.19",
