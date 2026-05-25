@@ -4,3 +4,8 @@ pre-commit:
       run: just lint
     test:
       run: just test
+
+pre-push:
+  commands:
+    pipeline:
+      run: just pipeline
