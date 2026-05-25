@@ -30,7 +30,7 @@ Below is a complete list of rules that Repolinter can run, along with their conf
 
 ### `apache-notice`
 
-No inputs. Checks for the presense of a `NOTICE` file in the root of the repository. This rule is equivalent to the following:
+No inputs. Checks for the presence of a `NOTICE` file in the root of the repository. This rule is equivalent to the following:
 
 ```JSON
 {
@@ -87,7 +87,7 @@ Checks that a given file matches a provided hash.
 
 ### `file-hashes-not-exist`
 
-Check files' hashes not included in a list of certain cryptographic hashes.
+Check files’ hashes not included in a list of certain cryptographic hashes.
 
 | Input                  | Required | Type       | Default  | Description                                                                                                                                                                  |
 |------------------------| -------- |------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -128,7 +128,7 @@ Note: provide either `content` or `contents`
 
 ### `file-not-exists`
 
-Checks that a file doesn't exist.
+Checks that a file doesn’t exist.
 
 | Input          | Required | Type       | Default | Description                                                                                   |
 | -------------- | -------- | ---------- | ------- | --------------------------------------------------------------------------------------------- |
@@ -154,7 +154,7 @@ Checks that the first lines of a file contain a set of regular expressions.
 
 ### `file-type-exclusion`
 
-Checks that no files exist of a certain filetype.
+Checks that no files exist of a certain file type.
 
 | Input  | Required | Type       | Default | Description                                                            |
 | ------ | -------- | ---------- | ------- | ---------------------------------------------------------------------- |
@@ -186,7 +186,7 @@ Check for blacklisted filepaths in Git.
 
 | Input        | Required | Type       | Default | Description                                                        |
 | ------------ | -------- | ---------- | ------- | ------------------------------------------------------------------ |
-| `denylist`   | **Yes**  | `string[]` |         | A list of patterns to search against all paths in the git history. |
+| `denylist`   | **Yes**  | `string[]` |         | A list of patterns to search against all paths in the Git history. |
 | `ignoreCase` | No       | `boolean`  | `false` | Set to true to make `denylist` case insensitive.                   |
 
 ### `git-working-tree`
@@ -195,11 +195,11 @@ Checks whether the directory is managed with Git.
 
 | Input         | Required | Type      | Default | Description                                                   |
 | ------------- | -------- | --------- | ------- | ------------------------------------------------------------- |
-| `allowSubDir` | No       | `boolean` |         | Whether or not to search subdirectories for a git repository. |
+| `allowSubDir` | No       | `boolean` |         | Whether or not to search subdirectories for a Git repository. |
 
 ### `large-file`
 
-Check if a list of files' size on the file system that is larger than provided size.
+Check if a list of files’ size on the file system that is larger than provided size.
 
 | Input                    | Required | Type       | Default                | Description                                                                                                                                             |
 |--------------------------| -------- |------------| ---------------------- |---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -220,11 +220,11 @@ Checks if a given file matches a provided [JSON schema](https://json-schema.org/
 
 ### `license-detectable-by-licensee`
 
-Fails if Licensee doesn't detect the repository's license. This rule takes no inputs, but requires `licensee` in the path, see [command line dependencies](#command-line-dependencies) for details.
+Fails if Licensee doesn’t detect the repository’s license. This rule takes no inputs, but requires `licensee` in the path, see [command line dependencies](#command-line-dependencies) for details.
 
 ### `best-practices-badge-present`
 
-Check Best Practices Badge is present in README. Optionally check a certain badge level is accomplished.
+Check Best Practices Badge is present in readme. Optionally check a certain badge level is accomplished.
 
 | Input        | Required | Type       | Default | Description                                                        |
 | ------------ | -------- | ---------- | ------- | ------------------------------------------------------------------ |

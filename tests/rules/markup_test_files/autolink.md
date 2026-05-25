@@ -1,1 +1,1 @@
-this is an autolink: www.example.com/something/somethingelse. Autolinks only work in markdown.
+this is an autolink: www.example.com/something/somethingelse. Autolinks only work in Markdown.

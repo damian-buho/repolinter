@@ -15,7 +15,7 @@ Below is a complete list of axioms that Repolinter can check.
 
 ### `contributor-count`
 
-This axiom uses [gitlog](https://github.com/domharrington/node-gitlog#readme) to count the number of contributors to the current git repository. Contributors are counted based on unique occurrences of an author name in the git log. This axiom is a numerical axiom, meaning numerical comparisons can be used.
+This axiom uses [gitlog](https://github.com/domharrington/node-gitlog#readme) to count the number of contributors to the current Git repository. Contributors are counted based on unique occurrences of an author name in the Git log. This axiom is a numerical axiom, meaning numerical comparisons can be used.
 
 An example of using this axiom:
 
@@ -56,7 +56,7 @@ An example of using this axiom:
 
 ### `linguist`
 
-This axiom uses GitHub's [linguist](https://github.com/github/linguist) to detect programming languages in the current repository. To use this axiom, linguist must be installed in the system `PATH` or in the same directory as Repolinter. This axiom will return a lowercase list of programming languages from [this list of supported languages](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml).
+This axiom uses GitHub’s [linguist](https://github.com/github/linguist) to detect programming languages in the current repository. To use this axiom, linguist must be installed in the system `PATH` or in the same directory as Repolinter. This axiom will return a lowercase list of programming languages from [this list of supported languages](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml).
 
 An example of using this axiom:
 

@@ -24,7 +24,7 @@ The contents of the result should be an array of targets where `t.path` is a tar
 
 ## Rules
 
-A rule consists of two parts: a JavaScript module, which determines the rule's functionality and a JSON schema, which validates the rule's configuration options in rulesets. Rules are registered in [rules/rules.js](../rules/rules.js) and [rulesets/schema.json](../rulesets/schema.json). Rules are also documented under [rules.md](./rules.md).
+A rule consists of two parts: a JavaScript module, which determines the rule’s functionality and a JSON schema, which validates the rule’s configuration options in rulesets. Rules are registered in [rules/rules.js](../rules/rules.js) and [rulesets/schema.json](../rulesets/schema.json). Rules are also documented under [rules.md](./rules.md).
 
 ### Rule Configuration JSON Schema
 
@@ -32,7 +32,7 @@ The configuration JSON schema determines how `rule.options` should be validated 
 
 - The file itself should always be named `<rule-name>-config.json` and be located under the `rules` folder.
 - The top-level type should always be `object`.
-- The `$id` field should be an absolute raw.githubusercontent.com URL to where the schema is hosted on GitHub (ex. https://raw.githubusercontent.com/todogroup/repolinter/master/rules/apache-notice-config.json). This allows IDEs such as VSCode to apply the schema via a URL.
+- The `$id` field should be an absolute raw.githubusercontent.com URL to where the schema is hosted on GitHub (ex. https://raw.githubusercontent.com/todogroup/repolinter/master/rules/apache-notice-config.json). This allows IDEs such as Visual Studio Code to apply the schema via a URL.
 
 To get started, you can use the following template:
 
@@ -65,7 +65,7 @@ A rule implementation is encouraged to use `Result#targets` to show the individu
 
 ## Fixes
 
-A fix, similar to a rule, consists of two parts: a JavaScript module, which determines the fix's functionality and a JSON schema, which validates the fix's configuration options in rulesets. Fixes are registered in [fixes/fixes.js](../fixes/fixes.js) and [rulesets/schema.json](../rulesets/schema.json). Fixes are also documented under [fixes.md](./fixes.md).
+A fix, similar to a rule, consists of two parts: a JavaScript module, which determines the fix’s functionality and a JSON schema, which validates the fix’s configuration options in rulesets. Fixes are registered in [fixes/fixes.js](../fixes/fixes.js) and [rulesets/schema.json](../rulesets/schema.json). Fixes are also documented under [fixes.md](./fixes.md).
 
 ### Fix Configuration JSON Schema
 

@@ -8,7 +8,7 @@ Lint open source repositories for common issues.
 
 ## Installation
 
-Repolinter requires [Node.JS](https://nodejs.org/en/) >= v12 to function properly. Once Node.JS is installed, you can install Repolinter using `npm`:
+Repolinter requires [Node.JS](https://nodejs.org/en/) >= v12 to function properly. Once Node.js is installed, you can install Repolinter using `npm`:
 
 ```sh
 npm install -g repolinter
@@ -40,7 +40,7 @@ repolinter % echo $?
 
 ## Linting a Remote Repository
 
-Repolinter also supports linting a git repository using the `--git` flag. With this flag enabled, the directory input will be interpreted as a git URL which Repolinter will automatically clone into a temporary directory.
+Repolinter also supports linting a Git repository using the `--git` flag. With this flag enabled, the directory input will be interpreted as a Git URL which Repolinter will automatically clone into a temporary directory.
 
 ```sh
 repolinter lint -g https://github.com/todogroup/repolinter.git
@@ -125,7 +125,7 @@ rules:
 Where:
 
 - **`$schema`**- points to the [JSON schema](./rulesets/schema.json) for all Repolinter rulesets. This schema both validates the ruleset and makes the ruleset creation process a bit easier.
-- **`version`** - specifies the ruleset version Repolinter should expect. Currently there are two versions: omitted for legacy config ([example](https://github.com/todogroup/repolinter/blob/1a66d77e3a744222a049bdb4041437cbcf26a308/rulesets/default.json)) and `2` for all others. Use `2` unless you know what you're doing.
+- **`version`** - specifies the ruleset version Repolinter should expect. Currently there are two versions: omitted for legacy config ([example](https://github.com/todogroup/repolinter/blob/1a66d77e3a744222a049bdb4041437cbcf26a308/rulesets/default.json)) and `2` for all others. Use `2` unless you know what you’re doing.
 - **`axiom`** - The axiom functionality, covered in [Axioms](#axioms).
 - **`rules`** - The actual ruleset, covered in [Rules](#rules).
 
@@ -172,7 +172,7 @@ Rules are objects of the following format:
     ...
 ```
 
-- **`rule`** - The check to perform. Repolinter can perform any check listed under the [rules documentation](./docs/rules.md). Unlike eslint, Repolinter checks are designed to be reused and specialized: for example, the `file-existence` check can be used in a `README-file-exists` rule and a `LICENSE-file-exists` rule in the same ruleset. This allows a user to write a very specific ruleset from configuring generic checks.
+- **`rule`** - The check to perform. Repolinter can perform any check listed under the [rules documentation](./docs/rules.md). Unlike ESLint, Repolinter checks are designed to be reused and specialized: for example, the `file-existence` check can be used in a `README-file-exists` rule and a `LICENSE-file-exists` rule in the same ruleset. This allows a user to write a very specific ruleset from configuring generic checks.
 - **`level`** - The error level to notify if the check fails. `warning` will not change the exit code and `off` will not run the check.
 - **`where`** - Conditionally enable or disable this rule based off of [axioms](#axioms). Strings in this array follow the format of `<axiom>=<value>`, where value is either an axiom output or `*` to simply test if the axiom is enabled. If this option is present, this rule will only run if all specified axiom outputs are present. The available axioms in Repolinter can be found in the [axioms documentation](./docs/axioms.md).
 - **`fix`** _(optional)_ - The action to perform if the check performed by `rule` fails. Repolinter can perform any action listed under [fixes documentation](./docs/fixes.md).
@@ -263,7 +263,7 @@ axioms:
   <axiom-id>: axiom-target
 ```
 
-Each axiom is configured as a key value pair in the `axioms` object, where `<axiom-id>` specifies the program to run and `<axiom-target>` specifies the target to be used in the `where` conditional. The available axiom IDs can be found in the [axiom documentation](./docs/axioms.md). It should be noted that some axioms require external packages to run.
+Each axiom is configured as a key-value pair in the `axioms` object, where `<axiom-id>` specifies the program to run and `<axiom-target>` specifies the target to be used in the `where` conditional. The available axiom IDs can be found in the [axiom documentation](./docs/axioms.md). It should be noted that some axioms require external packages to run.
 
 An example configuration using an axiom to detect the packaging system for a project:
 
@@ -355,14 +355,14 @@ rules:
 ```
 
 Relative paths are resolved relative to the location used to access the
-extending file.  For example, if repolinter is invoked as:
+extending file. For example, if repolinter is invoked as:
 
 ```
 repolinter -u http://example.com/custom-rules.yaml
 ```
 
 And that ruleset includes `extends: "./default.yaml"`, the path will be resolved
-relative to the original URL as `http://example.com/default.yaml`.  If instead
+relative to the original URL as `http://example.com/default.yaml`. If instead
 repolinter is invoked as:
 
 ```
