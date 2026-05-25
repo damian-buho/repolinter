@@ -14,14 +14,20 @@ const FormatResult = FormatResultBase as typeof FormatResultBase & {
 }
 
 const logSymbols = {
-  info: '\u2139',
-  success: '\u2714',
-  warning: '\u26A0',
-  error: '\u2716'
+  info:     'i',
+  success:  '✔',
+  warning:  '⚠',
+  error:    '🗙'
 }
 
 function frontSpace(string: string | undefined): string {
   return string ? ' ' + string : ''
+}
+
+function colorSymbol(symbol: string, passed: boolean): string {
+  return passed
+    ? styleText('green', symbol)
+    : styleText('red', symbol)
 }
 
 class SymbolFormatter {
@@ -36,13 +42,13 @@ class SymbolFormatter {
     let policyLines = ''
     if (!result.passed) {
       if (rulePolicyUrl)
-        policyLines += `\n\t${logSymbols.info} PolicyUrl: ${rulePolicyUrl}`
+        policyLines += `\n\t${styleText('gray', logSymbols.info)} PolicyUrl: ${rulePolicyUrl}`
       if (rulePolicyInfo)
-        policyLines += `\n\t${logSymbols.info} PolicyInfo: ${rulePolicyInfo}`
+        policyLines += `\n\t${styleText('gray', logSymbols.info)} PolicyInfo: ${rulePolicyInfo}`
     }
-    const formatbase = `\n${
-      result.passed ? okSymbol : errorSymbol
-    }  ${ruleName}:${frontSpace(result.message)}${
+    const formatbase = `\n${colorSymbol(
+      result.passed ? okSymbol : errorSymbol, result.passed
+    )} ${ruleName}:${frontSpace(result.message)}${
       !result.passed ? policyLines : ''
     }`
     if (result.targets.length === 0) {
@@ -61,7 +67,9 @@ class SymbolFormatter {
       result.targets
         .map(
           (t: any) =>
-            `\n\t${t.passed ? okSymbol : errorSymbol} ${t.path || t.pattern}${
+            `\n\t${colorSymbol(
+              t.passed ? okSymbol : errorSymbol, t.passed
+            )} ${t.path || t.pattern}${
               t.message ? ': ' + t.message : ''
             }`
         )
@@ -92,7 +100,7 @@ class SymbolFormatter {
       )
     }
     if (output.errored) {
-      return ret.join('') + `\n${styleText(['bgRed', 'white'], output.errMsg!)}`
+      return ret.join('') + `\n${styleText('red', output.errMsg!)}`
     }
     ret.push(
       Object.entries(output.targets)
@@ -106,17 +114,20 @@ class SymbolFormatter {
         .join('')
     )
     ret.push(
-      styleText('inverse', '\nLint:') +
+      styleText('bold', '\nLint:') +
         output.results
           .map(result => {
             if (result.status === FormatResult.ERROR) {
-              return `\n${logSymbols.error} ${styleText(
-                ['bgRed', 'white'],
+              return `\n${styleText('red', logSymbols.error)} ${styleText(
+                'red',
                 `${result.ruleInfo.name} failed to run:`
               )} ${result.runMessage}`
             }
             if (result.status === FormatResult.IGNORED) {
-              return `\n${logSymbols.info} ${result.ruleInfo.name}: ${result.runMessage}`
+              return `\n${styleText('gray', logSymbols.info)} ${styleText(
+                'gray',
+                `${result.ruleInfo.name}: ${result.runMessage}`
+              )}`
             }
             return SymbolFormatter.formatResult(
               result.lintResult,
@@ -131,7 +142,7 @@ class SymbolFormatter {
     const fixresults = output.results.filter(r => r.fixResult)
     if (fixresults.length > 0) {
       ret.push(
-        styleText('inverse', `\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
+        styleText('bold', `\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
           fixresults.map(result =>
             SymbolFormatter.formatResult(
               result.fixResult,
