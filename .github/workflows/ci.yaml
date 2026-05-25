@@ -1,8 +1,9 @@
 name: CI
+# Validation pipeline: runs on PRs and pushes to main. Publishing on tag push
+# lives in release.yaml so `git push --follow-tags` doesn't double-trigger.
 on:
   push:
     branches: [main]
-    tags: ['**']
   pull_request:
     branches: [main]
 
@@ -107,59 +108,3 @@ jobs:
       - name: Docker Run
         run: docker run -t -v ${{ github.workspace }}:/src -w /src ghcr.io/${{ github.repository }}:latest .
 
-  publish-release:
-    name: Publish a Release
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [test, test-docker]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  # create GitHub release
-      id-token: write  # OIDC for npm provenance
-      packages: write  # push image to ghcr.io
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'  # npm 11 ships here; trusted publishing (OIDC) needs npm >= 11.5.1
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install NPM Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Publish to npm
-        run: npm publish --provenance
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Gather Docker Labels
-        id: docker_meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-
-      - name: Build and Push to GitHub Container Registry
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
