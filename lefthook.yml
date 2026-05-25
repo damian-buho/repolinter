@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    lint:
+      run: just lint
+    test:
+      run: just test
