@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Opt JS-based actions (checkout, setup-node, cache, setup-python) into Node 24
+# ahead of the 2026-06-02 forced switch; silences the Node 20 deprecation warning.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   test:
     strategy:
@@ -21,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # rule tests grep against historical commits; shallow clone breaks them
 
       - name: Setup Node
         uses: actions/setup-node@v4
