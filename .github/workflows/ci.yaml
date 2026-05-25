@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['v*.*.*']
+    tags: ['**']
   pull_request:
     branches: [main]
 
@@ -109,7 +109,7 @@ jobs:
 
   publish-release:
     name: Publish a Release
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [test, test-docker]
     runs-on: ubuntu-latest
     permissions:
