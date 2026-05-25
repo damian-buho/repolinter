@@ -6,14 +6,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['23', '22', '20', '18', '16', '14']
-        os: ['windows-latest', 'ubuntu-24.04', 'ubuntu-latest', 'macos-latest', 'macos-13']
-        exclude:
-          # exclude node14 test on arm due to nodejs 14 release is not available for darwin-arm
-          - node-version: '14'
-            os: 'macos-latest'
+        node-version: ['24', '22']
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
-    name: Node ${{ matrix.node-version }} sample (${{ matrix.os }})
+    name: Node ${{ matrix.node-version }} (${{ matrix.os }})
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,8 +23,8 @@ jobs:
 
       - name: Get NPM Cache Directory
         id: npm-cache
-        run: |
-          echo "::set-output name=dir::$(npm config get cache)"
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
 
       - name: Cache NPM
         uses: actions/cache@v4
@@ -87,13 +83,13 @@ jobs:
       - name: Docker Build
         uses: docker/build-push-action@v6
         with:
-          tags: todogroup/repolinter:latest
+          tags: ghcr.io/${{ github.repository }}:latest
           load: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Docker Run
-        run: docker run -t -v ${{ github.workspace }}:/src -w /src todogroup/repolinter:latest .
+        run: docker run -t -v ${{ github.workspace }}:/src -w /src ghcr.io/${{ github.repository }}:latest .
 
   publish-release:
     name: Publish a Release
@@ -126,7 +122,7 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
         if: steps.semantic.outputs.new_release_published == 'true'
@@ -139,7 +135,7 @@ jobs:
       - name: Gather Docker Labels
         if: steps.semantic.outputs.new_release_published == 'true'
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v5
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
 

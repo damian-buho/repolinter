@@ -5,25 +5,11 @@ repository:
   name: repolinter
 
   # A short description of the repository that will show up on GitHub
-  description: Repolinter, The Open Source Repository Linter
+  description: Fork of the TODO Group repolinter — open source repository linter
 
   # A URL with more information about the repository
-  homepage: https://todogroup.org
+  homepage: https://github.com/damian-buho/repolinter
 
-  # Collaborators: give specific users access to this repository.
-  # see /governance/roles.md for details on write access policy
-  # note that the permissions below may provide wider access than needed for
-  # a specific role, and we trust these individuals to act according to their
-  # role. If there are questions, please contact one of the chairs.
 collaborators:
-  - username: caniszczyk
-    permission: admin
-
-  - username: trevmex
-    permission: admin
-
-  - username: prototypicalpro
-    permission: admin
-
-  - username: hyandell
+  - username: damian-buho
     permission: admin
