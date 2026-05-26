@@ -81,8 +81,17 @@ describe(
       })
 
       describe('loadConfig', async () => {
-        const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
-        beforeEach(() => new Promise(resolve => server.start(resolve)))
+        const server = new ServerMock({ host: '127.0.0.1', port: 0 }, {})
+        let port
+        beforeEach(
+          () =>
+            new Promise(resolve =>
+              server.start(() => {
+                port = server.getHttpPort()
+                resolve()
+              })
+            )
+        )
         afterEach(() => new Promise(resolve => server.stop(resolve)))
 
         it('should load local config file', async () => {
@@ -96,7 +105,7 @@ describe(
         it('should load URL config file', async () => {
           server.on(serveDirectory(__dirname))
           const actual = await Config.loadConfig(
-            'http://localhost:9000/default.json'
+            `http://127.0.0.1:${port}/default.json`
           )
           assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
           assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
@@ -113,7 +122,7 @@ describe(
         it('should handle relative URL extends', async () => {
           server.on(serveDirectory(__dirname))
           const actual = await Config.loadConfig(
-            'http://localhost:9000/repolinter.yaml'
+            `http://127.0.0.1:${port}/repolinter.yaml`
           )
           assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
           assert.strictEqual(actual.rules['test-file-exists'].level, 'error')
@@ -121,11 +130,29 @@ describe(
 
         it('should handle absolute URL extends', async () => {
           server.on(serveDirectory(__dirname))
-          const actual = await Config.loadConfig(
-            path.join(__dirname, 'absolute-override.yaml')
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
           )
-          assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
-          assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
+          try {
+            const overridePath = path.join(tmpdir, 'absolute-override.yaml')
+            fs.writeFileSync(
+              overridePath,
+              [
+                '$schema: "../../rulesets/schema.json"',
+                `extends: "http://127.0.0.1:${port}/default.json"`,
+                'version: 2',
+                'rules:',
+                '  test-file-exists:',
+                '    level: off',
+                ''
+              ].join('\n')
+            )
+            const actual = await Config.loadConfig(overridePath)
+            assert.ok(Object.hasOwn(actual.rules, 'test-file-exists'))
+            assert.strictEqual(actual.rules['test-file-exists'].level, 'off')
+          } finally {
+            fs.rmSync(tmpdir, { recursive: true })
+          }
         })
 
         it('should handle encoded rulesets extends', async () => {
@@ -161,7 +188,7 @@ describe(
         it('should throw error on non existant URL', async () => {
           server.on(serveDirectory(__dirname))
           await assert.rejects(
-            () => Config.loadConfig('http://localhost:9000/404'),
+            () => Config.loadConfig(`http://127.0.0.1:${port}/404`),
             /404/
           )
         })

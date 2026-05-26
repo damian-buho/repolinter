@@ -202,8 +202,9 @@ describe(
     })
 
     it('runs repolinter using a remote ruleset', async () => {
-      const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
+      const server = new ServerMock({ host: '127.0.0.1', port: 0 }, {})
       await new Promise(resolve => server.start(resolve))
+      const port = server.getHttpPort()
       server.on({
         method: 'GET',
         path: '/repolinter-other.json',
@@ -227,13 +228,13 @@ describe(
         )
         const [act1, act2, act3] = await Promise.all([
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" --rulesetUrl http://localhost:9000/repolinter-other.json`
+            `"${repolinterPath}" lint "${selfPath}" --rulesetUrl http://127.0.0.1:${port}/repolinter-other.json`
           ),
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" --ruleset-url http://localhost:9000/repolinter-other.json`
+            `"${repolinterPath}" lint "${selfPath}" --ruleset-url http://127.0.0.1:${port}/repolinter-other.json`
           ),
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" -u http://localhost:9000/repolinter-other.json`
+            `"${repolinterPath}" lint "${selfPath}" -u http://127.0.0.1:${port}/repolinter-other.json`
           )
         ])
         actual = act1
@@ -252,8 +253,9 @@ describe(
     })
 
     it('runs repolinter using a remote YAML ruleset', async () => {
-      const server = new ServerMock({ host: 'localhost', port: 9000 }, {})
+      const server = new ServerMock({ host: '127.0.0.1', port: 0 }, {})
       await new Promise(resolve => server.start(resolve))
+      const port = server.getHttpPort()
       server.on({
         method: 'GET',
         path: '/repolinter-other.yml',
@@ -277,13 +279,13 @@ describe(
         )
         const [act1, act2, act3] = await Promise.all([
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" --rulesetUrl http://localhost:9000/repolinter-other.yml`
+            `"${repolinterPath}" lint "${selfPath}" --rulesetUrl http://127.0.0.1:${port}/repolinter-other.yml`
           ),
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" --ruleset-url http://localhost:9000/repolinter-other.yml`
+            `"${repolinterPath}" lint "${selfPath}" --ruleset-url http://127.0.0.1:${port}/repolinter-other.yml`
           ),
           execAsync(
-            `"${repolinterPath}" lint "${selfPath}" -u http://localhost:9000/repolinter-other.yml`
+            `"${repolinterPath}" lint "${selfPath}" -u http://127.0.0.1:${port}/repolinter-other.yml`
           )
         ])
         actual = act1
