@@ -4,6 +4,8 @@ The original Repolinter project has been archived.
 
 This fork is a heavily modernized version, that will be supported by [me](https://github.com/damian-buho).
 
+[Docs](https://damian-buho.github.io/repolinter/)
+
 # ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-logo-600.png)
 ![Build Status](https://github.com/damian-buho/repolinter/workflows/Build/badge.svg)
 
