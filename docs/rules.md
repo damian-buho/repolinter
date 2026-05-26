@@ -98,9 +98,9 @@ Check files’ hashes not included in a list of certain cryptographic hashes.
 
 ### file-no-broken-links
 
-Scans a set of markup files for broken links using [linkinator](https://github.com/JustinBeckwith/linkinator). Markdown files are checked directly by linkinator. For other markup formats, files are first rendered to HTML using [github-markup](https://github.com/github/markup), then each link is tested by linkinator. Absolute URLs are checked using an HTTP request, and relative URLs are checked by accessing the file specified.
+Scans a set of markup files for broken links using [linkinator](https://github.com/JustinBeckwith/linkinator). Markdown files (`.md`, `.markdown`, `.mdown`, `.mkd`, `.mkdn`) are checked directly by linkinator. AsciiDoc files (`.adoc`, `.asciidoc`) are first rendered to HTML using [asciidoctor.js](https://github.com/asciidoctor/asciidoctor.js), then each link is tested by linkinator. Absolute URLs are checked using an HTTP request, and relative URLs are checked by accessing the file specified.
 
-For non-Markdown files, [github-markup](https://github.com/github/markup) and its dependencies must be installed and available in `PATH`.
+Files in other markup formats (e.g. `.rst`, `.org`, `.textile`, `.rdoc`, `.creole`, `.mediawiki`) are silently ignored — earlier versions rendered these through Ruby `github-markup`, which has been removed.
 
 | Input                          | Required | Type       | Default | Description                                                                                                                                                              |
 | ------------------------------ | -------- | ---------- | ------- |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -220,7 +220,7 @@ Checks if a given file matches a provided [JSON schema](https://json-schema.org/
 
 ### license-detectable-by-licensee
 
-Fails if Licensee doesn’t detect the repository’s license. This rule takes no inputs, but requires `licensee` in the path, see [command line dependencies](#command-line-dependencies) for details.
+Fails if the bundled SPDX matcher does not detect the repository's license. This rule takes no inputs; no external command-line tool is required. The match threshold can be tuned via the `REPOLINTER_LICENSE_THRESHOLD` environment variable (default `0.9`).
 
 ### best-practices-badge-present
 

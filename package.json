@@ -1,6 +1,6 @@
 {
   "name": "@damian-buho/repolinter",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Lint open source repositories (fork)",
   "type": "module",
   "main": "dist/index.js",
@@ -71,13 +71,16 @@
   },
   "dependencies": {
     "ajv": "8.20.0",
+    "asciidoctor": "3.0.4",
     "command-exists": "1.2.9",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
     "isbinaryfile": "6.0.0",
+    "linguist-js": "2.9.2",
     "linkinator": "7.6.1",
     "matched": "5.0.1",
     "simple-git": "3.36.0",
+    "spdx-license-list": "6.11.0",
     "yaml": "2.9.0",
     "yargs": "18.0.0"
   },

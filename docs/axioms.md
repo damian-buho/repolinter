@@ -35,7 +35,7 @@ An example of using this axiom:
 
 ### licensee
 
-This axiom uses [licensee](https://github.com/licensee/licensee) to detect the license used in the current repository. To use this axiom licensee must be installed in your `PATH` or in the same directory as Repolinter.
+This axiom detects the license used in the current repository by matching the project's `LICENSE` file against the canonical [SPDX license templates](https://spdx.org/licenses/) using a Sørensen–Dice bigram similarity score (default threshold 0.9; tune with `REPOLINTER_LICENSE_THRESHOLD`). No external runtime is required; the detector ships as a pure-JS dependency.
 This axiom will return a list of [license identifiers](https://spdx.org/licenses/) associated with the current repository.
 
 An example of using this axiom:
@@ -56,7 +56,7 @@ An example of using this axiom:
 
 ### linguist
 
-This axiom uses GitHub's [linguist](https://github.com/github/linguist) to detect programming languages in the current repository. To use this axiom, linguist must be installed in the system `PATH` or in the same directory as Repolinter. This axiom will return a lowercase list of programming languages from [this list of supported languages](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml).
+This axiom detects programming languages in the current repository using [linguist-js](https://github.com/Nixinova/Linguist), a pure-JS port of GitHub's [linguist](https://github.com/github/linguist) that consumes the same upstream `languages.yml` data. No external runtime is required. This axiom will return a lowercase list of programming languages from [this list of supported languages](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml).
 
 An example of using this axiom:
 

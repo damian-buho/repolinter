@@ -1,3 +1,15 @@
+# 1.2.0
+
+### Breaking changes
+
+- Replaced the Ruby `licensee`, `github-linguist`, and `github-markup` integrations with pure-JS equivalents (`spdx-license-list`, `linguist-js`, `asciidoctor`). Repolinter no longer requires a Ruby runtime, `bundler`, or the underlying native build dependencies (libicu, libcurl, cmake, etc.). The `licensee` and `linguist` axioms now work on Windows as well.
+- `file-no-broken-links` only renders Markdown (`.md`, `.markdown`, `.mdown`, `.mkd`, `.mkdn`) and AsciiDoc (`.adoc`, `.asciidoc`). Other formats previously supported via `github-markup` (`.rst`, `.org`, `.textile`, `.rdoc`, `.creole`, `.mediawiki`) are now silently ignored.
+- The match threshold for the `licensee` axiom can be tuned via the `REPOLINTER_LICENSE_THRESHOLD` environment variable (default `0.9`).
+
+### Internal
+
+- Dropped `Gemfile`, `Gemfile.lock`, `lib/github_markup_check_and_render`, the `ruby-build` Docker stage, and the Ruby/`docutils` system-dep steps in CI.
+
 # [0.12.0](https://github.com/todogroup/repolinter/compare/v0.11.2...v0.12.0) (2025-05-09)
 
 

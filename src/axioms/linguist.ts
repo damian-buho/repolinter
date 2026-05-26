@@ -10,8 +10,9 @@ export default async function linguistAxiom(
 ): Promise<Result> {
   const languages: string[] = []
   try {
-    const jsonObject: Record<string, unknown> =
-      await linguist.identifyLanguages(fileSystem.targetDirectory)
+    const jsonObject = await linguist.identifyLanguages(
+      fileSystem.targetDirectory
+    )
     for (const language in jsonObject) {
       languages.push(language.toLowerCase())
     }

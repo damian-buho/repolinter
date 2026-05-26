@@ -4,10 +4,18 @@
 import nodeFs from 'node:fs'
 import nodePath from 'node:path'
 import nodeOs from 'node:os'
+import { createRequire } from 'node:module'
 import { check, LinkState, type LinkResult } from 'linkinator'
-import GitHubMarkup from '../lib/github-markup.js'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
+
+interface AsciidoctorInstance {
+  convert(input: string, options?: object): string
+}
+type AsciidoctorFactory = () => AsciidoctorInstance
+const asciidoctor = createRequire(import.meta.url)(
+  'asciidoctor'
+) as AsciidoctorFactory
 
 interface FileNoBrokenLinksOptions {
   globsAll: string[]
@@ -17,8 +25,10 @@ interface FileNoBrokenLinksOptions {
 }
 
 const MD_LINK_RE = /\[[^\]]*\]\(([^)]+)\)/g
-const RST_LINK_RE = /`[^`]+<([^>]+)>`_/g
 const MARKDOWN_EXTS = new Set(['.md', '.markdown', '.mdown', '.mkd', '.mkdn'])
+const ASCIIDOC_EXTS = new Set(['.adoc', '.asciidoc'])
+
+let asciidoctorInstance: AsciidoctorInstance | undefined
 
 async function checkFile(
   fileSystem: FileSystem,
@@ -30,18 +40,39 @@ async function checkFile(
     return checkMarkdownFile(fileSystem, file, options)
   }
 
-  const rendered = await GitHubMarkup.renderMarkup(
-    nodePath.posix.resolve(fileSystem.targetDirectory, file)
-  )
-  if (rendered === undefined) {
-    return {
-      passed: true,
-      path: file,
-      message: 'Ignored due to unknown file format.'
+  if (ASCIIDOC_EXTS.has(extension)) {
+    const rendered = await renderAsciiDocument(fileSystem, file)
+    if (rendered === undefined) {
+      return {
+        passed: true,
+        path: file,
+        message: 'Ignored due to unknown file format.'
+      }
     }
+    return checkRenderedHtml(fileSystem, file, rendered, options)
   }
 
-  return checkRenderedHtml(fileSystem, file, rendered, options)
+  // Historically rendered via Ruby github-markup (.rst, .org, .textile, .rdoc,
+  // .creole, .mediawiki). These formats have no maintained JS renderer, so
+  // they're now silently skipped rather than checked.
+  return {
+    passed: true,
+    path: file,
+    message: 'Ignored due to unknown file format.'
+  }
+}
+
+async function renderAsciiDocument(
+  fileSystem: FileSystem,
+  file: string
+): Promise<string | undefined> {
+  const content = await fileSystem.getFileContents(file)
+  if (content === undefined) return undefined
+  asciidoctorInstance ??= asciidoctor()
+  return asciidoctorInstance.convert(content, {
+    safe: 'safe',
+    standalone: false
+  }) as string
 }
 
 async function checkMarkdownFile(
@@ -117,8 +148,7 @@ async function extractExternalLinkTargets(
   if (!content) return new Set()
 
   const targets = new Set<string>()
-  const linkRe = file.endsWith('.rst') ? RST_LINK_RE : MD_LINK_RE
-  for (const match of content.matchAll(linkRe)) {
+  for (const match of content.matchAll(MD_LINK_RE)) {
     const target = match[1]
     if (!target || !target.startsWith('../')) continue
     const resolved = nodePath.posix.normalize(
