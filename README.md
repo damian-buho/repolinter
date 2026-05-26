@@ -1,15 +1,21 @@
-# Revived
+# ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-small.svg)
 
-The original Repolinter project has been archived.
+[The original Repolinter project](https://github.com/todogroup/repolinter) has been archived.
 
-This fork is a heavily modernized version, that will be supported by [me](https://github.com/damian-buho).
+This fork is a heavily modernized version, that will be supported by [me](https://dbuho.me).
+
+Lints open source repositories for common issues.
 
 [Docs](https://damian-buho.github.io/repolinter/) · [GitHub Action](MARKETPLACE.md) · [Container image](https://github.com/damian-buho/repolinter/pkgs/container/repolinter)
 
-# ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-logo-600.png)
-![Build Status](https://github.com/damian-buho/repolinter/workflows/Build/badge.svg)
+[![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/damian-buho/repolinter/pipeline.yaml)
+![NPM Version](https://img.shields.io/npm/v/%40damian-buho%2Frepolinter?style=flat-square)
+![NPM Last Update](https://img.shields.io/npm/last-update/%40damian-buho%2Frepolinter?style=flat-square)
+![NPM License](https://img.shields.io/npm/l/%40damian-buho%2Frepolinter?style=flat-square)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Known Vulnerabilities](https://snyk.io/test/npm/%40damian-buho%2Frepolinter/badge.svg)](https://snyk.io/test/npm/%40damian-buho%2Frepolinter)
 
-Lint open source repositories for common issues.
 
 ## Installation
 
