@@ -1,7 +1,12 @@
 pre-commit:
   commands:
     format:
-      run: just format
+      # Scope to staged JS/TS only — and stage_fixed re-adds prettier's edits
+      # into the same commit so the working tree is clean afterwards. Without
+      # it, prettier rewrites land as a dirty diff right after the commit.
+      glob: "{src/**/*.ts,tests/**/*.js}"
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
     lint:
       run: just lint
     test:
