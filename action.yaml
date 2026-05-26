@@ -1,0 +1,295 @@
+# Repolinter — GitHub Action
+#
+# Composite action that runs the published `ghcr.io/damian-buho/repolinter`
+# image against the checked-out workspace (or a remote Git URL), renders the
+# markdown report into the run summary, optionally posts it as a sticky PR
+# comment, and gates the job on a configurable severity threshold.
+#
+# Consumer usage:
+#   - uses: damian-buho/repolinter@v1
+#     with:
+#       config_file: .github/repolinter.yaml
+#       comment:     true
+
+name:        'Repolinter'
+description: 'Lint open source repositories for common issues'
+author:      'Damián Búho'
+
+branding:
+  icon:  check-square
+  color: blue
+
+inputs:
+  directory:
+    description: 'Target directory to lint (relative to $GITHUB_WORKSPACE). When `git` is true, this is a Git URL instead.'
+    required:    false
+    default:     '.'
+  git:
+    description: 'Treat `directory` as a Git URL and clone it before linting.'
+    required:    false
+    default:     'false'
+  config_file:
+    description: 'Path or URL to a Repolinter ruleset (json/yaml). Empty enables auto-discovery.'
+    required:    false
+    default:     ''
+  dry_run:
+    description: 'Skip auto-fixes. CI defaults to true to keep the workspace read-only.'
+    required:    false
+    default:     'true'
+  allow_paths:
+    description: 'Newline-separated list of paths to restrict linting to.'
+    required:    false
+    default:     ''
+  fail_on:
+    description: 'Severity threshold that fails the job: none | warn | error'
+    required:    false
+    default:     'error'
+  comment:
+    description: 'Post the markdown report as a sticky comment on the triggering pull request.'
+    required:    false
+    default:     'false'
+  version:
+    description: 'Image tag to pull (e.g. latest, 1, 1.2, 1.2.3).'
+    required:    false
+    default:     'latest'
+  image:
+    description: 'Override the full image reference. Takes precedence over `version`; useful for testing locally-built images.'
+    required:    false
+    default:     ''
+  github_token:
+    description: 'Token used to post PR comments. Defaults to ${{ github.token }}.'
+    required:    false
+    default:     ${{ github.token }}
+
+outputs:
+  result:
+    description: 'pass | fail (after applying fail_on threshold)'
+    value:       ${{ steps.summary.outputs.result }}
+  passed:
+    description: 'Count of passed rules'
+    value:       ${{ steps.summary.outputs.passed }}
+  warnings:
+    description: 'Count of warnings'
+    value:       ${{ steps.summary.outputs.warnings }}
+  errors:
+    description: 'Count of errors'
+    value:       ${{ steps.summary.outputs.errors }}
+  report_path:
+    description: 'Path on the runner to the generated markdown report'
+    value:       ${{ steps.lint.outputs.report_path }}
+
+runs:
+  using: composite
+  steps:
+    # Resolve which image to run: explicit `image` wins, else build from `version`.
+    - name: Resolve image reference
+      id:   image
+      shell: bash
+      env:
+        VERSION:        ${{ inputs.version }}
+        IMAGE_OVERRIDE: ${{ inputs.image }}
+      run: |
+        if [ -n "$IMAGE_OVERRIDE" ]; then
+          ref="$IMAGE_OVERRIDE"
+          echo "Using explicit image override: $ref"
+        else
+          ref="ghcr.io/damian-buho/repolinter:${VERSION}"
+          echo "Using image from version='${VERSION}': $ref"
+        fi
+        echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+    # Pull explicitly so registry errors surface in their own step (clearer logs)
+    # and so a locally-built image (no remote) still works via inspect fallback.
+    - name: Pull image
+      shell: bash
+      env:
+        IMAGE: ${{ steps.image.outputs.ref }}
+      run: |
+        if docker pull --quiet "$IMAGE"; then
+          echo "Pulled $IMAGE"
+        elif docker image inspect "$IMAGE" >/dev/null 2>&1; then
+          echo "Pull failed but local image present, continuing: $IMAGE"
+        else
+          echo "::error::Image not available locally or remotely: $IMAGE"
+          exit 1
+        fi
+
+    # Run repolinter twice: once for JSON (gating), once for markdown (humans).
+    # Two container invocations of the already-pulled image are cheaper than
+    # reimplementing the markdown formatter outside the image.
+    - name: Lint
+      id:   lint
+      shell: bash
+      env:
+        IMAGE:       ${{ steps.image.outputs.ref }}
+        DIRECTORY:   ${{ inputs.directory }}
+        GIT_MODE:    ${{ inputs.git }}
+        CONFIG_FILE: ${{ inputs.config_file }}
+        DRY_RUN:     ${{ inputs.dry_run }}
+        ALLOW_PATHS: ${{ inputs.allow_paths }}
+      run: |
+        set -uo pipefail
+
+        report_md="${RUNNER_TEMP}/repolinter-report.md"
+        report_json="${RUNNER_TEMP}/repolinter-report.json"
+        echo "report_path=$report_md"   >> "$GITHUB_OUTPUT"
+        echo "report_json=$report_json" >> "$GITHUB_OUTPUT"
+
+        # Build the shared repolinter CLI argument set.
+        args=()
+        if [ "$GIT_MODE" = "true" ]; then
+          echo "Mode: git URL ($DIRECTORY)"
+          args+=(--git)
+        else
+          echo "Mode: local directory ($DIRECTORY)"
+        fi
+        if [ -n "$CONFIG_FILE" ]; then
+          case "$CONFIG_FILE" in
+            http://*|https://*)
+              echo "Ruleset: URL ($CONFIG_FILE)"
+              args+=(--rulesetUrl "$CONFIG_FILE")
+              ;;
+            *)
+              echo "Ruleset: file ($CONFIG_FILE)"
+              args+=(--rulesetFile "$CONFIG_FILE")
+              ;;
+          esac
+        else
+          echo "Ruleset: auto-discover (no config_file provided)"
+        fi
+        if [ "$DRY_RUN" = "true" ]; then
+          echo "Fixes: dry-run (no writes)"
+          args+=(--dryRun)
+        else
+          echo "Fixes: apply (workspace will be modified)"
+        fi
+        while IFS= read -r p; do
+          if [ -n "$p" ]; then
+            echo "Allow path: $p"
+            args+=(--allowPaths "$p")
+          fi
+        done <<< "$ALLOW_PATHS"
+
+        # Mount the workspace at /src; --dryRun keeps writes off in practice.
+        docker_base=(run --rm
+          -v "${GITHUB_WORKSPACE}:/src"
+          -w /src
+          "$IMAGE" lint)
+
+        echo "::group::Repolinter (JSON for gating)"
+        docker "${docker_base[@]}" --format json "${args[@]}" "$DIRECTORY" \
+          > "$report_json"
+        echo "::endgroup::"
+
+        echo "::group::Repolinter (markdown report)"
+        docker "${docker_base[@]}" --format markdown "${args[@]}" "$DIRECTORY" \
+          | tee "$report_md"
+        echo "::endgroup::"
+
+        # Exit decision lives in the Summarize / threshold steps so a non-zero
+        # repolinter exit doesn't skip comment posting.
+        exit 0
+
+    # Count rule statuses from the JSON report and render the markdown into
+    # the Actions run summary page. Sets outputs but does not fail the job.
+    - name: Summarize
+      id:   summary
+      shell: bash
+      env:
+        REPORT_JSON: ${{ steps.lint.outputs.report_json }}
+        REPORT_MD:   ${{ steps.lint.outputs.report_path }}
+        FAIL_ON:     ${{ inputs.fail_on }}
+      run: |
+        set -euo pipefail
+
+        # Status values come from src/lib/formatresult.ts:
+        #   PASSED, NOT_PASSED_ERROR, NOT_PASSED_WARN, IGNORED, ERROR
+        errors=$(  jq '[.results[] | select(.status == "ERROR" or .status == "NOT_PASSED_ERROR")] | length' "$REPORT_JSON")
+        warnings=$(jq '[.results[] | select(.status == "NOT_PASSED_WARN")]                         | length' "$REPORT_JSON")
+        passed=$(  jq '[.results[] | select(.status == "PASSED")]                                  | length' "$REPORT_JSON")
+        ignored=$( jq '[.results[] | select(.status == "IGNORED")]                                 | length' "$REPORT_JSON")
+        echo "Counts: errors=$errors warnings=$warnings passed=$passed ignored=$ignored"
+
+        echo "errors=$errors"     >> "$GITHUB_OUTPUT"
+        echo "warnings=$warnings" >> "$GITHUB_OUTPUT"
+        echo "passed=$passed"     >> "$GITHUB_OUTPUT"
+        echo "ignored=$ignored"   >> "$GITHUB_OUTPUT"
+
+        case "$FAIL_ON" in
+          none)
+            fail=0
+            echo "fail_on=none → never fail"
+            ;;
+          warn)
+            if [ "$errors" -gt 0 ] || [ "$warnings" -gt 0 ]; then fail=1; else fail=0; fi
+            echo "fail_on=warn → fail=$fail (errors=$errors, warnings=$warnings)"
+            ;;
+          error)
+            if [ "$errors" -gt 0 ]; then fail=1; else fail=0; fi
+            echo "fail_on=error → fail=$fail (errors=$errors)"
+            ;;
+          *)
+            echo "::error::Invalid fail_on='$FAIL_ON' (expected: none | warn | error)"
+            exit 2
+            ;;
+        esac
+
+        if [ "$fail" -eq 1 ]; then result=fail; else result=pass; fi
+        echo "result=$result" >> "$GITHUB_OUTPUT"
+        echo "fail=$fail"     >> "$GITHUB_OUTPUT"
+
+        # Render report into the Actions UI summary page.
+        {
+          echo "## Repolinter — $result"
+          echo
+          echo "errors: $errors · warnings: $warnings · passed: $passed · ignored: $ignored"
+          echo
+          cat "$REPORT_MD"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    # Post (or update) a sticky PR comment. Hidden marker lets us find the prior
+    # comment so each run replaces the last one instead of stacking.
+    - name: Post sticky PR comment
+      if:   ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      env:
+        REPORT_MD: ${{ steps.lint.outputs.report_path }}
+        RESULT:    ${{ steps.summary.outputs.result }}
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const fs = require('fs');
+          const marker = '<!-- repolinter-action-comment -->';
+          const body =
+            `${marker}\n## Repolinter — ${process.env.RESULT}\n\n` +
+            fs.readFileSync(process.env.REPORT_MD, 'utf8');
+
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          core.info(`Posting sticky comment to ${owner}/${repo}#${issue_number}`);
+
+          const comments = await github.paginate(github.rest.issues.listComments, {
+            owner, repo, issue_number, per_page: 100,
+          });
+          const existing = comments.find(c => c.body && c.body.includes(marker));
+          if (existing) {
+            core.info(`Updating existing comment id=${existing.id}`);
+            await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+          } else {
+            core.info('Creating new comment');
+            await github.rest.issues.createComment({ owner, repo, issue_number, body });
+          }
+
+    # Apply the gating decision as the very last step so the comment is posted
+    # even when the job is about to fail.
+    - name: Apply fail_on threshold
+      shell: bash
+      env:
+        FAIL:    ${{ steps.summary.outputs.fail }}
+        FAIL_ON: ${{ inputs.fail_on }}
+      run: |
+        if [ "$FAIL" = "1" ]; then
+          echo "::error::Repolinter found violations above fail_on='${FAIL_ON}'"
+          exit 1
+        fi
+        echo "Repolinter passed fail_on='${FAIL_ON}' threshold"

@@ -1,11 +1,33 @@
-name: repolinter
-on: [push, pull_request]
+name: Repolinter
+# Dogfood: lint this repo with our own action.
+#
+# Uses the locally-checked-out action source (`uses: ./`) against the published
+# `:latest` image. On PRs from forks the GITHUB_TOKEN is read-only so the
+# sticky-comment step will no-op — that's fine, the report still renders to
+# the Actions run summary.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents:      read
+  pull-requests: write  # required for the sticky PR comment when applicable
+
+concurrency:
+  group:              repolinter-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   repolinter:
+    name:    Repolinter
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: todogroup/repolinter-action@v1
-      with:
-        config_file: .github/repolinter.yaml
+      - uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          config_file: .github/repolinter.yaml
+          comment:     ${{ github.event_name == 'pull_request' }}

@@ -103,5 +103,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Run image against this repo
-        run: docker run --rm -t -v ${{ github.workspace }}:/src -w /src ghcr.io/${{ github.repository }}:ci .
+      # Smoke-test the in-tree action against the in-tree image. Exercises both
+      # surfaces end-to-end before a release ever pushes either of them.
+      - name: Dogfood action against built image
+        uses: ./
+        with:
+          image:       ghcr.io/${{ github.repository }}:ci
+          config_file: .github/repolinter.yaml
