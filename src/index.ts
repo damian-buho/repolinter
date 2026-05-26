@@ -178,7 +178,7 @@ export function shouldRuleRun(
   validTargets: string[],
   ruleAxioms: string[]
 ): string[] {
-  const ruleRegex = /([\w-]+)((?:>|<)=?)(\d+)/i
+  const ruleRegex = /^([\w-]+)((?:>|<)=?)(\d+)/i
   interface NumericalRuleAxiom {
     axiom: string
     name: string
