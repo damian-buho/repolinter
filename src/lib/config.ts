@@ -38,6 +38,8 @@ function deepMerge(target: JsonObject, ...sources: JsonObject[]): JsonObject {
   for (const source of sources) {
     if (source && typeof source === 'object') {
       for (const key of Object.keys(source)) {
+        // block prototype pollution via __proto__ and constructor.prototype
+        if (key === '__proto__' || key === 'constructor') continue
         const sourceValue = source[key]
         const tgtValue = target[key]
         if (
