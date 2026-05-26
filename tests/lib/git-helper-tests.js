@@ -3,59 +3,34 @@
 
 import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
-import fs from 'node:fs'
-import os from 'node:os'
-import path from 'node:path'
-import { spawnSync } from 'node:child_process'
 import { gitAllCommits } from '../../dist/lib/git-helper.js'
-
-function git(cwd, ...arguments_) {
-  const result = spawnSync('git', ['-C', cwd, ...arguments_], {
-    encoding: 'utf8'
-  })
-  if (result.status !== 0) {
-    throw new Error(
-      `git ${arguments_.join(' ')} failed: ${result.stderr || result.stdout}`
-    )
-  }
-  return result.stdout
-}
-
-// Build a throwaway repo so the test owns its fixture and does not depend on
-// the host repo's history (shallow CI clones used to break the > 100 assertion).
-function initRepo() {
-  const directory = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'repolinter-git-helper-')
-  )
-  git(directory, 'init', '-q', '-b', 'main')
-  git(directory, 'config', 'user.email', 'test@example.com')
-  git(directory, 'config', 'user.name', 'Test')
-  git(directory, 'config', 'commit.gpgsign', 'false')
-  return directory
-}
+import { mktempRepo, commitEmpty, rmRepo } from './git-fixture.js'
 
 describe('gitAllCommits', () => {
-  describe('full commits list', () => {
-    const COMMIT_COUNT = 105
+  describe('non-empty repo', () => {
+    // Small enough to be fast on every CI runner, large enough that any
+    // trailing-newline bug in the splitter would still show up as +1.
+    const COMMIT_COUNT = 25
     let tmpdir
 
     before(() => {
-      tmpdir = initRepo()
+      tmpdir = mktempRepo()
       for (let index = 0; index < COMMIT_COUNT; index++) {
-        git(tmpdir, 'commit', '--allow-empty', '-q', '-m', `commit ${index}`)
+        commitEmpty(tmpdir, `commit ${index}`)
       }
     })
 
-    after(() => {
-      fs.rmSync(tmpdir, { recursive: true, force: true })
-    })
+    after(() => rmRepo(tmpdir))
 
     it('returns every commit reachable from any ref', () => {
       const actual = gitAllCommits(tmpdir)
-      // Exact equality also guards against the trailing-newline bug
+      // Exact equality guards against the trailing-newline bug
       // (split('\n') used to leak a phantom '' entry).
       assert.equal(actual.length, COMMIT_COUNT)
       assert.ok(actual.every(sha => /^[0-9a-f]{40}$/.test(sha)))
+      // All SHAs must be distinct — duplicate output would indicate a deeper
+      // bug in the helper or in the upstream git invocation.
+      assert.equal(new Set(actual).size, COMMIT_COUNT)
     })
   })
 
@@ -63,12 +38,10 @@ describe('gitAllCommits', () => {
     let tmpdir
 
     before(() => {
-      tmpdir = initRepo()
+      tmpdir = mktempRepo()
     })
 
-    after(() => {
-      fs.rmSync(tmpdir, { recursive: true, force: true })
-    })
+    after(() => rmRepo(tmpdir))
 
     it('returns [] when the repo has no commits', () => {
       assert.deepEqual(gitAllCommits(tmpdir), [])
