@@ -1,20 +1,37 @@
 // Copyright 2017 TODO Group. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, it } from 'node:test'
+import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
-import path from 'node:path'
 import FileSystem from '../../dist/lib/file-system.js'
 import axioms from '../../dist/axioms/axioms.js'
+import { mktempRepo, commitEmptyAs, rmRepo } from '../lib/git-fixture.js'
 
 const contributors = axioms['contributor-count']
 
 describe('contributors axiom', () => {
-  it('repolinter contributor count greater than zero', async () => {
-    const fs = new FileSystem(path.resolve('.'))
-    const contributorCount = await contributors(fs)
-    assert.strictEqual(contributorCount.passed, true)
-    assert.strictEqual(contributorCount.targets.length, 1)
-    assert.ok(Number.parseInt(contributorCount.targets[0].path) > 0)
+  // Fixture: three commits across two distinct authors. The third commit
+  // re-uses an existing author so we also exercise the deduplication branch
+  // in the axiom's mapping pipeline.
+  let tmpdir
+
+  before(() => {
+    tmpdir = mktempRepo()
+    commitEmptyAs(tmpdir, 'first commit by alice', 'Alice')
+    commitEmptyAs(tmpdir, 'first commit by bob', 'Bob')
+    commitEmptyAs(tmpdir, 'second commit by alice', 'Alice')
+  })
+
+  after(() => rmRepo(tmpdir))
+
+  it('counts distinct authors across all commits', async () => {
+    const fileSystem = new FileSystem(tmpdir)
+    const result = await contributors(fileSystem)
+
+    assert.strictEqual(result.passed, true)
+    assert.strictEqual(result.targets.length, 1)
+    assert.strictEqual(result.targets[0].passed, true)
+    // Alice + Bob; the second Alice commit must not double-count.
+    assert.strictEqual(Number.parseInt(result.targets[0].path, 10), 2)
   })
 })

@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'node:path'
-import { describe, it, afterEach } from 'node:test'
+import { describe, it, afterEach, before, after } from 'node:test'
 import assert from 'node:assert/strict'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 import { exec as cpExec } from 'node:child_process'
 import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
+import { mktempRepo, commitFile, rmRepo } from '../lib/git-fixture.js'
 const ESC = '\u001B'
 const ANSI_RE = new RegExp(`${ESC}${String.raw`\[[0-9;]*m`}`, 'g')
 const stripAnsi = s => s.replaceAll(ANSI_RE, '')
@@ -163,20 +164,38 @@ describe(
       assert.strictEqual(actual3.out.trim(), expected.trim())
     })
 
-    it('runs repolinter on a remote git repository', async () => {
-      const [actual, actual2] = await Promise.all([
-        execAsync(
-          `${repolinterPath} lint --git https://github.com/todogroup/repolinter.git`
-        ),
-        execAsync(
-          `${repolinterPath} lint -g https://github.com/todogroup/repolinter.git`
-        )
-      ])
+    describe('--git mode', () => {
+      // Build a local git repo with enough content for repolinter to lint and
+      // clone it over file:// — no network, no upstream URL dependency.
+      let fixtureUrl, fixtureDirectory
 
-      assert.strictEqual(actual.code, 0)
-      assert.strictEqual(actual2.code, 0)
-      assert.ok(actual.out.trim().includes('Lint:'))
-      assert.ok(actual2.out.trim().includes('Lint:'))
+      before(() => {
+        fixtureDirectory = mktempRepo()
+        commitFile(fixtureDirectory, 'README.md', '# fixture\n', 'add readme')
+        // Empty in-repo ruleset → repolinter auto-discovers it and produces
+        // a passing run regardless of what files the fixture does/doesn't have.
+        commitFile(
+          fixtureDirectory,
+          'repolinter.json',
+          JSON.stringify({ version: 2, axioms: {}, rules: {} }, undefined, 2) + '\n',
+          'add empty ruleset'
+        )
+        fixtureUrl = pathToFileURL(fixtureDirectory).href
+      })
+
+      after(() => rmRepo(fixtureDirectory))
+
+      it('runs repolinter on a remote git repository', async () => {
+        const [actual, actual2] = await Promise.all([
+          execAsync(`${repolinterPath} lint --git ${fixtureUrl}`),
+          execAsync(`${repolinterPath} lint -g ${fixtureUrl}`)
+        ])
+
+        assert.strictEqual(actual.code, 0)
+        assert.strictEqual(actual2.code, 0)
+        assert.ok(actual.out.trim().includes('Lint:'))
+        assert.ok(actual2.out.trim().includes('Lint:'))
+      })
     })
 
     it('runs repolinter using a remote ruleset', async () => {
