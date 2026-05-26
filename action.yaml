@@ -57,9 +57,9 @@ inputs:
     required:    false
     default:     ''
   github_token:
-    description: 'Token used to post PR comments. Defaults to ${{ github.token }}.'
+    description: 'Token used to post PR comments. Defaults to the workflow github.token when empty.'
     required:    false
-    default:     ${{ github.token }}
+    default:     ''
 
 outputs:
   result:
@@ -256,7 +256,7 @@ runs:
         REPORT_MD: ${{ steps.lint.outputs.report_path }}
         RESULT:    ${{ steps.summary.outputs.result }}
       with:
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.github_token || github.token }}
         script: |
           const fs = require('fs');
           const marker = '<!-- repolinter-action-comment -->';
