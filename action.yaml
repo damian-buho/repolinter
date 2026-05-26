@@ -11,7 +11,7 @@
 #       config_file: .github/repolinter.yaml
 #       comment:     true
 
-name:        'Repolinter'
+name:        'Repolinter (Damián Búho)'
 description: 'Lint open source repositories for common issues'
 author:      'Damián Búho'
 
