@@ -85,6 +85,29 @@ jobs:
           tag_name: ${{ steps.ver.outputs.version }}
           generate_release_notes: true
 
+      # Floating tags let Marketplace consumers pin `@v1` / `@v1.2` and keep
+      # receiving patch updates. Pushed with GITHUB_TOKEN so the tag push does
+      # not retrigger this workflow (same property the manual-dispatch tag uses).
+      - name: Update floating major/minor tags
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          v="${VERSION#v}"
+          if ! [[ "$v" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Skipping floating tags — '${VERSION}' is not a clean semver (pre-release or build metadata)"
+            exit 0
+          fi
+          major="v${BASH_REMATCH[1]}"
+          minor="v${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for floating in "${major}" "${minor}"; do
+            echo "Moving ${floating} → ${GITHUB_SHA}"
+            git tag --force --annotate "${floating}" --message "Floating tag for ${VERSION}"
+            git push --force origin "refs/tags/${floating}"
+          done
+
       - uses: docker/setup-qemu-action@v4  # arm64 emulation for multiarch build
 
       - uses: docker/setup-buildx-action@v4
