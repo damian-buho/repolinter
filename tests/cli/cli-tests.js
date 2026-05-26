@@ -177,7 +177,8 @@ describe(
         commitFile(
           fixtureDirectory,
           'repolinter.json',
-          JSON.stringify({ version: 2, axioms: {}, rules: {} }, undefined, 2) + '\n',
+          JSON.stringify({ version: 2, axioms: {}, rules: {} }, undefined, 2) +
+            '\n',
           'add empty ruleset'
         )
         fixtureUrl = pathToFileURL(fixtureDirectory).href

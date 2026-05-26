@@ -85,9 +85,9 @@ export function commitEmptyAs(repoDirectory, message, authorName) {
     repoDirectory,
     ['commit', '--allow-empty', '--no-verify', '-q', '-m', message],
     {
-      GIT_AUTHOR_NAME:     authorName,
-      GIT_AUTHOR_EMAIL:    email,
-      GIT_COMMITTER_NAME:  authorName,
+      GIT_AUTHOR_NAME: authorName,
+      GIT_AUTHOR_EMAIL: email,
+      GIT_COMMITTER_NAME: authorName,
       GIT_COMMITTER_EMAIL: email
     }
   )
