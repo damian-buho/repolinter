@@ -1,11 +1,7 @@
-.nyc_output/
-coverage/
-node_modules/
-tmp/
 .idea/
-vendor/
-.bundle
-out
 .vscode/
+coverage/
 dist/
 docs/generated/
+node_modules/
+tmp/

@@ -1,11 +1,7 @@
 .git/
-.nyc_output/
+.idea/
+.vscode/
 coverage/
+dist/
 node_modules/
 tmp/
-.idea/
-vendor/
-.bundle
-out
-.vscode/
-dist/
