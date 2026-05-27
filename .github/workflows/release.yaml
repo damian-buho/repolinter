@@ -92,7 +92,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache:        npm
+          # No cache: npm here — setup-node would write npm packages fetched from
+          # the untrusted checkout into the shared GHA cache, which privileged
+          # workflows could later restore (cache poisoning via workflow_run).
 
       - run: npm ci
 
