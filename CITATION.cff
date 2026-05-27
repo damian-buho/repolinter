@@ -5,8 +5,7 @@
 cff-version: 1.2.0
 title: Repolinter (Damián Búho)
 message: >-
-  Please cite this software using the metadata from this
-  file.
+  Please cite this software using the metadata from this file.
 type: software
 authors:
   - family-names: Búho
@@ -17,8 +16,7 @@ authors:
 repository-code: 'https://github.com/damian-buho/repolinter'
 url: 'https://damian-buho.github.io/repolinter/'
 abstract: >-
-  Linter for open source repositories (fork of
-  todogroup/repolinter)
+  Linter for open source repositories (fork of todogroup/repolinter)
 keywords:
   - lint
   - linter
@@ -29,4 +27,4 @@ keywords:
   - open source
   - repolinter
 license: Apache-2.0
-version: 2.0.1
+version: 2.0.2
