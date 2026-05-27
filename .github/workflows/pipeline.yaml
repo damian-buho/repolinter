@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Pipeline
 # Validation pipeline. Runs on PRs and pushes to main, and is reused by
 # release.yaml so a tagged commit gets re-validated against the exact tag SHA

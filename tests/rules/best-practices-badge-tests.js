@@ -1,4 +1,7 @@
 // Copyright 2022 TODO Group. All rights reserved.
+// SPDX-FileCopyrightText: 2017 TODO Group
+// SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+//
 // SPDX-License-Identifier: Apache-2.0
 
 import { describe, it, before } from 'node:test'

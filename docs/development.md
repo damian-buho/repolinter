@@ -1,3 +1,10 @@
+<!--
+SPDX-FileCopyrightText: 2017 TODO Group
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Development
 
 Repolinter is broken down into 7 main components, each of which is contained in a subfolder:

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+//
+// SPDX-License-Identifier: Apache-2.0
+
 declare module 'command-exists' {
   export function sync(command: string): string | undefined
   export default function (command: string): Promise<string>

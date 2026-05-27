@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Documentation
 # Builds typedoc and deploys to GitHub Pages using the native Pages deployment
 # (no third-party push-to-gh-pages action). Requires repo Pages source to be

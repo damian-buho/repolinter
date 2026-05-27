@@ -1,5 +1,6 @@
-// Copyright 2017 TODO Group. All rights reserved.
-// Licensed under the Apache License, Version 2.0.
+// SPDX-FileCopyrightText: 2017 TODO Group.
+// SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+// SPDX-License-Identifier: Apache-2.0
 
 import licensee from '../lib/licensee.js'
 import Result from '../lib/result.js'
