@@ -15,7 +15,7 @@ describe('rule', () => {
     it('returns a passed result if requested file matches the patterns', async () => {
       const ruleopts = {
         globsAll: ['dist/rules/file-starts-with.js'],
-        lineCount: 2,
+        lineCount: 5,
         patterns: ['Copyright', 'License']
       }
 
