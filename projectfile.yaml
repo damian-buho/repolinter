@@ -1,0 +1,58 @@
+---
+$schema: https://projectfile.org/schema/v1.json
+identity:
+  created: "2026-06-23"
+  name: repolinter
+  namespace: damian-buho
+  summary: Linter for open source repositories (fork of todogroup/repolinter)
+  title: Repolinter (Damián Búho)
+  version: 2.0.0
+keywords:
+  - lint
+  - linter
+  - repository
+  - github
+  - license
+  - readme
+  - open source
+  - repolinter
+kind: SoftwareSourceCode
+license:
+  spdx: Apache-2.0
+links:
+  - type: bugs
+    url: https://github.com/damian-buho/repolinter/issues
+  - type: homepage
+    url: https://damian-buho.github.io/repolinter/
+  - type: source-code
+    url: https://github.com/damian-buho/repolinter
+  - type: package-registry
+    url: https://www.npmjs.com/package/repolinter
+org:
+  projectfile:
+    cli:
+      derived:
+        - links[type=package-registry]
+people:
+  - email: damian.buho@proton.me
+    family-names: Búho
+    given-names: Damián
+    name: Damián Búho
+    orcid: 0009-0004-8579-7633
+    roles:
+      - contributor
+      - author
+    url: https://dbuho.me
+repositories:
+  - branch: main
+    primary: true
+    role: origin
+    type: git
+    url: git@github.com:damian-buho/repolinter.git
+requirements:
+  runtime:
+    node: '>=22.13.0'
+stack:
+  - docker
+  - node
+  - typescript
