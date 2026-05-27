@@ -32,12 +32,15 @@ concurrency:
 
 jobs:
   gate:
-    # Two-fact gate: Pipeline must have succeeded for a push event, and the
-    # head SHA must carry a tag we haven't already released. Either fails →
+    # Three-fact gate: Pipeline must have succeeded for a push to main, and the
+    # head SHA must carry a tag we haven't already released. Any failing fact →
     # all downstream jobs no-op via `if: needs.gate.outputs.tag != ''`.
     name: Gate
     runs-on: ubuntu-24.04
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     permissions:
       contents: read
     outputs:
@@ -71,33 +74,63 @@ jobs:
           echo "Releasing ${tag} at $(git rev-parse HEAD)"
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
-  publish-npm:
-    # npm publish + GitHub release + floating tags. Runs in parallel with the
-    # per-arch image builds.
-    name: Publish npm + GitHub release
+  build-npm:
+    # Build the package and produce a signed tarball artifact. Runs with minimal
+    # permissions so npm lifecycle scripts cannot access OIDC or write tokens.
+    name: Build npm artifact
     needs: gate
     if:    needs.gate.outputs.tag != ''
     runs-on: ubuntu-24.04
     permissions:
-      contents:  write  # GitHub release creation + floating tag push
-      id-token:  write  # OIDC for npm provenance
+      contents: read
     steps:
       - uses: actions/checkout@v6
         with:
-          ref:          ${{ github.event.workflow_run.head_sha }}
-          fetch-depth:  0  # full history so floating-tag moves can resolve refs
+          ref:         ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v6
         with:
-          node-version:  '24'  # npm 11.5+ ships here; trusted publishing requires it
-          registry-url:  https://registry.npmjs.org
-          cache:         npm
+          node-version: '24'
+          cache:        npm
 
       - run: npm ci
 
-      # prepublishOnly runs the build, so no explicit build step is needed.
+      # prepublishOnly only fires on `npm publish`, not `npm pack`. Run the
+      # build explicitly so the dist/ directory is present in the tarball.
+      - run: npm run build
+
+      - run: npm pack
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name:              npm-tarball
+          path:              "*.tgz"
+          if-no-files-found: error
+          retention-days:    1
+
+  publish-npm:
+    # Publishes the pre-built tarball to npm (OIDC) and creates the GitHub
+    # release. No checkout, so npm lifecycle scripts never run here.
+    name: Publish npm + GitHub release
+    needs: [gate, build-npm]
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write  # GitHub release creation
+      id-token: write  # OIDC for npm trusted publishing + provenance
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-tarball
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version:  '24'
+          registry-url:  https://registry.npmjs.org
+
       - name: Publish to npm
-        run:  npm publish --provenance
+        run:  npm publish *.tgz --provenance
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
@@ -105,9 +138,27 @@ jobs:
           tag_name:               ${{ needs.gate.outputs.tag }}
           generate_release_notes: true
 
-      # Floating tags let Marketplace consumers pin `@v1` / `@v1.2` and keep
-      # receiving patch updates. Pushed with GITHUB_TOKEN so the tag push does
-      # not retrigger Pipeline → no Release loop.
+  update-floating-tags:
+    # Moves the floating major/minor tags (v1, v1.2) to the new release SHA.
+    # Runs after publish-npm succeeds. Uses contents: write only — no OIDC —
+    # so the checkout cannot be leveraged to exfiltrate privileged tokens.
+    # Floating tags let Marketplace consumers pin `@v1` / `@v1.2` and keep
+    # receiving patch updates. Pushed with GITHUB_TOKEN so the tag push does
+    # not retrigger Pipeline → no Release loop.
+    name: Update floating tags
+    needs: [gate, publish-npm]
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Check out the validated release tag rather than the raw head_sha so
+          # the ref is a named, published ref — not raw external event data.
+          ref:         ${{ needs.gate.outputs.tag }}
+          fetch-depth: 0
+
       - name: Update floating major/minor tags
         env:
           VERSION: ${{ needs.gate.outputs.tag }}
@@ -129,17 +180,16 @@ jobs:
           done
 
   build-image:
-    # Per-arch image build on a native runner. Each entry pushes by digest
-    # only (no tag) so two arches never race to overwrite the same tag —
-    # the manifest-merge job is the single writer of the released tags.
+    # Per-arch image build on a native runner. Exports a single-platform OCI
+    # layout tar — no registry credentials required at build time. The separate
+    # push-image job handles the privileged push so Dockerfile RUN commands
+    # never execute in a context that holds packages: write or id-token: write.
     name: Build image (${{ matrix.arch }})
     needs: gate
     if:    needs.gate.outputs.tag != ''
     runs-on: ${{ matrix.runner }}
     permissions:
-      contents:  read
-      id-token:  write  # OIDC for GHCR build attestation
-      packages:  write  # push image by digest to GHCR
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -157,51 +207,97 @@ jobs:
 
       - uses: docker/setup-buildx-action@v4
 
-      - uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Image labels
         id:   meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
 
-      - name: Build and push by digest
-        id:   build
+      - name: Build image (OCI export, no push)
         uses: docker/build-push-action@v7
         with:
           context:    .
           platforms:  ${{ matrix.platform }}
           labels:     ${{ steps.meta.outputs.labels }}
-          # push-by-digest: pushes a per-arch image to GHCR with no tag and
-          # returns its digest. The manifest job glues these into one tag.
-          outputs:    type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          # Export as OCI layout tar — no registry login needed, no credential
+          # access during Dockerfile execution.
+          outputs:    type=oci,dest=${{ runner.temp }}/image-${{ matrix.arch }}.tar
           # Per-arch cache scopes so amd64 and arm64 don't evict each other.
           cache-from: type=gha,scope=${{ matrix.arch }}
           cache-to:   type=gha,scope=${{ matrix.arch }},mode=max
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name:              image-oci-${{ matrix.arch }}
+          path:              ${{ runner.temp }}/image-${{ matrix.arch }}.tar
+          if-no-files-found: error
+          retention-days:    1
+
+  push-image:
+    # Loads the pre-built OCI tar and pushes by digest to GHCR. No checkout,
+    # no code from the repository runs here — only the trusted registry action.
+    name: Push image (${{ matrix.arch }})
+    needs: [gate, build-image]
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ubuntu-24.04  # any runner; imagetools create is registry-side
+    permissions:
+      contents: read
+      id-token: write  # OIDC for GHCR build attestation
+      packages: write  # push image by digest to GHCR
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: image-oci-${{ matrix.arch }}
+          path: ${{ runner.temp }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push by digest
+        id:   push
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${{ github.repository }}"
+          oci_dir="${RUNNER_TEMP}/oci-${{ matrix.arch }}"
+          # imagetools create requires an OCI layout directory, not a tar file.
+          mkdir -p "${oci_dir}"
+          tar -xf "${{ runner.temp }}/image-${{ matrix.arch }}.tar" --directory "${oci_dir}"
+          # Push the pre-built image layers; capture the digest for the manifest job.
+          docker buildx imagetools create \
+            --tag "${image}:build-${{ matrix.arch }}" \
+            "oci-layout://${oci_dir}"
+          digest=$(docker buildx imagetools inspect "${image}:build-${{ matrix.arch }}" \
+            --format '{{.Manifest.Digest}}')
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          echo "Pushed ${{ matrix.arch }}: ${digest}"
+
       - name: Export digest
         run: |
           mkdir -p "${RUNNER_TEMP}/digests"
-          digest='${{ steps.build.outputs.digest }}'
+          digest='${{ steps.push.outputs.digest }}'
           touch "${RUNNER_TEMP}/digests/${digest#sha256:}"
 
-      - name: Upload digest
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name:               digests-${{ matrix.arch }}
-          path:               ${{ runner.temp }}/digests/*
-          if-no-files-found:  error
-          retention-days:     1
+          name:              digests-${{ matrix.arch }}
+          path:              ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days:    1
 
   publish-manifest:
     # Glue step: download per-arch digests, create a single multiarch manifest
     # list under the released tags, and push. Sole writer of the release tags.
     name: Publish manifest
-    needs: [gate, build-image]
+    needs: [gate, push-image]
     if:    needs.gate.outputs.tag != ''
     runs-on: ubuntu-24.04
     permissions:

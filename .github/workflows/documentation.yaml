@@ -16,9 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents:  read
-  pages:     write
-  id-token:  write  # OIDC attestation for the Pages artifact
+  contents: read  # build job only needs read; deploy job declares its own elevated permissions
 
 concurrency:
   # Only one Pages deployment at a time; never cancel mid-deploy.
@@ -64,6 +62,9 @@ jobs:
     name:    Deploy
     needs:   build
     runs-on: ubuntu-24.04
+    permissions:
+      pages:    write
+      id-token: write  # OIDC attestation for the Pages artifact
     environment:
       name: github-pages
       url:  ${{ steps.deployment.outputs.page_url }}
