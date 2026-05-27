@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-small.svg)
 
 [The original Repolinter project](https://github.com/todogroup/repolinter) has been archived.
@@ -5,24 +10,32 @@
 This fork is a heavily modernized version, that will be supported by [me](https://dbuho.me).
 
 Lints open source repositories for common issues.
-
 [Docs](https://damian-buho.github.io/repolinter/) · [GitHub Action](MARKETPLACE.md) · [Container image](https://github.com/damian-buho/repolinter/pkgs/container/repolinter)
 
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/damian-buho/repolinter/pipeline.yaml)
 ![NPM Version](https://img.shields.io/npm/v/%40damian-buho%2Frepolinter?style=flat-square)
 ![NPM Last Update](https://img.shields.io/npm/last-update/%40damian-buho%2Frepolinter?style=flat-square)
 ![NPM License](https://img.shields.io/npm/l/%40damian-buho%2Frepolinter?style=flat-square)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+[![Pipeline](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml)
+[![CodeQL](https://github.com/damian-buho/repolinter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/github-code-scanning/codeql)
+[![Documentation](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml)
 [![Known Vulnerabilities](https://snyk.io/test/npm/%40damian-buho%2Frepolinter/badge.svg)](https://snyk.io/test/npm/%40damian-buho%2Frepolinter)
 
+
+## Try with docker
+
+```shell
+docker run --rm -it -v ${PWD}:/app/ws -w /app/ws ghcr.io/damian-buho/repolinter:latest
+```
 
 ## Installation
 
 Repolinter requires [Node.JS](https://nodejs.org/en/) >= v22 to function properly.
 Once Node.js is installed, you can install Repolinter using `npm`:
 
-```sh
+```shell
 npm install -g repolinter
 ```
 
@@ -30,7 +43,7 @@ npm install -g repolinter
 
 Once installed, run the following to lint a directory:
 
-```sh
+```shell
 repolinter lint <directory>
 ```
 
@@ -119,7 +132,7 @@ Repolinter will pull its configuration from the following sources in order of pr
 
 Any ruleset starts with the following base, shown in both JSON and YAML format:
 
-```JSON
+```json
 {
   "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
   "version": 2,
@@ -128,7 +141,7 @@ Any ruleset starts with the following base, shown in both JSON and YAML format:
 }
 ```
 
-```YAML
+```yaml
 version: 2
 axioms: {}
 rules:
@@ -145,7 +158,7 @@ Where:
 
 Rules are objects of the following format:
 
-```JavaScript
+```javascript
 "<rule-name>": {
   "level": "error" | "warning" | "off",
   "rule": {
@@ -166,7 +179,7 @@ Rules are objects of the following format:
 }
 ```
 
-```YAML
+```yaml
 <rule-name>:
   level: error | warning | off
   rule:
@@ -192,7 +205,7 @@ Rules are objects of the following format:
 
 A minimal example of a rule that checks for the existence of a `README`:
 
-```JSON
+```json
 "readme-file-exists" : {
   "level": "error",
   "rule": {
@@ -204,7 +217,7 @@ A minimal example of a rule that checks for the existence of a `README`:
 }
 ```
 
-```YAML
+```yaml
 readme-file-exists:
   level: error
   rule:
@@ -216,7 +229,7 @@ readme-file-exists:
 
 Checking that the `README` matches a certain hash, and replacing it if not:
 
-```JSON
+```json
 "readme-file-up-to-date" : {
   "level": "error",
   "rule": {
@@ -240,7 +253,7 @@ Checking that the `README` matches a certain hash, and replacing it if not:
 }
 ```
 
-```YAML
+```yaml
 readme-file-up-to-date:
   level: error
   rule:
@@ -264,13 +277,13 @@ readme-file-up-to-date:
 
 #### Axioms
 
-```JSON
+```json
 "axioms": {
   "<axiom-id>": "<axiom-target>"
 }
 ```
 
-```YAML
+```yaml
 axioms:
   <axiom-id>: axiom-target
 ```
@@ -279,7 +292,7 @@ Each axiom is configured as a key-value pair in the `axioms` object, where `<axi
 
 An example configuration using an axiom to detect the packaging system for a project:
 
-```JavaScript
+```javascript
 {
   "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
   "version": 2,
@@ -296,7 +309,7 @@ An example configuration using an axiom to detect the packaging system for a pro
 }
 ```
 
-```YAML
+```yaml
 version: 2
 axioms:
   packagers: package-type
@@ -310,7 +323,7 @@ rules:
 
 Some axioms (ex. [`contributor-count`](./docs/axioms.md#contributor-count)) output numerical values instead of strings. For these axioms, numerical comparisons (`<`, `>`, `<=`, `>=`) can be also be specified in the `where` conditional. Note that if a numerical comparison is used for a non-numerical axiom, the comparison will always fail.
 
-```JavaScript
+```javascript
 {
   "axioms": {
     "contributor-count": "contributors"
@@ -324,7 +337,7 @@ Some axioms (ex. [`contributor-count`](./docs/axioms.md#contributor-count)) outp
 }
 ```
 
-```YAML
+```yaml
 axioms:
   contributor-count: contributors
 rules:
@@ -345,25 +358,26 @@ up to 20 rulesets deep.
 Extend a ruleset by including an "extends" top-level key which identifies a URL
 or file path:
 
-```JavaScript
+```javascript
 {
-  "extends": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json"
+  "extends": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json",
   "rules": {
     # disable CI check
-    "integrates-with-ci": {
+    "integrates-with-ci":
+    {
       "level": "off"
     }
   }
 }
 ```
 
-```YAML
+```yaml
 extends: https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json
 rules:
   # disable CI check
-  integrates-with-ci
+  integrates-with-ci:
     level: off
-    ...
+...
 ```
 
 Relative paths are resolved relative to the location used to access the
@@ -390,7 +404,7 @@ YAML and JSON rulesets can be extended from either format.
 
 Repolinter also includes an extensible JavaScript API:
 
-```JavaScript
+```javascript
 const repolinter = require('repolinter')
 const result = await repolinter.lint('.')
 ```
