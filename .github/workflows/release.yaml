@@ -1,96 +1,116 @@
 name: Release
-# Tag-triggered: re-runs the full validation pipeline against the tagged SHA,
-# then publishes to npm (OIDC trusted publishing) and GHCR (multiarch).
+# Fires when Pipeline finishes successfully and a git tag points to the head
+# commit. Publishes to npm (OIDC trusted publishing) and GHCR (multiarch
+# native: amd64 + arm64).
 #
-# Can also be dispatched manually against any ref. In that case the version is
-# read from package.json and the matching tag is created at the dispatched ref
-# before publishing — push by GITHUB_TOKEN does not retrigger this workflow,
-# so there is no double-fire.
+# To release: push a tag.
+#   git tag vX.Y.Z && git push origin vX.Y.Z
+# Pipeline runs on the tag push; its success triggers this workflow; the gate
+# finds the tag at HEAD; the rest publishes.
+#
+# There is no workflow_dispatch path — tag creation IS the release operation.
+# Floating major/minor tag pushes use GITHUB_TOKEN so the tag push does not
+# retrigger Pipeline, and therefore does not loop back into Release.
+#
+# Note: workflow_run-triggered workflows always run the version of this file
+# from the default branch. To roll out a change to Release, merge to main first.
 
 on:
-  push:
-    tags: ['**']
-  workflow_dispatch:
+  workflow_run:
+    workflows: [Pipeline]
+    types: [completed]
 
 permissions:
   contents: read
 
 concurrency:
-  # Never cancel an in-flight release — a half-published tag is worse than a delay.
-  group: release-${{ github.ref }}
+  # workflow_run carries no meaningful github.ref — key on the underlying
+  # head_sha so two pipeline runs for the same SHA (branch push + tag push)
+  # serialize. Never cancel; the gate dedups any duplicate trigger.
+  group: release-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: false
 
 jobs:
-  pipeline:
-    name: Pipeline
-    uses: ./.github/workflows/pipeline.yaml
+  gate:
+    # Two-fact gate: Pipeline must have succeeded for a push event, and the
+    # head SHA must carry a tag we haven't already released. Either fails →
+    # all downstream jobs no-op via `if: needs.gate.outputs.tag != ''`.
+    name: Gate
+    runs-on: ubuntu-26.04
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     permissions:
       contents: read
-
-  publish:
-    name: Publish
-    needs: pipeline
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  # GitHub release creation + tag push on manual dispatch
-      id-token: write  # OIDC for npm provenance + GHCR attestation
-      packages: write  # push image to GHCR
+    outputs:
+      tag: ${{ steps.gate.outputs.tag }}
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0  # full history so we can create / inspect tags
+          ref:          ${{ github.event.workflow_run.head_sha }}
+          fetch-depth:  0  # need full history + tags for the points-at check
+
+      - id:   gate
+        name: Resolve tag at HEAD (and dedup)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Tagged commits typically produce TWO Pipeline runs (branch push +
+        # tag push), each firing Release. We dedup by skipping if a GitHub
+        # release for this tag already exists from the first run.
+        run: |
+          set -euo pipefail
+          tag=$(git tag --points-at HEAD | head -n1)
+          if [ -z "${tag}" ]; then
+            echo "No tag at $(git rev-parse HEAD) — Pipeline succeeded but nothing to release."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if gh release view "${tag}" --json tagName >/dev/null 2>&1; then
+            echo "GitHub release ${tag} already exists — duplicate trigger ignored."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Releasing ${tag} at $(git rev-parse HEAD)"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+  publish-npm:
+    # npm publish + GitHub release + floating tags. Runs in parallel with the
+    # per-arch image builds.
+    name: Publish npm + GitHub release
+    needs: gate
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ubuntu-26.04
+    permissions:
+      contents:  write  # GitHub release creation + floating tag push
+      id-token:  write  # OIDC for npm provenance
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref:          ${{ github.event.workflow_run.head_sha }}
+          fetch-depth:  0  # full history so floating-tag moves can resolve refs
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'  # npm 11.5+ ships here; trusted publishing requires it
-          registry-url: https://registry.npmjs.org
-          cache: npm
+          node-version:  '24'  # npm 11.5+ ships here; trusted publishing requires it
+          registry-url:  https://registry.npmjs.org
+          cache:         npm
 
       - run: npm ci
 
-      - name: Resolve release version
-        id: ver
-        # Tag pushes use the tag name as-is; dispatch reads package.json so
-        # `cog bump` (or a manual edit) defines the release version.
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            ver="${GITHUB_REF_NAME}"
-          else
-            ver="$(node -p "require('./package.json').version")"
-          fi
-          echo "Resolved version: ${ver}"
-          echo "version=${ver}" >> "$GITHUB_OUTPUT"
-
-      - name: Create and push tag
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          TAG: ${{ steps.ver.outputs.version }}
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
-            echo "Tag ${TAG} already exists at $(git rev-parse "${TAG}") — reusing"
-          else
-            git tag "${TAG}"
-            git push origin "${TAG}"
-          fi
-
       # prepublishOnly runs the build, so no explicit build step is needed.
       - name: Publish to npm
-        run: npm publish --provenance
+        run:  npm publish --provenance
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.ver.outputs.version }}
+          tag_name:               ${{ needs.gate.outputs.tag }}
           generate_release_notes: true
 
       # Floating tags let Marketplace consumers pin `@v1` / `@v1.2` and keep
       # receiving patch updates. Pushed with GITHUB_TOKEN so the tag push does
-      # not retrigger this workflow (same property the manual-dispatch tag uses).
+      # not retrigger Pipeline → no Release loop.
       - name: Update floating major/minor tags
         env:
-          VERSION: ${{ steps.ver.outputs.version }}
+          VERSION: ${{ needs.gate.outputs.tag }}
         run: |
           set -euo pipefail
           v="${VERSION#v}"
@@ -103,12 +123,97 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for floating in "${major}" "${minor}"; do
-            echo "Moving ${floating} → ${GITHUB_SHA}"
+            echo "Moving ${floating} → $(git rev-parse HEAD)"
             git tag --force --annotate "${floating}" --message "Floating tag for ${VERSION}"
             git push --force origin "refs/tags/${floating}"
           done
 
-      - uses: docker/setup-qemu-action@v4  # arm64 emulation for multiarch build
+  build-image:
+    # Per-arch image build on a native runner. Each entry pushes by digest
+    # only (no tag) so two arches never race to overwrite the same tag —
+    # the manifest-merge job is the single writer of the released tags.
+    name: Build image (${{ matrix.arch }})
+    needs: gate
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents:  read
+      id-token:  write  # OIDC for GHCR build attestation
+      packages:  write  # push image by digest to GHCR
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch:     amd64
+            platform: linux/amd64
+            runner:   ubuntu-26.04
+          - arch:     arm64
+            platform: linux/arm64
+            runner:   ubuntu-26.04-arm  # native GitHub-hosted arm64, no QEMU
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image labels
+        id:   meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: Build and push by digest
+        id:   build
+        uses: docker/build-push-action@v7
+        with:
+          context:    .
+          platforms:  ${{ matrix.platform }}
+          labels:     ${{ steps.meta.outputs.labels }}
+          # push-by-digest: pushes a per-arch image to GHCR with no tag and
+          # returns its digest. The manifest job glues these into one tag.
+          outputs:    type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          # Per-arch cache scopes so amd64 and arm64 don't evict each other.
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to:   type=gha,scope=${{ matrix.arch }},mode=max
+
+      - name: Export digest
+        run: |
+          mkdir -p "${RUNNER_TEMP}/digests"
+          digest='${{ steps.build.outputs.digest }}'
+          touch "${RUNNER_TEMP}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name:               digests-${{ matrix.arch }}
+          path:               ${{ runner.temp }}/digests/*
+          if-no-files-found:  error
+          retention-days:     1
+
+  publish-manifest:
+    # Glue step: download per-arch digests, create a single multiarch manifest
+    # list under the released tags, and push. Sole writer of the release tags.
+    name: Publish manifest
+    needs: [gate, build-image]
+    if:    needs.gate.outputs.tag != ''
+    runs-on: ubuntu-26.04
+    permissions:
+      id-token:  write  # OIDC for GHCR attestation on the manifest list
+      packages:  write  # push the multiarch manifest list
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path:            ${{ runner.temp }}/digests
+          pattern:         digests-*
+          merge-multiple:  true
 
       - uses: docker/setup-buildx-action@v4
 
@@ -119,24 +224,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Image metadata
-        id: meta
+        id:   meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
-          # `value=` overrides github.ref-derived input so dispatch works even
-          # when the ref is a branch; `latest` is auto-applied on semver values.
+          # `latest` is auto-applied on semver values.
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.ver.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.ver.outputs.version }}
-            type=semver,pattern={{major}},value=${{ steps.ver.outputs.version }}
+            type=semver,pattern={{version}},value=${{ needs.gate.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.gate.outputs.tag }}
+            type=semver,pattern={{major}},value=${{ needs.gate.outputs.tag }}
 
-      - name: Build and push multiarch image
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
