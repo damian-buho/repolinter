@@ -149,7 +149,7 @@ async function fileContents(
             }
             console.trace('Error trace:')
             throw new Error(
-              'Please open an issue on https://github.com/todogroup/repolinter'
+              'Please open an issue on https://github.com/damian-buho/repolinter'
             )
           }
 
