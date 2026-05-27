@@ -25,6 +25,7 @@ coverage:
 
 lint:
     npm run lint
+    reuse lint --lines
 
 fix:
     npm run fix
