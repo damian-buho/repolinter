@@ -38,9 +38,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # workflow_run path: pin to the SHA Pipeline validated.
-          # workflow_dispatch path: workflow_run is empty → defaults to GITHUB_SHA.
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          # Always use github.sha (default-branch HEAD, non-tainted) rather than
+          # workflow_run.head_sha (external event data flagged by cache-poisoning
+          # CodeQL rule). Docs always reflect current main HEAD — this is correct
+          # behaviour, and github.sha works for both workflow_run and workflow_dispatch.
 
       - uses: actions/setup-node@v6
         with:

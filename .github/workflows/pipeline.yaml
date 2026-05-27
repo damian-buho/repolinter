@@ -81,8 +81,10 @@ jobs:
           context: .
           load: true
           tags: ghcr.io/${{ github.repository }}:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Branch-scoped cache: PR builds and main builds never share the same
+          # scope, so a malicious PR cannot poison the cache read by main.
+          cache-from: type=gha,scope=${{ github.ref_name }}
+          cache-to:   type=gha,scope=${{ github.ref_name }},mode=max
 
       # Smoke-test the in-tree action against the in-tree image. Exercises both
       # surfaces end-to-end before a release ever pushes either of them.
