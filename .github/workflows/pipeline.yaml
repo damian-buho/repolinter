@@ -89,11 +89,3 @@ jobs:
           # scope, so a malicious PR cannot poison the cache read by main.
           cache-from: type=gha,scope=${{ github.ref_name }}
           cache-to:   type=gha,scope=${{ github.ref_name }},mode=max
-
-      # Smoke-test the in-tree action against the in-tree image. Exercises both
-      # surfaces end-to-end before a release ever pushes either of them.
-#      - name: Dogfood action against built image
-#        uses: ./
-#        with:
-#          image:       ghcr.io/${{ github.repository }}:ci
-#          config_file: .github/repolinter.yaml
