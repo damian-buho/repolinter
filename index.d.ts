@@ -1,3 +1,7 @@
+// Copyright 2026 Damián Búho
+//
+// SPDX-License-Identifier: Apache-2.0
+
 declare class FileSystem {
   targetDir: string
   filterPaths: string[]

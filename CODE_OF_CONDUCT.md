@@ -1,5 +1,7 @@
 <!--
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 SPDX-FileCopyrightText: 2026 The TODO Group
+
 SPDX-License-Identifier: Apache-2.0
 -->
 

@@ -1,17 +1,6 @@
-# syntax=docker/dockerfile:1
-# Repolinter — Multistage Dockerfile
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 #
-# Build:
-#   docker build -t repolinter .
-#
-# Multiarch (amd64 + arm64):
-#   docker buildx build --platform linux/amd64,linux/arm64 -t repolinter .
-#
-# Run against current directory:
-#   docker run --rm -t -v ${PWD}:/src -w /src repolinter
-#
-# Run against a remote GitHub repository:
-#   docker run --rm -t repolinter --git https://github.com/username/repo.git
+# SPDX-License-Identifier: Apache-2.0
 
 # ---------------------------------------------------------------------------
 # Stage 1: node-build — compile TypeScript, produce dist/ + production modules

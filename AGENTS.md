@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Agents — repolinter
 
 ## Project overview
