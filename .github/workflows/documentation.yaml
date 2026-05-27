@@ -38,10 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # Always use github.sha (default-branch HEAD, non-tainted) rather than
-          # workflow_run.head_sha (external event data flagged by cache-poisoning
-          # CodeQL rule). Docs always reflect current main HEAD — this is correct
-          # behaviour, and github.sha works for both workflow_run and workflow_dispatch.
+          # github.sha = default-branch HEAD, non-tainted by workflow_run event data.
+          # Works for both workflow_run and workflow_dispatch; docs always reflect main.
+          ref: ${{ github.sha }}
 
       - uses: actions/setup-node@v6
         with:
