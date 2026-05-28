@@ -32,8 +32,21 @@ class FileSystem {
       .catch(() => false)
   }
 
+  // Resolves a relative path and asserts it stays within targetDirectory,
+  // preventing path traversal (e.g. ../../etc/passwd) via caller-supplied input.
+  resolveContained(relativeFile: string): string {
+    const base = path.resolve(this.targetDirectory)
+    const resolved = path.resolve(base, relativeFile)
+    if (resolved !== base && !resolved.startsWith(base + path.sep)) {
+      throw new Error(
+        `path '${relativeFile}' resolves outside target directory '${base}'`
+      )
+    }
+    return resolved
+  }
+
   async relativeFileExists(file: string): Promise<boolean> {
-    return FileSystem.fileExists(path.resolve(this.targetDirectory, file))
+    return FileSystem.fileExists(this.resolveContained(file))
   }
 
   async findFirst(
@@ -105,7 +118,7 @@ class FileSystem {
   }
 
   async isBinaryFile(relativeFile: string): Promise<boolean> {
-    const file = path.resolve(this.targetDirectory, relativeFile)
+    const file = this.resolveContained(relativeFile)
     try {
       const { isBinaryFile } = await import('isbinaryfile')
       return isBinaryFile(file)
@@ -140,7 +153,7 @@ class FileSystem {
   }
 
   async getFileContents(relativeFile: string): Promise<string | undefined> {
-    const file = path.resolve(this.targetDirectory, relativeFile)
+    const file = this.resolveContained(relativeFile)
     try {
       return await fs.promises.readFile(file, 'utf8')
     } catch {
@@ -149,21 +162,18 @@ class FileSystem {
   }
 
   async setFileContents(relativeFile: string, contents: string): Promise<void> {
-    return fs.promises.writeFile(
-      path.resolve(this.targetDirectory, relativeFile),
-      contents
-    )
+    return fs.promises.writeFile(this.resolveContained(relativeFile), contents)
   }
 
   async removeFile(relativeFile: string): Promise<void> {
-    return fs.promises.unlink(path.resolve(this.targetDirectory, relativeFile))
+    return fs.promises.unlink(this.resolveContained(relativeFile))
   }
 
   async getFileLines(
     relativeFile: string,
     lineCount: number
   ): Promise<string | undefined> {
-    const file = path.resolve(this.targetDirectory, relativeFile)
+    const file = this.resolveContained(relativeFile)
     let fd: fs.promises.FileHandle | undefined
     try {
       fd = await fs.promises.open(file, 'r')

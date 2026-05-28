@@ -197,6 +197,51 @@ describe(
             /404/
           )
         })
+
+        it('should reject extends with parent-directory traversal', async () => {
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
+          )
+          try {
+            const configPath = path.join(tmpdir, 'traversal.yaml')
+            fs.writeFileSync(
+              configPath,
+              [
+                'version: 2',
+                'extends: "../../etc/passwd"',
+                'rules: {}',
+                ''
+              ].join('\n')
+            )
+            await assert.rejects(
+              () => Config.loadConfig(configPath),
+              /parent directories/
+            )
+          } finally {
+            fs.rmSync(tmpdir, { recursive: true })
+          }
+        })
+
+        it('should reject extends with an absolute path', async () => {
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
+          )
+          try {
+            const configPath = path.join(tmpdir, 'absolute.yaml')
+            fs.writeFileSync(
+              configPath,
+              ['version: 2', 'extends: "/etc/passwd"', 'rules: {}', ''].join(
+                '\n'
+              )
+            )
+            await assert.rejects(
+              () => Config.loadConfig(configPath),
+              /parent directories/
+            )
+          } finally {
+            fs.rmSync(tmpdir, { recursive: true })
+          }
+        })
       })
 
       describe('validateConfig', () => {})

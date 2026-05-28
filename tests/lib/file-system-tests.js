@@ -246,6 +246,53 @@ describe(
       })
 
       describe('getFileLines', () => {})
+
+      describe('resolveContained', () => {
+        const fsInstance = new FileSystem(__dirname)
+
+        it('should resolve a relative path within targetDirectory', () => {
+          const resolved = fsInstance.resolveContained('text_file_for_test.txt')
+          assert.strictEqual(
+            resolved,
+            path.resolve(__dirname, 'text_file_for_test.txt')
+          )
+        })
+
+        it('should throw on parent-directory traversal', () => {
+          assert.throws(
+            () => fsInstance.resolveContained('../../etc/passwd'),
+            /resolves outside target directory/
+          )
+        })
+
+        it('should throw on absolute path outside targetDirectory', () => {
+          assert.throws(
+            () => fsInstance.resolveContained('/etc/passwd'),
+            /resolves outside target directory/
+          )
+        })
+
+        it('getFileContents should reject on path traversal', async () => {
+          await assert.rejects(
+            () => fsInstance.getFileContents('../../package.json'),
+            /resolves outside target directory/
+          )
+        })
+
+        it('setFileContents should reject on path traversal', async () => {
+          await assert.rejects(
+            () => fsInstance.setFileContents('../../injected', 'evil'),
+            /resolves outside target directory/
+          )
+        })
+
+        it('removeFile should reject on path traversal', async () => {
+          await assert.rejects(
+            () => fsInstance.removeFile('../../package.json'),
+            /resolves outside target directory/
+          )
+        })
+      })
     })
   },
   { timeout: 10_000 }

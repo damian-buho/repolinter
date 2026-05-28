@@ -6,7 +6,6 @@
 import nodefs from 'node:fs'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import path from 'node:path'
 
 interface LargeFileOptions {
   globsAll?: string[]
@@ -43,7 +42,7 @@ async function largeFile(
 
   const allResults = await Promise.all(
     files.map(async file => {
-      const filePath = path.resolve(fs.targetDirectory, file)
+      const filePath = fs.resolveContained(file)
       const stat = await nodefs.promises.stat(filePath)
       const passed = stat.size <= options.size
       const readerFriendlySize =

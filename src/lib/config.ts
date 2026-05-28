@@ -122,6 +122,14 @@ async function resolveExtension(
   } else if (isAbsoluteURL(sourceLocation)) {
     parent = new URL(ruleset.extends, sourceLocation).toString()
   } else {
+    // Disallow absolute paths and parent-directory traversal in local extends
+    // to prevent a repo-controlled config from reading arbitrary server files.
+    const normalized = path.normalize(ruleset.extends)
+    if (path.isAbsolute(normalized) || normalized.startsWith('..')) {
+      throw new Error(
+        `extends path '${ruleset.extends}' must be a relative path that does not traverse parent directories`
+      )
+    }
     parent = path.resolve(path.dirname(sourceLocation), ruleset.extends)
   }
 
