@@ -205,7 +205,7 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.arch }}
           cache-to:   type=gha,scope=${{ matrix.arch }},mode=max
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name:              image-oci-${{ matrix.arch }}
           path:              ${{ runner.temp }}/image-${{ matrix.arch }}.tar
@@ -228,7 +228,7 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: image-oci-${{ matrix.arch }}
           path: ${{ runner.temp }}
@@ -250,10 +250,13 @@ jobs:
           # imagetools create requires an OCI layout directory, not a tar file.
           mkdir -p "${oci_dir}"
           tar -xf "${{ runner.temp }}/image-${{ matrix.arch }}.tar" --directory "${oci_dir}"
+          # OCI layout has no named tag; reference the single manifest by its content digest
+          # so imagetools does not fall back to `:latest` (which does not exist in the layout).
+          manifest_digest=$(jq -r '.manifests[0].digest' "${oci_dir}/index.json")
           # Push the pre-built image layers; capture the digest for the manifest job.
           docker buildx imagetools create \
             --tag "${image}:build-${{ matrix.arch }}" \
-            "oci-layout://${oci_dir}"
+            "oci-layout://${oci_dir}@${manifest_digest}"
           digest=$(docker buildx imagetools inspect "${image}:build-${{ matrix.arch }}" \
             --format '{{.Manifest.Digest}}')
           echo "digest=${digest}" >> "$GITHUB_OUTPUT"
@@ -265,7 +268,7 @@ jobs:
           digest='${{ steps.push.outputs.digest }}'
           touch "${RUNNER_TEMP}/digests/${digest#sha256:}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name:              digests-${{ matrix.arch }}
           path:              ${{ runner.temp }}/digests/*
@@ -284,7 +287,7 @@ jobs:
       packages:  write  # push the multiarch manifest list
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path:            ${{ runner.temp }}/digests
           pattern:         digests-*
