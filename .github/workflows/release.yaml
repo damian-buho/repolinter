@@ -138,39 +138,6 @@ jobs:
           ref:         ${{ needs.gate.outputs.tag }}
           fetch-depth: 0
 
-      - name: Update floating major/minor tags
-        env:
-          VERSION:         ${{ needs.gate.outputs.tag }}
-          GIT_SIGNING_KEY: ${{ secrets.GIT_SIGNING_KEY }}
-        run: |
-          set -euo pipefail
-          key_file=$(mktemp)
-          chmod 600 "${key_file}"
-          printf '%s\n' "${GIT_SIGNING_KEY}" > "${key_file}"
-          # git 2.34+ treats user.signingkey as a public key path and signs via
-          # the SSH agent. Load the private key into a short-lived agent so git
-          # can find the private key without needing a persistent key file.
-          eval "$(ssh-agent -s)"
-          trap 'ssh-agent -k 2>/dev/null || true; rm -f "${key_file}"' EXIT
-          ssh-add "${key_file}"
-          pub_key=$(ssh-keygen -y -f "${key_file}")
-          v="${VERSION#v}"
-          if ! [[ "$v" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            echo "Skipping floating tags — '${VERSION}' is not a clean semver (pre-release or build metadata)"
-            exit 0
-          fi
-          major="${BASH_REMATCH[1]}"
-          minor="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-          git config user.name        "github-actions[bot]"
-          git config user.email       "41898282+github-actions[bot]@users.noreply.github.com"
-          git config gpg.format       ssh
-          git config user.signingkey  "key::${pub_key}"
-          for floating in "${major}" "${minor}"; do
-            echo "Moving ${floating} → $(git rev-parse HEAD)"
-            git tag --force --sign "${floating}" --message "Floating tag for ${VERSION}"
-            git push --force origin "refs/tags/${floating}"
-          done
-
   build-image:
     # Per-arch image build on a native runner. Exports a single-platform OCI
     # layout tar — no registry credentials required at build time. The separate
