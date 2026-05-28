@@ -38,15 +38,23 @@ org:
       derived:
         - links[type=package-registry]
 people:
-  - email: damian.buho@proton.me
-    family-names: Búho
+  - family-names: Búho
     given-names: Damián
-    name: Damián Búho
+    email: damian.buho@proton.me
     orcid: 0009-0004-8579-7633
-    roles:
-      - contributor
-      - author
     url: https://dbuho.me
+    roles:
+      - author
+      - maintainer
+      - copyright
+    from: "2026-06-23"
+  - name: TODO Group
+    url: https://todogroup.org/
+    roles:
+      - author
+      - founder
+      - copyright
+    to: "2026-06-22"
 repositories:
   - branch: main
     primary: true
