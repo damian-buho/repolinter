@@ -140,9 +140,14 @@ jobs:
 
       - name: Update floating major/minor tags
         env:
-          VERSION: ${{ needs.gate.outputs.tag }}
+          VERSION:         ${{ needs.gate.outputs.tag }}
+          GIT_SIGNING_KEY: ${{ secrets.GIT_SIGNING_KEY }}
         run: |
           set -euo pipefail
+          key_file=$(mktemp)
+          chmod 600 "${key_file}"
+          printf '%s\n' "${GIT_SIGNING_KEY}" > "${key_file}"
+          trap 'rm -f "${key_file}"' EXIT
           v="${VERSION#v}"
           if ! [[ "$v" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
             echo "Skipping floating tags — '${VERSION}' is not a clean semver (pre-release or build metadata)"
@@ -150,11 +155,13 @@ jobs:
           fi
           major="${BASH_REMATCH[1]}"
           minor="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name        "github-actions[bot]"
+          git config user.email       "41898282+github-actions[bot]@users.noreply.github.com"
+          git config gpg.format       ssh
+          git config user.signingkey  "${key_file}"
           for floating in "${major}" "${minor}"; do
             echo "Moving ${floating} → $(git rev-parse HEAD)"
-            git tag --force --annotate "${floating}" --message "Floating tag for ${VERSION}"
+            git tag --force --sign "${floating}" --message "Floating tag for ${VERSION}"
             git push --force origin "refs/tags/${floating}"
           done
 
