@@ -36,7 +36,7 @@ format:
 format-check:
     npm run format:check
 
-pipeline: format lint test build
+pipeline: format lint test build build-docker
 
 publish:
     npm publish
