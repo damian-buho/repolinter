@@ -118,10 +118,10 @@ jobs:
           generate_release_notes: true
 
   update-floating-tags:
-    # Moves the floating major/minor tags (v1, v1.2) to the new release SHA.
+    # Moves the floating major/minor tags (1, 1.2) to the new release SHA.
     # Runs after publish-npm succeeds. Uses contents: write only — no OIDC —
     # so the checkout cannot be leveraged to exfiltrate privileged tokens.
-    # Floating tags let Marketplace consumers pin `@v1` / `@v1.2` and keep
+    # Floating tags let Marketplace consumers pin `@1` / `@1.2` and keep
     # receiving patch updates. Pushed with GITHUB_TOKEN so the tag push does
     # not retrigger Pipeline → no Release loop.
     name: Update floating tags
@@ -148,8 +148,8 @@ jobs:
             echo "Skipping floating tags — '${VERSION}' is not a clean semver (pre-release or build metadata)"
             exit 0
           fi
-          major="v${BASH_REMATCH[1]}"
-          minor="v${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          major="${BASH_REMATCH[1]}"
+          minor="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for floating in "${major}" "${minor}"; do
