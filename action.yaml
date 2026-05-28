@@ -180,19 +180,23 @@ runs:
           -w /src
           "$IMAGE" lint)
 
+        # `|| json_rc=$?` prevents bash's implicit -e from killing this step when
+        # repolinter exits 1 (violations found). Exit >1 means Docker/infra error.
+        json_rc=0
         echo "::group::Repolinter (JSON for gating)"
         docker "${docker_base[@]}" --format json "${args[@]}" "$DIRECTORY" \
-          > "$report_json"
+          > "$report_json" || json_rc=$?
         echo "::endgroup::"
+        echo "JSON exit=$json_rc"
+        if [ "$json_rc" -gt 1 ]; then
+          echo "::error::Repolinter container failed (exit $json_rc); check image and args"
+          exit "$json_rc"
+        fi
 
         echo "::group::Repolinter (markdown report)"
         docker "${docker_base[@]}" --format markdown "${args[@]}" "$DIRECTORY" \
-          | tee "$report_md"
+          | tee "$report_md" || true
         echo "::endgroup::"
-
-        # Exit decision lives in the Summarize / threshold steps so a non-zero
-        # repolinter exit doesn't skip comment posting.
-        exit 0
 
     # Count rule statuses from the JSON report and render the markdown into
     # the Actions run summary page. Sets outputs but does not fail the job.
@@ -218,6 +222,28 @@ runs:
         echo "warnings=$warnings" >> "$GITHUB_OUTPUT"
         echo "passed=$passed"     >> "$GITHUB_OUTPUT"
         echo "ignored=$ignored"   >> "$GITHUB_OUTPUT"
+
+        # Emit per-rule annotations so violations appear inline on the PR diff.
+        # One annotation per failed file target, or one per rule when no paths exist.
+        jq -r '
+          .results[] | . as $r |
+          if   (.status == "NOT_PASSED_ERROR" or .status == "ERROR") then "error"
+          elif  .status == "NOT_PASSED_WARN"                         then "warning"
+          else empty end | . as $lvl |
+          $r |
+          ($r.ruleInfo.name) as $name |
+          ($r.lintResult.targets // [] | map(select(.passed == false))) as $failed |
+          if ($failed | length) > 0 then
+            $failed[] |
+            if .path then
+              "::\($lvl) file=\(.path),title=Rule: \($name)::\(.message // $r.lintResult.message // "")"
+            else
+              "::\($lvl) title=Rule: \($name)::\(.message // $r.lintResult.message // "")"
+            end
+          else
+            "::\($lvl) title=Rule: \($name)::\($r.lintResult.message // $r.runMessage // "")"
+          end
+        ' "$REPORT_JSON" || true
 
         case "$FAIL_ON" in
           none)
