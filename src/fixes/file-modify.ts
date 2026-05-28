@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Result from '../lib/result.js'
+import { safeFetch } from '../lib/safe-fetch.js'
 import type FileSystem from '../lib/file-system.js'
 
 interface SkipPathsMatching {
@@ -60,7 +61,7 @@ async function fileModify(
     content = options.text
   } else if (typeof options.text === 'object') {
     if (options.text.url) {
-      const request = await fetch(options.text.url)
+      const request = await safeFetch(options.text.url)
       if (!request.ok) {
         return new Result(
           `Could not fetch from ${options.text.url}, received status code ${request.status}`,

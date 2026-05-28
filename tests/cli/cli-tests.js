@@ -17,6 +17,10 @@ const ANSI_RE = new RegExp(`${ESC}${String.raw`\[[0-9;]*m`}`, 'g')
 const stripAnsi = s => s.replaceAll(ANSI_RE, '')
 import * as repolinter from '../../dist/index.js'
 
+// CLI tests use mock-http-server on 127.0.0.1, which safe-fetch blocks
+// by default. Child processes inherit this env from cpExec.
+process.env.REPOLINTER_ALLOW_PRIVATE_FETCH = '1'
+
 async function execAsync(command, options = {}) {
   return new Promise((resolve, reject) => {
     cpExec(command, options, (error, outstd, errstd) =>

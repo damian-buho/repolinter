@@ -12,6 +12,7 @@ import YAML from 'yaml'
 import Rules from '../rules/rules.js'
 import RuleInfo from './ruleinfo.js'
 import Fixes from '../fixes/fixes.js'
+import { safeFetch } from './safe-fetch.js'
 
 interface RuleEntry {
   level: 'off' | 'warning' | 'error'
@@ -146,7 +147,7 @@ async function loadConfig(
 
   let configData: string
   if (isAbsoluteURL(configLocation)) {
-    const response = await fetch(configLocation)
+    const response = await safeFetch(configLocation)
     if (!response.ok) {
       throw new Error(
         `Failed to fetch config from ${configLocation} with status code ${response.status}`

@@ -12,6 +12,9 @@ import * as Config from '../../dist/lib/config.js'
 import fs from 'node:fs'
 import ServerMock from 'mock-http-server'
 
+// Allow loopback fetches against the in-process mock-http-server.
+process.env.REPOLINTER_ALLOW_PRIVATE_FETCH = '1'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const serveDirectory = directory => ({
