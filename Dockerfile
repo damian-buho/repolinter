@@ -5,7 +5,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1: node-build — compile TypeScript, produce dist/ + production modules
 # ---------------------------------------------------------------------------
-FROM node:24-trixie-slim@sha256:05c08ce4291e9a58f59456a7985176defb12cdd42271f35ff81a3e167ea61d4c AS node-build
+FROM node:26-trixie-slim@sha256:1e738cb88890a15c71880323fbc35a739b7bbc703d72e8bfd1613128f8182f78 AS node-build
 
 WORKDIR /build
 
@@ -23,7 +23,7 @@ RUN ./docker/build-node.sh
 # ---------------------------------------------------------------------------
 # Stage 2: node-runtime — final image
 # ---------------------------------------------------------------------------
-FROM node:24-trixie-slim@sha256:05c08ce4291e9a58f59456a7985176defb12cdd42271f35ff81a3e167ea61d4c
+FROM node:26-trixie-slim@sha256:1e738cb88890a15c71880323fbc35a739b7bbc703d72e8bfd1613128f8182f78
 
 # -- Node app from node-build --
 WORKDIR /app
