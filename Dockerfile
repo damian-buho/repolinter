@@ -9,13 +9,13 @@ FROM node:24-trixie-slim@sha256:05c08ce4291e9a58f59456a7985176defb12cdd42271f35f
 
 WORKDIR /build
 
-COPY --parents  docker/build-node.sh                  \
-                fixes/                                \
-                package*.json                         \
-                rules/                                \
-                rulesets/                             \
-                src/                                  \
-                tsconfig.json                         \
+COPY --parents  docker/build-node.sh      \
+                fixes/                    \
+                package*.json             \
+                rules/                    \
+                rulesets/                 \
+                src/                      \
+                tsconfig.json             \
                 /build/
 
 RUN ./docker/build-node.sh

@@ -10,8 +10,8 @@ echo "=== repolinter runtime setup ==="
 
 echo "[runtime] Installing runtime dependencies..."
 apt-get update
-apt-get install -y --no-install-recommends \
-    ca-certificates \
+apt-get install -y --no-install-recommends      \
+    ca-certificates                             \
     git
 rm -rf /var/lib/apt/lists/*
 
