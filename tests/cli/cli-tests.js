@@ -23,13 +23,13 @@ process.env.REPOLINTER_ALLOW_PRIVATE_FETCH = '1'
 
 async function execAsync(command, options = {}) {
   return new Promise((resolve, reject) => {
-    cpExec(command, options, (error, outstd, errstd) =>
+    cpExec(command, { timeout: 10_000, ...options }, (error, outstd, errstd) =>
       error !== null && error.code === undefined
         ? reject(error)
         : resolve({
             out: stripAnsi(outstd),
             err: stripAnsi(errstd),
-            code: error === null ? 0 : error.code
+            code: error === null ? 0 : (error.code ?? 1)
           })
     )
   })

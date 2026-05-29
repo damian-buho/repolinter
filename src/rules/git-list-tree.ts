@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import GitHelper from '../lib/git-helper.js'
+import GitHelper, { GIT_TIMEOUT_MS } from '../lib/git-helper.js'
 
 interface GitListTreeOptions {
   denylist?: string[]
@@ -28,7 +28,9 @@ function gitFilesAtCommit(targetDirectory: string, commit: string): string[] {
     '--name-only',
     commit
   ]
-  return spawnSync('git', arguments_).stdout.toString().split('\n')
+  return spawnSync('git', arguments_, { timeout: GIT_TIMEOUT_MS })
+    .stdout.toString()
+    .split('\n')
 }
 
 function listFiles(

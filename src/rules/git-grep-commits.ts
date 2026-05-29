@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-import GitHelper from '../lib/git-helper.js'
+import GitHelper, { GIT_TIMEOUT_MS } from '../lib/git-helper.js'
 
 interface GitGrepCommitsOptions {
   denylist?: string[]
@@ -67,7 +67,7 @@ function gitGrep(
     pattern,
     commit
   ]
-  return spawnSync('git', arguments_)
+  return spawnSync('git', arguments_, { timeout: GIT_TIMEOUT_MS })
     .stdout.toString()
     .split('\n')
     .filter(x => !!x)

@@ -26,6 +26,10 @@ interface FileNoBrokenLinksOptions {
   'pass-external-relative-links'?: boolean
 }
 
+// What: per-link network timeout; overridable so mutation testing (or slow CI) can shrink
+// it without weakening the production default.
+const LINK_TIMEOUT_MS = Number(process.env.REPOLINTER_LINK_TIMEOUT_MS) || 10_000
+
 const MD_LINK_RE = /\[[^\]]*\]\(([^)]+)\)/g
 const MARKDOWN_EXTS = new Set(['.md', '.markdown', '.mdown', '.mkd', '.mkdn'])
 const ASCIIDOC_EXTS = new Set(['.adoc', '.asciidoc'])
@@ -87,7 +91,7 @@ async function checkMarkdownFile(
     serverRoot: fileSystem.targetDirectory,
     markdown: true,
     recurse: false,
-    timeout: 10_000
+    timeout: LINK_TIMEOUT_MS
   })
 
   return processResults(result.links, file, fileSystem, options)
@@ -111,7 +115,7 @@ async function checkRenderedHtml(
       path: temporaryFile,
       serverRoot: temporaryDirectory,
       recurse: false,
-      timeout: 10_000
+      timeout: LINK_TIMEOUT_MS
     })
 
     return processResults(result.links, file, fileSystem, options)
