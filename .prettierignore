@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+.stryker-tmp
 dist
 node_modules
 vendor

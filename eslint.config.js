@@ -15,7 +15,7 @@ import tseslint from 'typescript-eslint'
 export default tseslint.config(
   {
     ignores: [
-      '.nyc_output/',
+      '.stryker-tmp/',
       'coverage/',
       'node_modules/',
       'tmp/',

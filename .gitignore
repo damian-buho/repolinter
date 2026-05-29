@@ -9,3 +9,7 @@ dist/
 docs/generated/
 node_modules/
 tmp/
+
+# stryker temp files and reports
+.stryker-tmp
+reports/
