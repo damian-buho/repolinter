@@ -6,6 +6,7 @@
 import { spawnSync } from 'node:child_process'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
+import { GIT_TIMEOUT_MS } from '../lib/git-helper.js'
 
 interface GitGrepLogOptions {
   denylist?: string[]
@@ -35,7 +36,9 @@ function grepLog(
   if (options.ignoreCase) {
     arguments_.push('-i')
   }
-  const log = spawnSync('git', arguments_).stdout.toString()
+  const log = spawnSync('git', arguments_, {
+    timeout: GIT_TIMEOUT_MS
+  }).stdout.toString()
   return parseLog(log)
 }
 

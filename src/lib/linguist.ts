@@ -4,7 +4,7 @@
 
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import { existsSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 
 const require = createRequire(import.meta.url)
@@ -20,7 +20,7 @@ class Linguist {
       'binary-extensions.json'
     )
 
-    if (existsSync(fixturePath)) {
+    if (existsSync(fixturePath) && statSync(fixturePath).size > 0) {
       return
     }
 

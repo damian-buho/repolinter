@@ -6,6 +6,7 @@
 import { spawnSync } from 'node:child_process'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
+import { GIT_TIMEOUT_MS } from '../lib/git-helper.js'
 
 interface GitWorkingTreeOptions {
   allowSubDir?: boolean
@@ -16,7 +17,7 @@ function gitWorkingTree(
   options: GitWorkingTreeOptions
 ): Result {
   const arguments_ = ['-C', fs.targetDirectory, 'rev-parse', '--show-prefix']
-  const gitResult = spawnSync('git', arguments_)
+  const gitResult = spawnSync('git', arguments_, { timeout: GIT_TIMEOUT_MS })
   const result = new Result('', [], true)
   if (gitResult.status === 0) {
     const prefix = gitResult.stdout.toString().trim()

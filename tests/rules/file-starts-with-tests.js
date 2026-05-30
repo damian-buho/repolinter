@@ -5,7 +5,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { describe, it } from 'node:test'
+import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file-system.js'
 import fileStartsWith from '../../dist/rules/file-starts-with.js'
@@ -146,22 +146,27 @@ describe('rule', () => {
       assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
     })
 
-    it('should handle broken symlinks', async () => {
+    describe('broken symlink handling', () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      const stat = fs.lstatSync(brokenSymlink)
-      assert.strictEqual(stat.isSymbolicLink(), true)
-      const fsInstance = new FileSystem(path.resolve('.'))
+      before(() => fs.symlinkSync('nonexistantfile', brokenSymlink))
+      after(() => fs.unlinkSync(brokenSymlink))
 
-      const ruleopts = {
-        globsAll: [brokenSymlink],
-        lineCount: 1,
-        patterns: ['something']
-      }
+      it('should handle broken symlinks', async () => {
+        const stat = fs.lstatSync(brokenSymlink)
+        assert.strictEqual(stat.isSymbolicLink(), true)
+        const fsInstance = new FileSystem(path.resolve('.'))
 
-      const actual = await fileStartsWith(fsInstance, ruleopts)
-      assert.strictEqual(actual.passed, false)
-      assert.strictEqual(actual.targets.length, 1)
-      assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
+        const ruleopts = {
+          globsAll: [brokenSymlink],
+          lineCount: 1,
+          patterns: ['something']
+        }
+
+        const actual = await fileStartsWith(fsInstance, ruleopts)
+        assert.strictEqual(actual.passed, false)
+        assert.strictEqual(actual.targets.length, 1)
+        assert.strictEqual(actual.targets[0].pattern, ruleopts.globsAll[0])
+      })
     })
   })
 })

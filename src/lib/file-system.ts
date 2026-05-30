@@ -100,7 +100,19 @@ class FileSystem {
       typeof globs === 'string'
         ? this.normalizePath(globs)
         : globs.map(g => this.normalizePath(g))
-    const globbed = await glob(fixedGlobs, options)
+    // Always exclude node_modules and .git to avoid scanning dependency trees
+    // during rule evaluation. Callers may extend this list via options.ignore.
+    const defaultIgnore = ['node_modules/**', '.git/**']
+    const userIgnore = options.ignore
+      ? Array.isArray(options.ignore)
+        ? options.ignore
+        : [options.ignore]
+      : []
+    const mergedOptions = {
+      ...options,
+      ignore: [...defaultIgnore, ...userIgnore]
+    }
+    const globbed = await glob(fixedGlobs, mergedOptions)
     return globbed
       .map(p => this.normalizePath(p))
       .filter(p => this.shouldInclude(p))

@@ -99,13 +99,21 @@ describe(
       })
 
       describe('findAllFiles', () => {
-        it('should ignore symlinks for ** globs', async () => {
+        describe('symlink handling', () => {
           const symlink = './tests/lib/symlink_for_test'
-          const stats = realFs.lstatSync(symlink)
-          assert.strictEqual(stats.isSymbolicLink(), true)
-          const fs = new FileSystem(path.resolve('./tests'))
-          const files = await fs.findAllFiles('**/lib/symlink_for_test', false)
-          assert.strictEqual(files.length, 0)
+          before(() => realFs.symlinkSync('file-system-tests.js', symlink))
+          after(() => realFs.unlinkSync(symlink))
+
+          it('should ignore symlinks for ** globs', async () => {
+            const stats = realFs.lstatSync(symlink)
+            assert.strictEqual(stats.isSymbolicLink(), true)
+            const fs = new FileSystem(path.resolve('./tests'))
+            const files = await fs.findAllFiles(
+              '**/lib/symlink_for_test',
+              false
+            )
+            assert.strictEqual(files.length, 0)
+          })
         })
       })
 

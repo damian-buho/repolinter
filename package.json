@@ -1,6 +1,6 @@
 {
   "name": "@damian-buho/repolinter",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Linter for open source repositories (fork of todogroup/repolinter)",
   "type": "module",
   "main": "dist/index.js",
@@ -92,12 +92,15 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/tap-runner": "9.6.1",
+    "@stryker-mutator/typescript-checker": "9.6.1",
     "@types/eslint": "9.6.1",
     "@types/nock": "10.0.3",
     "@types/node": "25.9.1",
     "@types/yaml": "1.9.6",
     "@types/yargs": "17.0.35",
-    "eslint": "10.4.0",
+    "eslint": "10.4.1",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.16.2",
     "eslint-plugin-n": "18.0.1",
@@ -113,6 +116,9 @@
     "typedoc": "0.28.19",
     "typedoc-rhineai-theme": "1.2.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "^8.59.4"
+    "typescript-eslint": "8.59.4"
+  },
+  "overrides": {
+    "qs": "6.15.2"
   }
 }

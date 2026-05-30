@@ -5,7 +5,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { describe, it } from 'node:test'
+import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file-system.js'
 import fileContents from '../../dist/rules/file-contents.js'
@@ -199,19 +199,24 @@ describe('rule', () => {
       assert.strictEqual(actual.passed, false)
     })
 
-    it('should handle broken symlinks', async () => {
+    describe('broken symlink handling', () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      const stat = fs.lstatSync(brokenSymlink)
-      assert.strictEqual(stat.isSymbolicLink(), true)
-      const fsInstance = new FileSystem(path.resolve('.'))
+      before(() => fs.symlinkSync('nonexistantfile', brokenSymlink))
+      after(() => fs.unlinkSync(brokenSymlink))
 
-      const rule = {
-        globsAll: [brokenSymlink],
-        lineCount: 1,
-        patterns: ['something']
-      }
-      const actual = await fileContents(fsInstance, rule)
-      assert.strictEqual(actual.passed, true)
+      it('should handle broken symlinks', async () => {
+        const stat = fs.lstatSync(brokenSymlink)
+        assert.strictEqual(stat.isSymbolicLink(), true)
+        const fsInstance = new FileSystem(path.resolve('.'))
+
+        const rule = {
+          globsAll: [brokenSymlink],
+          lineCount: 1,
+          patterns: ['something']
+        }
+        const actual = await fileContents(fsInstance, rule)
+        assert.strictEqual(actual.passed, true)
+      })
     })
   })
 })
