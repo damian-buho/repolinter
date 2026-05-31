@@ -19,10 +19,11 @@ Lints open source repositories for common issues.
 ![NPM License](https://img.shields.io/npm/l/%40damian-buho%2Frepolinter?style=flat-square)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+[![Documentation](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml)
 [![Pipeline](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml)
 [![CodeQL](https://github.com/damian-buho/repolinter/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/github-code-scanning/codeql)
-[![Documentation](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml)
 [![Known Vulnerabilities](https://snyk.io/test/npm/%40damian-buho%2Frepolinter/badge.svg)](https://snyk.io/test/npm/%40damian-buho%2Frepolinter)
+[![REUSE status](https://api.reuse.software/badge/github.com/damian-buho/repolinter)](https://api.reuse.software/info/github.com/damian-buho/repolinter)
 
 
 ## Try with docker
