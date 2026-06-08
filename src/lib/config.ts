@@ -176,13 +176,13 @@ async function validateConfig(
   const ajvProperties = new Ajv({ strict: false })
   const loadSchemasFrom = (
     registry: Record<string, unknown>,
-    subDirectory: string
+    subdirectory: string
   ): Promise<JsonObject[]> =>
     Promise.all(
       Object.keys(registry).map(name =>
         fs.promises
           .readFile(
-            path.resolve(__dirname, '..', subDirectory, `${name}-config.json`),
+            path.resolve(__dirname, '..', subdirectory, `${name}-config.json`),
             'utf8'
           )
           .then(data => JSON.parse(data) as JsonObject)
