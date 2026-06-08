@@ -53,7 +53,7 @@ function extractInfo(commit: string): CommitInfo {
   const hash = lines[0]
   const message = lines.slice(3).join('\n')
   return {
-    hash: (hash ?? '').split(' ')[1],
+    hash: (hash ?? '').split(' ', 2)[1],
     message
   }
 }
