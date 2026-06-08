@@ -33,6 +33,7 @@ describe(
     describe('config', () => {
       describe('isAbsoluteURL', () => {
         it('should identify absolute URLs', async () => {
+          // eslint-disable-next-line unicorn/prefer-https
           assert.strictEqual(Config.isAbsoluteURL('http://example.com/'), true)
           assert.strictEqual(Config.isAbsoluteURL('https://example.com/'), true)
           assert.strictEqual(Config.isAbsoluteURL('ftp://example.com/'), true)

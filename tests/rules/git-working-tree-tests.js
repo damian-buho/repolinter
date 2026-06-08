@@ -22,16 +22,16 @@ describe(
     describe('git_working_tree', () => {
       // Fixtures:
       //   repoDirectory  — a fresh git repo (root of a working tree)
-      //   subDirectory   — a subdirectory inside that repo
+      //   subdirectory   — a subdirectory inside that repo
       //   plainDirectory — a temp dir that is NOT a git repo
-      let repoDirectory, subDirectory, plainDirectory
+      let repoDirectory, subdirectory, plainDirectory
 
       before(() => {
         repoDirectory = mktempRepo()
         // Seed at least one commit so the working tree is in a normal state.
         commitFile(repoDirectory, 'README.md', '# fixture\n', 'init')
-        subDirectory = path.join(repoDirectory, 'nested')
-        fs.mkdirSync(subDirectory)
+        subdirectory = path.join(repoDirectory, 'nested')
+        fs.mkdirSync(subdirectory)
         plainDirectory = mktempPlainDirectory()
       })
 
@@ -49,7 +49,7 @@ describe(
       })
 
       it('passes if the specified sub-directory is managed in Git and sub-directories are allowed', () => {
-        const result = gitWorkingTree(new FileSystem(subDirectory), {
+        const result = gitWorkingTree(new FileSystem(subdirectory), {
           allowSubDir: true
         })
 
@@ -57,7 +57,7 @@ describe(
       })
 
       it('fails if the specified sub-directory is managed in Git but sub-directories are not allowed', () => {
-        const result = gitWorkingTree(new FileSystem(subDirectory), {
+        const result = gitWorkingTree(new FileSystem(subdirectory), {
           allowSubDir: false
         })
 
