@@ -57,7 +57,8 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm rebuild
 
       - name: Generate typedoc
         run:  pnpm generate-docs

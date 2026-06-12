@@ -39,7 +39,8 @@ jobs:
           node-version: '24'
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm rebuild
 
       - name: Lint
         run: pnpm lint
@@ -69,7 +70,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm rebuild
 
       - run: pnpm build
 

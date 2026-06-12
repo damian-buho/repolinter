@@ -10,7 +10,6 @@ FROM node:26-trixie-slim@sha256:1e738cb88890a15c71880323fbc35a739b7bbc703d72e8bf
 WORKDIR /build
 
 COPY --parents  docker/build-node.sh      \
-                .npmrc                   \
                 fixes/                    \
                 package.json              \
                 pnpm-lock.yaml            \

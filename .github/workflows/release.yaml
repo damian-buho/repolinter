@@ -107,7 +107,8 @@ jobs:
           # No cache: pnpm — avoids writing packages from this checkout into the
           # shared GHA cache where other workflows could restore them.
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm rebuild
 
       # prepublishOnly runs the build before publish; no explicit build step needed.
       - name: Publish to npm
