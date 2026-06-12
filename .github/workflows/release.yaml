@@ -96,18 +96,22 @@ jobs:
           ref:         ${{ needs.gate.outputs.tag }}
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: https://registry.npmjs.org
-          # No cache: npm — avoids writing packages from this checkout into the
+          # No cache: pnpm — avoids writing packages from this checkout into the
           # shared GHA cache where other workflows could restore them.
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       # prepublishOnly runs the build before publish; no explicit build step needed.
       - name: Publish to npm
-        run:  npm publish --provenance
+        run:  pnpm publish --provenance --no-git-checks
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0

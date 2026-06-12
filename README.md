@@ -35,10 +35,10 @@ docker run --rm -it -v ${PWD}:/app/ws -w /app/ws ghcr.io/damian-buho/repolinter:
 ## Installation
 
 Repolinter requires [Node.JS](https://nodejs.org/en/) >= v22 to function properly.
-Once Node.js is installed, you can install Repolinter using `npm`:
+Once Node.js is installed, you can install Repolinter using [pnpm](https://pnpm.io/):
 
 ```shell
-npm install -g repolinter
+pnpm install -g repolinter
 ```
 
 ## Linting a Local Repository

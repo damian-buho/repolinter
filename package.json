@@ -17,6 +17,7 @@
   "files": [
     "dist/"
   ],
+  "packageManager": "pnpm@11.6.0",
   "engines": {
     "node": ">=22.13.0"
   },
@@ -26,8 +27,8 @@
   "scripts": {
     "build": "tsc && chmod +x dist/cli.js && cp rules/*-config.json dist/rules/ && cp fixes/*-config.json dist/fixes/ && cp -r rulesets/ dist/rulesets/",
     "prebuild": "rm -rf dist",
-    "prepublishOnly": "npm run build",
-    "pretest": "npm run lint",
+    "prepublishOnly": "pnpm build",
+    "pretest": "pnpm lint",
     "test": "node --test 'tests/**/*.js'",
     "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
     "lint": "eslint ./",

@@ -13,3 +13,6 @@ tmp/
 # stryker temp files and reports
 .stryker-tmp
 reports/
+
+# pnpm auto-generated
+pnpm-workspace.yaml
