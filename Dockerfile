@@ -11,7 +11,8 @@ WORKDIR /build
 
 COPY --parents  docker/build-node.sh      \
                 fixes/                    \
-                package*.json             \
+                package.json              \
+                pnpm-lock.yaml            \
                 rules/                    \
                 rulesets/                 \
                 src/                      \

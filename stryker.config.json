@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
-  "packageManager": "npm",
+  "packageManager": "pnpm",
   "reporters": [
     "html",
     "json",
@@ -13,7 +13,7 @@
   "coverageAnalysis": "perTest",
   "timeoutMS": 6000,
   "timeoutFactor": 1.5,
-  "buildCommand": "npm run build",
+  "buildCommand": "pnpm build",
   "ignorePatterns": [
     "tests/lib/symlink_for_test",
     "tests/rules/broken_symlink_for_test"

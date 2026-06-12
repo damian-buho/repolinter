@@ -8,13 +8,17 @@ set -euo pipefail
 
 echo "=== repolinter node-build ==="
 
-echo "[node] Installing npm dependencies..."
-npm ci
+echo "[node] Installing pnpm..."
+npm install -g pnpm@11.6.0
+
+echo "[node] Installing pnpm dependencies..."
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm rebuild unrs-resolver
 
 echo "[node] Building TypeScript..."
-npm run build
+pnpm build
 
 echo "[node] Pruning dev dependencies..."
-npm prune --omit=dev
+pnpm prune --prod
 
 echo "[node] Build complete."

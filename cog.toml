@@ -15,7 +15,7 @@ skip_ci = "[skip ci]"
 skip_untracked = false
 pre_bump_hooks = [
   "yq -i -o=json '.version = \"{{version}}\"' package.json",
-  "npm install --package-lock-only",
+  "pnpm install --lockfile-only",
   "yq -i -o=yaml '.version = \"{{version}}\"' CITATION.cff",
 ]
 post_bump_hooks = [

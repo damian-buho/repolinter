@@ -9,7 +9,7 @@ default:
     @just --choose || just --list
 
 build:
-    npm run build
+    pnpm build
 
 build-docker:
     docker buildx build -t repolinter:dev --load .
@@ -24,23 +24,23 @@ coverage:
     node --test --experimental-test-coverage 'tests/**/*.js'
 
 lint:
-    npm run lint
+    pnpm lint
     reuse lint --lines
 
 fix:
-    npm run fix
+    pnpm fix
 
 format:
-    npm run format
+    pnpm format
 
 format-check:
-    npm run format:check
+    pnpm format:check
 
 stryker:
     mkdir --parents reports
-    REPOLINTER_LINK_TIMEOUT_MS=2000 REPOLINTER_GIT_TIMEOUT_MS=5000 npx stryker run --concurrency $(( ${NUMPROCS:-$(nproc)} / 8 )) 2>&1 | tee reports/stryker.log
+    REPOLINTER_LINK_TIMEOUT_MS=2000 REPOLINTER_GIT_TIMEOUT_MS=5000 pnpm dlx stryker run --concurrency $(( ${NUMPROCS:-$(nproc)} / 8 )) 2>&1 | tee reports/stryker.log
 
 pipeline: format lint test build build-docker
 
 publish:
-    npm publish
+    pnpm publish
