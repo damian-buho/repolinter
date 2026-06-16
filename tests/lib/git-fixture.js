@@ -23,15 +23,28 @@ const HERMETIC_ENV = {
   GIT_COMMITTER_EMAIL: 'test@example.com'
 }
 
+// Keys that leak the host repo's state into fixture repos when tests run
+// inside a pre-commit hook (lefthook / git hooks set GIT_DIR etc.).
+const LEAKED_GIT_KEYS = [
+  'GIT_DIR',
+  'GIT_INDEX_FILE',
+  'GIT_WORK_TREE',
+  'GIT_OBJECT_DIRECTORY',
+  'GIT_ALTERNATE_OBJECT_DIRECTORIES',
+  'GIT_COMMON_DIR'
+]
+
 export function git(cwd, ...arguments_) {
   return gitWithEnvironment(cwd, arguments_, {})
 }
 
 // Internal — allows per-call env overrides (used to vary commit author).
 function gitWithEnvironment(cwd, arguments_, extraEnvironment) {
+  const clean = { ...process.env }
+  for (const key of LEAKED_GIT_KEYS) delete clean[key]
   const result = spawnSync('git', ['-C', cwd, ...arguments_], {
     encoding: 'utf8',
-    env: { ...process.env, ...HERMETIC_ENV, ...extraEnvironment }
+    env: { ...clean, ...HERMETIC_ENV, ...extraEnvironment }
   })
   if (result.status !== 0) {
     throw new Error(
