@@ -25,9 +25,9 @@ async function fileExistence(
     ? await fs.findFirst(fileList, options.nocase)
     : await fs.findFirstFile(fileList, options.nocase)
 
-  const passed = !!file
+  const isPassed = !!file
 
-  return passed
+  return isPassed
     ? new Result(
         '',
         [{ passed: true, path: file, message: 'Found file' }],

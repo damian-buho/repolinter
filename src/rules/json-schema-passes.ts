@@ -66,14 +66,14 @@ async function jsonSchemaPasses(
         .join(', ')}`
     )
   }
-  const result = !!validator(parsed)
+  const isResult = !!validator(parsed)
   let message: string
   if (options['human-readable-message']) {
-    message = result
+    message = isResult
       ? `${options['human-readable-message']} found in file`
       : `${options['human-readable-message']} not found in file`
   } else {
-    message = result
+    message = isResult
       ? 'JSON validation passed'
       : `JSON validation failed with errors: ${(validator.errors ?? [])
           .map(
@@ -84,8 +84,8 @@ async function jsonSchemaPasses(
   }
   return new Result(
     '',
-    [{ path: file, pattern: fileName, passed: result, message }],
-    result
+    [{ path: file, pattern: fileName, passed: isResult, message }],
+    isResult
   )
 }
 

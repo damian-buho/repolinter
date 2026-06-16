@@ -25,7 +25,7 @@ async function fileModify(
   fs: FileSystem,
   options: FileModifyOptions,
   targets: string[],
-  dryRun: boolean = false
+  isDryRun: boolean = false
 ): Promise<Result> {
   const realTargets: string[] = options.files || targets
   if (realTargets.length === 0) {
@@ -53,7 +53,7 @@ async function fileModify(
         .map(p => new RegExp(p, options['skip-paths-matching']!.flags))
       regexes = [...regexes, ...filteredPatterns]
     }
-    files = files.filter(file => !regexes.some(regex => file.match(regex)))
+    files = files.filter(file => regexes.every(regex => !regex.test(file)))
   }
 
   let content: string | undefined
@@ -102,7 +102,7 @@ async function fileModify(
         passed: boolean
         path: string
       }> => {
-        if (!dryRun) {
+        if (!isDryRun) {
           const startNewlines =
             options.newlines && options.newlines.begin
               ? '\n'.repeat(options.newlines.begin)

@@ -19,6 +19,67 @@ export default class FormatResult {
   static readonly IGNORED: FormatResultStatus = 'IGNORED'
   static readonly ERROR: FormatResultStatus = 'ERROR'
 
+  static getStatus(ruleInfo: RuleInfo, lintResult: Result): FormatResultStatus {
+    if (lintResult.passed) {
+      return this.RULE_PASSED
+    }
+    if (ruleInfo.level === 'warning') {
+      return this.RULE_NOT_PASSED_WARN
+    }
+    if (ruleInfo.level === 'error') {
+      return this.RULE_NOT_PASSED_ERROR
+    }
+    return this.ERROR
+  }
+
+  static getAllStatus(): FormatResultStatus[] {
+    return [
+      this.RULE_PASSED,
+      this.RULE_NOT_PASSED_WARN,
+      this.RULE_NOT_PASSED_ERROR,
+      this.ERROR,
+      this.IGNORED
+    ]
+  }
+
+  static CreateIgnored(ruleInfo: RuleInfo, message: string): FormatResult {
+    return new FormatResult(
+      ruleInfo,
+      message,
+      this.IGNORED,
+      undefined,
+      undefined
+    )
+  }
+
+  static CreateError(ruleInfo: RuleInfo, message: string): FormatResult {
+    return new FormatResult(ruleInfo, message, this.ERROR, undefined, undefined)
+  }
+
+  static CreateLintOnly(ruleInfo: RuleInfo, lintResult: Result): FormatResult {
+    return new FormatResult(
+      ruleInfo,
+      undefined,
+      this.getStatus(ruleInfo, lintResult),
+      lintResult,
+      undefined
+    )
+  }
+
+  static CreateLintAndFix(
+    ruleInfo: RuleInfo,
+    lintResult: Result,
+    fixResult: Result
+  ): FormatResult {
+    return new FormatResult(
+      ruleInfo,
+      undefined,
+      this.getStatus(ruleInfo, lintResult),
+      lintResult,
+      fixResult
+    )
+  }
+
   status: FormatResultStatus
   declare runMessage?: string
   declare lintResult?: Result
@@ -37,72 +98,5 @@ export default class FormatResult {
     this.status = status
     if (lintResult) this.lintResult = lintResult
     if (fixResult) this.fixResult = fixResult
-  }
-
-  static getStatus(ruleInfo: RuleInfo, lintResult: Result): FormatResultStatus {
-    if (lintResult.passed) {
-      return FormatResult.RULE_PASSED
-    }
-    if (ruleInfo.level === 'warning') {
-      return FormatResult.RULE_NOT_PASSED_WARN
-    }
-    if (ruleInfo.level === 'error') {
-      return FormatResult.RULE_NOT_PASSED_ERROR
-    }
-    return FormatResult.ERROR
-  }
-
-  static getAllStatus(): FormatResultStatus[] {
-    return [
-      FormatResult.RULE_PASSED,
-      FormatResult.RULE_NOT_PASSED_WARN,
-      FormatResult.RULE_NOT_PASSED_ERROR,
-      FormatResult.ERROR,
-      FormatResult.IGNORED
-    ]
-  }
-
-  static CreateIgnored(ruleInfo: RuleInfo, message: string): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      message,
-      FormatResult.IGNORED,
-      undefined,
-      undefined
-    )
-  }
-
-  static CreateError(ruleInfo: RuleInfo, message: string): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      message,
-      FormatResult.ERROR,
-      undefined,
-      undefined
-    )
-  }
-
-  static CreateLintOnly(ruleInfo: RuleInfo, lintResult: Result): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      undefined,
-      FormatResult.getStatus(ruleInfo, lintResult),
-      lintResult,
-      undefined
-    )
-  }
-
-  static CreateLintAndFix(
-    ruleInfo: RuleInfo,
-    lintResult: Result,
-    fixResult: Result
-  ): FormatResult {
-    return new FormatResult(
-      ruleInfo,
-      undefined,
-      FormatResult.getStatus(ruleInfo, lintResult),
-      lintResult,
-      fixResult
-    )
   }
 }

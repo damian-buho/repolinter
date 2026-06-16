@@ -46,6 +46,7 @@ export default tseslint.config(
       }
     },
     rules: {
+      'no-empty': ['error', { allowEmptyCatch: true }],
       'tsdoc/syntax': 'warn',
       'n/no-unpublished-import': 'off',
       'n/no-unsupported-features/node-builtins': [
@@ -58,6 +59,12 @@ export default tseslint.config(
       'import-x/no-unresolved': 'off',
       'n/hashbang': 'off',
       'unicorn/throw-new-error': 'off',
+      'unicorn/consistent-boolean-name': [
+        'error',
+        {
+          checkProperties: false
+        }
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',

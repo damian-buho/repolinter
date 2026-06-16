@@ -4,7 +4,7 @@
 
 const whitespace = /\s/g
 const specials =
-  /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~']/g
+  /[\u{2000}-\u{206F}\u{2E00}-\u{2E7F}\\'!"#$%&()*+,./:;<=>?@[\]^`{|}~']/gu
 // Stryker disable next-line Regex : RGI_Emoji is a string property; \P{RGI_Emoji} is invalid per ECMAScript spec
 const emojiRegex = /\p{RGI_Emoji}/gv
 

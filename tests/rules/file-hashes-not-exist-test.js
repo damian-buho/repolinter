@@ -13,12 +13,8 @@ describe('rule', () => {
     it('returns pass if requested files not matches the hashes', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -34,12 +30,8 @@ describe('rule', () => {
     it('returns failure if requested files matches the hash', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -63,12 +55,8 @@ describe('rule', () => {
     it('returns failed if requested file contents exists different algorithm', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -93,9 +81,7 @@ describe('rule', () => {
     it('returns success if requested file does not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return []
-        },
+        findAllFiles: () => [],
         getFileContents() {},
         targetDir: '.'
       }

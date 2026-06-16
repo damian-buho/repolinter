@@ -34,6 +34,6 @@ describe('contributors axiom', () => {
     assert.strictEqual(result.targets.length, 1)
     assert.strictEqual(result.targets[0].passed, true)
     // Alice + Bob; the second Alice commit must not double-count.
-    assert.strictEqual(Number.parseInt(result.targets[0].path, 10), 2)
+    assert.strictEqual(Number(result.targets[0].path), 2)
   })
 })

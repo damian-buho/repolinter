@@ -40,7 +40,7 @@ export interface LintResult {
 }
 
 export interface Formatter {
-  formatOutput(output: LintResult, dryRun: boolean): string
+  formatOutput(output: LintResult, isDryRun: boolean): string
 }
 
 import defaultFormatter from './formatters/symbol-formatter.js'
@@ -51,7 +51,7 @@ export async function lint(
   targetDirectory: string,
   filterPaths: string[] = [],
   ruleset: unknown = undefined,
-  dryRun: boolean = false
+  isDryRun: boolean = false
 ): Promise<LintResult> {
   const fileSystem = new FileSystem()
   fileSystem.targetDirectory = targetDirectory
@@ -136,25 +136,26 @@ export async function lint(
   }
   const parsedRuleset = ruleset as Record<string, unknown>
   const configParsed = config.parseConfig(parsedRuleset)
-  let targetObject: Record<string, Result> = {}
-  if (parsedRuleset.axioms) {
-    targetObject = await determineTargets(
-      parsedRuleset.axioms as Record<string, string>,
-      fileSystem
-    )
-  }
+  const targetObject: Record<string, Result> = parsedRuleset.axioms
+    ? await determineTargets(
+        parsedRuleset.axioms as Record<string, string>,
+        fileSystem
+      )
+    : {}
   const result = await runRuleset(
     configParsed,
     targetObject,
     fileSystem,
-    dryRun
+    isDryRun
   )
-  const passed = !result.some(
+  const isPassed = result.every(
     r =>
-      r.status === FormatResult.ERROR ||
-      (r.status !== FormatResult.IGNORED &&
-        r.ruleInfo.level === 'error' &&
-        !r.lintResult!.passed)
+      !(
+        r.status === FormatResult.ERROR ||
+        (r.status !== FormatResult.IGNORED &&
+          r.ruleInfo.level === 'error' &&
+          !r.lintResult!.passed)
+      )
   )
 
   return {
@@ -164,7 +165,7 @@ export async function lint(
       rulesetPath,
       ruleset: parsedRuleset
     },
-    passed,
+    passed: isPassed,
     errored: false,
     results: result,
     targets: targetObject,
@@ -235,23 +236,23 @@ export async function runRuleset(
   ruleset: RuleInfo[],
   targets: boolean | Record<string, Result>,
   fileSystem: FileSystem,
-  dryRun: boolean
+  isDryRun: boolean
 ): Promise<InstanceType<typeof FormatResultBase>[]> {
-  let targetArray: string[] = []
-  if (typeof targets !== 'boolean') {
-    targetArray = Object.entries(targets)
-      .filter(([, result]) => result.passed)
-      .map(([axiomId, result]): [string, string[]] => [
-        axiomId,
-        result.targets
-          .map((t: ResultTarget) => t.path)
-          .filter((p): p is string => !!p)
-      ])
-      .flatMap(([axiomId, paths]: [string, string[]]) => [
-        `${axiomId}=*`,
-        ...paths.map(p => `${axiomId}=${p}`)
-      ])
-  }
+  const targetArray: string[] =
+    typeof targets === 'boolean'
+      ? []
+      : Object.entries(targets)
+          .filter(([, result]) => result.passed)
+          .map(([axiomId, result]): [string, string[]] => [
+            axiomId,
+            result.targets
+              .map((t: ResultTarget) => t.path)
+              .filter((p): p is string => !!p)
+          ])
+          .flatMap(([axiomId, paths]: [string, string[]]) => [
+            `${axiomId}=*`,
+            ...paths.map(p => `${axiomId}=${p}`)
+          ])
   const results = ruleset.map(async (r: RuleInfo) => {
     if (r.level === 'off') {
       return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
@@ -302,7 +303,7 @@ export async function runRuleset(
         fileSystem,
         r.fixConfig as Record<string, unknown>,
         fixTargets,
-        dryRun
+        isDryRun
       )
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)

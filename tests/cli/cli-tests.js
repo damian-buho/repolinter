@@ -12,7 +12,7 @@ import { exec as cpExec } from 'node:child_process'
 import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
 import { mktempRepo, commitFile, rmRepo } from '../lib/git-fixture.js'
-const ESC = '\u001B'
+const ESC = '\u{1B}'
 const ANSI_RE = new RegExp(`${ESC}${String.raw`\[[0-9;]*m`}`, 'g')
 const stripAnsi = s => s.replaceAll(ANSI_RE, '')
 import * as repolinter from '../../dist/index.js'
@@ -75,10 +75,13 @@ describe(
       )
 
       assert.notStrictEqual(actual.code, 0)
-      const fileExists = await realFs.promises
-        .access(path.resolve('tests/cli/fixed.txt'))
-        .then(() => true)
-        .catch(() => false)
+      let fileExists
+      try {
+        await realFs.promises.access(path.resolve('tests/cli/fixed.txt'))
+        fileExists = true
+      } catch {
+        fileExists = false
+      }
       assert.strictEqual(fileExists, true)
     })
 
@@ -94,10 +97,13 @@ describe(
 
       assert.notStrictEqual(actual.code, 0)
       assert.notStrictEqual(actual2.code, 0)
-      const fileExists = await realFs.promises
-        .access(path.resolve('tests/cli/fixed.txt'))
-        .then(() => true)
-        .catch(() => false)
+      let fileExists
+      try {
+        await realFs.promises.access(path.resolve('tests/cli/fixed.txt'))
+        fileExists = true
+      } catch {
+        fileExists = false
+      }
       assert.strictEqual(fileExists, false)
     })
 
@@ -112,7 +118,7 @@ describe(
       const expectedBinPath = stripAnsi(
         repolinter.defaultFormatter.formatOutput(
           await repolinter.lint(
-            `${selfBinPath}`,
+            selfBinPath,
             undefined,
             'tests/cli/repolinter-other.json'
           ),
@@ -371,9 +377,9 @@ describe(
     })
 
     afterEach(async () => {
-      return realFs.promises
-        .unlink(path.resolve('tests/cli/fixed.txt'))
-        .catch(() => {})
+      try {
+        await realFs.promises.unlink(path.resolve('tests/cli/fixed.txt'))
+      } catch {}
     })
   },
   { timeout: 30_000 }

@@ -12,9 +12,7 @@ describe('rule', () => {
     it('returns a passed result if requested file exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'LICENSE.md'
-        },
+        findFirstFile: () => 'LICENSE.md',
         targetDir: '.'
       }
 
@@ -36,9 +34,7 @@ describe('rule', () => {
     it('returns a passed result if requested file exists case-insensitivly', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'LICENSE.md'
-        },
+        findFirstFile: () => 'LICENSE.md',
         targetDir: '.'
       }
 

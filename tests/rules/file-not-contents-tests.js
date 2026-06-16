@@ -15,12 +15,8 @@ describe('rule', () => {
     it('returns passes if requested file content do not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -43,12 +39,8 @@ describe('rule', () => {
     it('returns fails if requested file content exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -71,9 +63,7 @@ describe('rule', () => {
     it('returns success if success flag enabled but file does not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return []
-        },
+        findAllFiles: () => [],
         getFileContents() {},
         targetDir: '.'
       }
@@ -94,9 +84,7 @@ describe('rule', () => {
     it('returns success if requested file does not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return []
-        },
+        findAllFiles: () => [],
         getFileContents() {},
         targetDir: '.'
       }
@@ -135,12 +123,8 @@ describe('rule', () => {
     it('returns passes if requested file contents do not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -162,12 +146,8 @@ describe('rule', () => {
     it('returns fails if requested file contents exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foobar'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foobar',
         targetDir: '.'
       }
 

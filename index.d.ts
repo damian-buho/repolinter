@@ -2,11 +2,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable unicorn/consistent-boolean-name */
+
 declare class FileSystem {
+  static fileExists (file: string): Promise<boolean>
+
   targetDir: string
   filterPaths: string[]
 
-  static fileExists (file: string): Promise<boolean>
   relativeFileExists (file: string): Promise<boolean>
   getFilterFiles (): string[]
   getFilterDirectories (): string[]

@@ -14,9 +14,8 @@ describe('api', () => {
         packagers: 'package'
       }
       const mockFs = {
-        findFirst(pattern) {
-          return pattern === 'package.json' ? 'package.json' : undefined
-        }
+        findFirst: pattern =>
+          pattern === 'package.json' ? 'package.json' : undefined
       }
       const actual = await repolinter.determineTargets(mockconfig, mockFs)
       assert.deepStrictEqual(structuredClone(actual), {

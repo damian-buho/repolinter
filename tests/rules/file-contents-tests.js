@@ -15,12 +15,8 @@ describe('rule', () => {
     it('returns passes if requested file contents exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -42,12 +38,8 @@ describe('rule', () => {
     it('returns passes and display context if requested file contents exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo get test'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo get test',
         targetDir: '.'
       }
 
@@ -72,12 +64,8 @@ describe('rule', () => {
     it('returns failure and display context if requested file contents exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo get test'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo get test',
         targetDir: '.'
       }
 
@@ -102,12 +90,8 @@ describe('rule', () => {
     it('returns passes if requested file contents exists with human-readable contents', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
       const ruleopts = {
@@ -132,12 +116,8 @@ describe('rule', () => {
     it('returns fails if requested file contents does not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return ['README.md']
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findAllFiles: () => ['README.md'],
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -161,9 +141,7 @@ describe('rule', () => {
     it('returns the pattern if requested file does not exist', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return []
-        },
+        findAllFiles: () => [],
         getFileContents() {},
         targetDir: '.'
       }
@@ -182,9 +160,7 @@ describe('rule', () => {
     it('returns failure if file does not exist with failure flag', async () => {
       /** @type {any} */
       const mockfs = {
-        findAllFiles() {
-          return []
-        },
+        findAllFiles: () => [],
         getFileContents() {},
         targetDir: '.'
       }

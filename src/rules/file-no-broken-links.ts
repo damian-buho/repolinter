@@ -74,6 +74,7 @@ async function renderAsciiDocument(
 ): Promise<string | undefined> {
   const content = await fileSystem.getFileContents(file)
   if (content === undefined) return undefined
+  // eslint-disable-next-line unicorn/no-top-level-assignment-in-function
   asciidoctorInstance ??= asciidoctor()
   return asciidoctorInstance.convert(content, {
     safe: 'safe',

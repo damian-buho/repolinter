@@ -40,10 +40,10 @@ async function fileHash(
   digester.update(contents)
   const hashResult = digester.digest('hex')
 
-  const passed = hashResult === options.hash
-  const message = passed ? 'Matches hash' : "Doesn't match hash"
+  const isPassed = hashResult === options.hash
+  const message = isPassed ? 'Matches hash' : "Doesn't match hash"
 
-  return new Result('', [{ path: file, passed, message }], passed)
+  return new Result('', [{ path: file, passed: isPassed, message }], isPassed)
 }
 
 export default fileHash

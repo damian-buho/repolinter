@@ -27,8 +27,8 @@ function frontSpace(string: string | undefined): string {
   return string ? ' ' + string : ''
 }
 
-function colorSymbol(symbol: string, passed: boolean): string {
-  return passed ? styleText('green', symbol) : styleText('red', symbol)
+function colorSymbol(symbol: string, isPassed: boolean): string {
+  return styleText(isPassed ? 'green' : 'red', symbol)
 }
 
 const SymbolFormatter = {
@@ -94,7 +94,7 @@ const SymbolFormatter = {
     }
   },
 
-  formatOutput(output: LintResult, dryRun: boolean): string {
+  formatOutput(output: LintResult, isDryRun: boolean): string {
     const returnValue = [`Target directory: ${output.params.targetDirectory}`]
     if (output.params.filterPaths.length > 0) {
       returnValue.push(
@@ -144,7 +144,7 @@ const SymbolFormatter = {
     const fixresults = output.results.filter(r => r.fixResult)
     if (fixresults.length > 0) {
       returnValue.push(
-        styleText('bold', `\nFix(es) ${dryRun ? 'suggested' : 'applied'}:`) +
+        styleText('bold', `\nFix(es) ${isDryRun ? 'suggested' : 'applied'}:`) +
           fixresults.map(result =>
             SymbolFormatter.formatResult(
               result.fixResult!,
@@ -152,7 +152,7 @@ const SymbolFormatter = {
               result.ruleInfo.policyUrl,
               result.ruleInfo.policyInfo,
               SymbolFormatter.getSymbol(result.ruleInfo.level),
-              dryRun ? logSymbols.info : logSymbols.success
+              isDryRun ? logSymbols.info : logSymbols.success
             )
           )
       )

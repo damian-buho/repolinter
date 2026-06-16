@@ -5,9 +5,8 @@
 import type { LintResult } from '../index.js'
 
 const JsonFormatter = {
-  formatOutput(output: LintResult, _dryRun: boolean): string {
-    return JSON.stringify(output)
-  }
+  formatOutput: (output: LintResult, _isDryRun: boolean): string =>
+    JSON.stringify(output)
 }
 
 export default JsonFormatter
