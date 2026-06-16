@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+minimumReleaseAgeExclude:
+  - eslint-plugin-unicorn@67.0.0
+
+overrides:
+  qs: 6.15.2
+  js-yaml: 4.2.0
