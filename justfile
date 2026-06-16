@@ -33,6 +33,9 @@ fix:
 format:
     pnpm format
 
+audit:
+    pnpm audit
+
 format-check:
     pnpm format:check
 
