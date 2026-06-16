@@ -42,9 +42,9 @@ export default async function bestPracticesBadgePresent(
   const bestPracticesData = (await bestPracticesResponse.json()) as {
     tiered_percentage: number
   }
-  const passed = bestPracticesData.tiered_percentage >= options.minPercentage
+  const isPassed = bestPracticesData.tiered_percentage >= options.minPercentage
   const message = `Best Practices Badge ${
-    passed ? 'reached' : 'did not reach'
+    isPassed ? 'reached' : 'did not reach'
   } minimum level`
-  return new Result(message, targets, passed)
+  return new Result(message, targets, isPassed)
 }

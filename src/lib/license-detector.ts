@@ -52,12 +52,12 @@ function diceCoefficient(
   candidate: Map<string, number>,
   template: Map<string, number>
 ): number {
-  let intersection = 0
   let candidateSize = 0
   let templateSize = 0
   for (const count of candidate.values()) candidateSize += count
   for (const count of template.values()) templateSize += count
   if (candidateSize === 0 || templateSize === 0) return 0
+  let intersection = 0
   for (const [gram, candidateCount] of candidate) {
     const templateCount = template.get(gram)
     if (templateCount !== undefined) {
@@ -114,7 +114,7 @@ async function findLicenseFile(
 function thresholdFromEnvironment(): number {
   const raw = process.env.REPOLINTER_LICENSE_THRESHOLD
   if (!raw) return DEFAULT_THRESHOLD
-  const parsed = Number.parseFloat(raw)
+  const parsed = Number(raw)
   if (Number.isNaN(parsed) || parsed <= 0 || parsed > 1) {
     return DEFAULT_THRESHOLD
   }

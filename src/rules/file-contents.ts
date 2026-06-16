@@ -50,14 +50,39 @@ function getContext(
   return matchedLine.slice(contextStart, contextEnd)
 }
 
+function addMultilineContext(
+  regex: RegExp,
+  matchedLine: string,
+  line: number,
+  contextLength: number,
+  contextLines: ContextLine[]
+): void {
+  let currentMatch = regex.exec(matchedLine)
+  if (currentMatch === null) {
+    contextLines.push({
+      line,
+      context:
+        '-- This is a multi-line regex match so we only displaying line number --'
+    })
+    return
+  }
+  regex.lastIndex = 0
+  while ((currentMatch = regex.exec(matchedLine)) !== null) {
+    contextLines.push({
+      line,
+      context: getContext(matchedLine, currentMatch, contextLength)
+    })
+    if (regex.lastIndex === 0) break
+  }
+}
+
 async function fileContents(
   fs: FileSystem,
   options: FileContentsOptions,
-  not = false
+  isNot = false
 ): Promise<Result> {
   const fileList = options.globsAll ?? options.files ?? []
   const files = await fs.findAllFiles(fileList, !!options.nocase)
-  const regexFlags = options.flags || ''
 
   if (files.length === 0) {
     return new Result(
@@ -69,6 +94,7 @@ async function fileContents(
     )
   }
 
+  const regexFlags = options.flags || ''
   const regex = new RegExp(options.content, regexFlags)
   let results: Array<
     { passed: boolean; path: string; message: string } | undefined
@@ -82,10 +108,10 @@ async function fileContents(
 
         const optionContextCharLength = options['context-char-length'] || 50
         const split = contents.split(regex)
-        const regexHasMatch = split.length > 1
-        if (!regexHasMatch) {
+        const isRegexHasMatch = split.length > 1
+        if (!isRegexHasMatch) {
           return {
-            passed: not ? !regexHasMatch : regexHasMatch,
+            passed: isNot ? !isRegexHasMatch : isRegexHasMatch,
             path: file,
             contextLines: [],
             message: `Doesn't contain '${getContent(options)}'`
@@ -111,28 +137,13 @@ async function fileContents(
         for (const current of lineNumbers) {
           const matchedLine = fileLines[current - 1]!
           if (regexFlags.includes('m')) {
-            let currentMatch = regex.exec(matchedLine)
-
-            if (currentMatch === null) {
-              contextLines.push({
-                line: current,
-                context:
-                  '-- This is a multi-line regex match so we only displaying line number --'
-              })
-              continue
-            }
-            regex.lastIndex = 0
-            while ((currentMatch = regex.exec(matchedLine)) !== null) {
-              contextLines.push({
-                line: current,
-                context: getContext(
-                  matchedLine,
-                  currentMatch,
-                  optionContextCharLength
-                )
-              })
-              if (regex.lastIndex === 0) break
-            }
+            addMultilineContext(
+              regex,
+              matchedLine,
+              current,
+              optionContextCharLength,
+              contextLines
+            )
             continue
           }
 
@@ -169,7 +180,7 @@ async function fileContents(
         }
 
         return {
-          passed: not ? !regexHasMatch : regexHasMatch,
+          passed: isNot ? !isRegexHasMatch : isRegexHasMatch,
           path: file,
           contextLines,
           message: `Contains '${getContent(options)}'`
@@ -178,7 +189,7 @@ async function fileContents(
     )
     const contextFilterResults = contextPromises.filter(
       (result): result is ContextResult & { passed: boolean } =>
-        result !== undefined && (not ? !result.passed : result.passed)
+        result !== undefined && (isNot ? !result.passed : result.passed)
     )
     const contextResults: Array<{
       passed: boolean
@@ -201,13 +212,13 @@ async function fileContents(
         const contents = await fs.getFileContents(file)
         if (!contents) return
 
-        const passed = contents.search(regex) >= 0
+        const isPassed = regex.test(contents)
         const message = `${
-          passed ? 'Contains' : "Doesn't contain"
+          isPassed ? 'Contains' : "Doesn't contain"
         } ${getContent(options)}`
 
         return {
-          passed: not ? !passed : passed,
+          passed: isNot ? !isPassed : isPassed,
           path: file,
           message
         }
@@ -219,8 +230,8 @@ async function fileContents(
     (r): r is { passed: boolean; path: string; message: string } =>
       r !== undefined
   )
-  const passed = !filteredResults.some(r => !r.passed)
-  return new Result('', filteredResults, passed)
+  const isPassed = filteredResults.every(r => r.passed)
+  return new Result('', filteredResults, isPassed)
 }
 
 export default fileContents

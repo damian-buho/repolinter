@@ -13,6 +13,8 @@ pre-commit:
       stage_fixed: true
     lint:
       run: just lint
+    audit:
+      run: just audit
     test:
       run: just test
 

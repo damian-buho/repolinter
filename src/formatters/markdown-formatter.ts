@@ -16,11 +16,11 @@ const FormatResult = FormatResultBase as typeof FormatResultBase & {
   ERROR: string
 }
 
-const ERROR_SYMBOL = '\u2757'
-const FAIL_SYMBOL = '\u274C'
-const WARN_SYMBOL = '\u26A0\uFE0F'
-const PASS_SYMBOL = '\u2705'
-const FIX_SYMBOL = '\uD83D\uDD28'
+const ERROR_SYMBOL = '\u{2757}'
+const FAIL_SYMBOL = '\u{274C}'
+const WARN_SYMBOL = '\u{26A0}\u{FE0F}'
+const PASS_SYMBOL = '\u{2705}'
+const FIX_SYMBOL = '\u{1F528}'
 
 const SUGGESTED_FIX = `${FIX_SYMBOL} **Suggested Fix**:`
 const APPLIED_FIX = `${PASS_SYMBOL} **Applied Fix**:`
@@ -42,9 +42,8 @@ function opWrap(
 }
 
 const MarkdownFormatter = {
-  formatRuleHeading(name: string, symbol: string): string {
-    return `${opWrap(undefined, symbol, ' ')}\`${name}\``
-  },
+  formatRuleHeading: (name: string, symbol: string): string =>
+    `${opWrap(undefined, symbol, ' ')}\`${name}\``,
 
   makeHeaderLink(name: string): string {
     const s = slugger(name)
@@ -54,7 +53,7 @@ const MarkdownFormatter = {
   formatResult(
     result: FormatResultType,
     symbol: string,
-    dryRun: boolean
+    isDryRun: boolean
   ): string {
     const header = MarkdownFormatter.formatRuleHeading(
       result.ruleInfo.name,
@@ -150,7 +149,7 @@ const MarkdownFormatter = {
             }
             return (
               base +
-              `\n  - ${dryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
+              `\n  - ${isDryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
                 fixTarget.message || result.fixResult!.message
               }`
             )
@@ -163,12 +162,12 @@ const MarkdownFormatter = {
       const unassociatedFixList = result.fixResult.targets.filter(
         (t: ResultTarget) =>
           !t.path ||
-          !result.lintResult!.targets.some(
-            (l: ResultTarget) => l.path === t.path
+          result.lintResult!.targets.every(
+            (l: ResultTarget) => l.path !== t.path
           )
       )
       if (result.fixResult.message || unassociatedFixList.length > 0) {
-        const fixSuggest = `\n\n${dryRun ? SUGGESTED_FIX : APPLIED_FIX}${opWrap(
+        const fixSuggest = `\n\n${isDryRun ? SUGGESTED_FIX : APPLIED_FIX}${opWrap(
           ' ',
           result.fixResult.message,
           '.'
@@ -198,15 +197,19 @@ const MarkdownFormatter = {
     return out
   },
 
-  createSection(name: string, body: string, collapse: boolean = false): string {
+  createSection(
+    name: string,
+    body: string,
+    isCollapse: boolean = false
+  ): string {
     const section = `\n\n## ${name} ${MarkdownFormatter.makeHeaderLink(name)}
-${collapse ? `\n${COLLAPSE_TOP}\n` : ''}
+${isCollapse ? `\n${COLLAPSE_TOP}\n` : ''}
 ${body}
-${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
+${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     return section
   },
 
-  formatOutput(output: LintResult, dryRun: boolean): string {
+  formatOutput(output: LintResult, isDryRun: boolean): string {
     const formatBase = [
       `# Repolinter Report\n\n${
         (output.formatOptions && output.formatOptions.disclaimer) || DISCLAIMER
@@ -291,7 +294,7 @@ ${collapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
       MarkdownFormatter.createSection(
         cfg.name,
         sorted[cfg.type]!.map(r =>
-          MarkdownFormatter.formatResult(r, cfg.symbol, dryRun)
+          MarkdownFormatter.formatResult(r, cfg.symbol, isDryRun)
         ).join('\n\n'),
         cfg.collapse
       )

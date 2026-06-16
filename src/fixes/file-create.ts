@@ -16,7 +16,7 @@ async function fileCreate(
   fs: FileSystem,
   options: FileCreateOptions,
   targets: string[],
-  dryRun: boolean = false
+  isDryRun: boolean = false
 ): Promise<Result> {
   const exists =
     targets.length > 0 || (await fs.relativeFileExists(options.file))
@@ -83,7 +83,7 @@ async function fileCreate(
   }
 
   const shouldRemove = options.replace && targets.length > 0
-  if (!dryRun) {
+  if (!isDryRun) {
     if (shouldRemove) {
       await Promise.all(targets.map(t => fs.removeFile(t)))
     }

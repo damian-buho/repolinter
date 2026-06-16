@@ -17,19 +17,21 @@ export interface GlobOptions {
 }
 
 class FileSystem {
+  static async fileExists(file: string): Promise<boolean> {
+    try {
+      await fs.promises.access(file, fs.constants.F_OK)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   targetDirectory: string
   filterPaths: string[]
 
   constructor(targetDirectory = '.', filterPaths: string[] = []) {
     this.targetDirectory = targetDirectory
     this.filterPaths = filterPaths
-  }
-
-  static async fileExists(file: string): Promise<boolean> {
-    return fs.promises
-      .access(file, fs.constants.F_OK)
-      .then(() => true)
-      .catch(() => false)
   }
 
   // Resolves a relative path and asserts it stays within targetDirectory,
@@ -51,44 +53,44 @@ class FileSystem {
 
   async findFirst(
     globs: string | string[],
-    nocase?: boolean
+    isNocase?: boolean
   ): Promise<string | undefined> {
-    const allFiles = await this.findAll(globs, nocase)
+    const allFiles = await this.findAll(globs, isNocase)
     return allFiles.length > 0 ? allFiles.at(0) : undefined
   }
 
   async findFirstFile(
     globs: string | string[],
-    nocase?: boolean
+    isNocase?: boolean
   ): Promise<string | undefined> {
-    const allFiles = await this.findAllFiles(globs, nocase)
+    const allFiles = await this.findAllFiles(globs, isNocase)
     return allFiles.length > 0 ? allFiles.at(0) : undefined
   }
 
   async findAllFiles(
     globs: string | string[],
-    nocase?: boolean
+    isNocase?: boolean
   ): Promise<string[]> {
     const symlinks: Record<string, boolean> = {}
     const filePaths = await this.glob(globs, {
       cwd: this.targetDirectory,
-      nocase: !!nocase,
+      nocase: !!isNocase,
       nodir: true,
       symlinks
     })
 
-    const onlySymlinks: Record<string, boolean> = {}
-    for (const fullPath in symlinks) {
-      if (symlinks[fullPath]) {
+    const onlySymlinks = new Set<string>()
+    for (const [fullPath, isSymlink] of Object.entries(symlinks)) {
+      if (isSymlink) {
         const relativeToRepoPath = this.normalizePath(
           path.relative(this.targetDirectory, fullPath)
         )
-        onlySymlinks[relativeToRepoPath] = true
+        onlySymlinks.add(relativeToRepoPath)
       }
     }
 
     return filePaths.filter(
-      filePath => !onlySymlinks[this.normalizePath(filePath)]
+      filePath => !onlySymlinks.has(this.normalizePath(filePath))
     )
   }
 
@@ -118,14 +120,14 @@ class FileSystem {
       .filter(p => this.shouldInclude(p))
   }
 
-  async findAll(globs: string | string[], nocase = false): Promise<string[]> {
+  async findAll(globs: string | string[], isNocase = false): Promise<string[]> {
     const fixedGlobs =
       typeof globs === 'string'
         ? this.normalizePath(globs)
         : globs.map(g => this.normalizePath(g))
     return this.glob(fixedGlobs, {
       cwd: this.targetDirectory,
-      nocase: !!nocase
+      nocase: !!isNocase
     })
   }
 

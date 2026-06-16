@@ -42,11 +42,11 @@ async function fileHashesNotExist(
           const contents = (await fs.getFileContents(file)) ?? ''
           digester.update(contents)
           const fileHashResult = digester.digest('hex')
-          const passed = fileHashResult !== hash
-          const message = passed ? "Doesn't Matches hash" : 'Match hash'
+          const isPassed = fileHashResult !== hash
+          const message = isPassed ? "Doesn't Matches hash" : 'Match hash'
 
           return {
-            passed,
+            passed: isPassed,
             path: file,
             message
           }
@@ -63,12 +63,12 @@ async function fileHashesNotExist(
     }
   }
 
-  const passed = results.length === 0
+  const isPassed = results.length === 0
 
-  if (passed) {
-    return new Result('No file matching hash found', results, passed)
+  if (isPassed) {
+    return new Result('No file matching hash found', results, isPassed)
   }
-  return new Result('File matching has found', results, passed)
+  return new Result('File matching has found', results, isPassed)
 }
 
 export default fileHashesNotExist

@@ -15,13 +15,13 @@ build-docker:
     docker buildx build -t repolinter:dev --load .
 
 test:
-    node --test 'tests/**/*.js'
+    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR node --test 'tests/**/*.js'
 
 test-verbose:
-    node --test --test-reporter spec 'tests/**/*.js'
+    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR node --test --test-reporter spec 'tests/**/*.js'
 
 coverage:
-    node --test --experimental-test-coverage 'tests/**/*.js'
+    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR node --test --experimental-test-coverage 'tests/**/*.js'
 
 lint:
     pnpm lint
@@ -32,6 +32,9 @@ fix:
 
 format:
     pnpm format
+
+audit:
+    pnpm audit
 
 format-check:
     pnpm format:check

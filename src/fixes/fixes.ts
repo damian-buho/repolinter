@@ -12,7 +12,7 @@ type FixFunction = (
   fs: FileSystem,
   options: unknown,
   targets: string[],
-  dryRun: boolean
+  isDryRun: boolean
 ) => Promise<Result>
 
 const fixes: Record<string, FixFunction> = {

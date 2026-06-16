@@ -12,9 +12,7 @@ describe('rule', () => {
     it("returns passed result if requested file type doesn't exist", async () => {
       /** @type {any} */
       const mockfs = {
-        findAll() {
-          return []
-        },
+        findAll: () => [],
         targetDir: '.'
       }
 
@@ -30,9 +28,7 @@ describe('rule', () => {
     it('returns failed result if requested file type exists', async () => {
       /** @type {any} */
       const mockfs = {
-        findAll() {
-          return ['foo.dll']
-        },
+        findAll: () => ['foo.dll'],
         targetDir: '.'
       }
 

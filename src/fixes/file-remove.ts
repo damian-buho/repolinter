@@ -14,16 +14,15 @@ async function fileRemove(
   fs: FileSystem,
   options: FileRemoveOptions,
   targets: string[],
-  dryRun: boolean = false
+  isDryRun: boolean = false
 ): Promise<Result> {
-  let resolvedTargets = targets
-  if (options.globsAll && options.globsAll.length > 0) {
-    resolvedTargets = await fs.findAllFiles(options.globsAll, !!options.nocase)
-  }
+  const resolvedTargets = options.globsAll?.length
+    ? await fs.findAllFiles(options.globsAll, !!options.nocase)
+    : targets
   if (resolvedTargets.length === 0) {
     return new Result('Found no files to remove', [], false)
   }
-  if (!dryRun) {
+  if (!isDryRun) {
     await Promise.all(resolvedTargets.map(async t => fs.removeFile(t)))
   }
   const removeTargets = resolvedTargets.map(t => ({

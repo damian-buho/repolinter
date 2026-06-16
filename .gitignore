@@ -15,4 +15,4 @@ tmp/
 reports/
 
 # pnpm auto-generated
-pnpm-workspace.yaml
+# pnpm-workspace.yaml

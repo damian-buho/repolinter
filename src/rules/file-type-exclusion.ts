@@ -39,8 +39,8 @@ async function fileTypeExclusion(
     )
   }
 
-  const passed = !targets.some(t => !t.passed)
-  return new Result('', targets, passed)
+  const isPassed = targets.every(t => t.passed)
+  return new Result('', targets, isPassed)
 }
 
 export default fileTypeExclusion

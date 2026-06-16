@@ -24,9 +24,8 @@ async function licenceDetect(fs: FileSystem): Promise<Result> {
     if (result.passed) {
       const identified = licenses[0]
       return `Licensee identified the license for project: ${identified}`
-    } else {
-      return 'Licensee did not identify a license for project'
     }
+    return 'Licensee did not identify a license for project'
   })()
 
   return result

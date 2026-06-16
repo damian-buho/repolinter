@@ -86,9 +86,12 @@ yargs(hideBin(process.argv))
         if (result) {
           console.error(result)
           process.exitCode = 1
-          fs.promises
-            .rm(temporaryDirectory, { recursive: true, force: true })
-            .catch(() => {})
+          try {
+            await fs.promises.rm(temporaryDirectory, {
+              recursive: true,
+              force: true
+            })
+          } catch {}
           return
         }
       }
@@ -117,9 +120,12 @@ yargs(hideBin(process.argv))
       console.log(formattedOutput)
       process.exitCode = output.passed ? 0 : 1
       if (temporaryDirectory) {
-        fs.promises
-          .rm(temporaryDirectory, { recursive: true, force: true })
-          .catch(() => {})
+        try {
+          await fs.promises.rm(temporaryDirectory, {
+            recursive: true,
+            force: true
+          })
+        } catch {}
       }
     }
   )

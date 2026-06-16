@@ -14,9 +14,13 @@ export default class Result {
   targets: ResultTarget[]
   passed: boolean
 
-  constructor(message?: string, targets: ResultTarget[] = [], passed = false) {
+  constructor(
+    message?: string,
+    targets: ResultTarget[] = [],
+    isPassed = false
+  ) {
     if (message) this.message = message
     this.targets = targets
-    this.passed = passed
+    this.passed = isPassed
   }
 }

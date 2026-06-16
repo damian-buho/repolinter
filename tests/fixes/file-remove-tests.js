@@ -74,9 +74,7 @@ describe('fixes', () => {
         removeFile(path) {
           removePaths.push(path)
         },
-        findAllFiles() {
-          return ['myfile.txt']
-        }
+        findAllFiles: () => ['myfile.txt']
       }
 
       const result = await fileRemove(
@@ -99,9 +97,7 @@ describe('fixes', () => {
         removeFile(path) {
           removePaths.push(path)
         },
-        findAllFiles() {
-          return ['myfile.txt']
-        }
+        findAllFiles: () => ['myfile.txt']
       }
 
       const result = await fileRemove(

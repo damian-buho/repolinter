@@ -13,6 +13,7 @@ COPY --parents  docker/build-node.sh      \
                 fixes/                    \
                 package.json              \
                 pnpm-lock.yaml            \
+                pnpm-workspace.yaml       \
                 rules/                    \
                 rulesets/                 \
                 src/                      \

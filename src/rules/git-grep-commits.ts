@@ -55,7 +55,7 @@ function listCommitsWithLines(
 function gitGrep(
   targetDirectory: string,
   pattern: string,
-  ignoreCase: boolean,
+  shouldIgnoreCase: boolean,
   commit: string
 ): string[] {
   const arguments_ = [
@@ -63,7 +63,7 @@ function gitGrep(
     targetDirectory,
     'grep',
     '-E',
-    ignoreCase ? '-i' : '',
+    shouldIgnoreCase ? '-i' : '',
     pattern,
     commit
   ]
@@ -76,10 +76,10 @@ function gitGrep(
 function gitLinesAtCommit(
   targetDirectory: string,
   pattern: string,
-  ignoreCase: boolean,
+  shouldIgnoreCase: boolean,
   commit: string
 ): LineEntry[] {
-  const lines = gitGrep(targetDirectory, pattern, ignoreCase, commit).map(
+  const lines = gitGrep(targetDirectory, pattern, shouldIgnoreCase, commit).map(
     entry => {
       const [filePath, ...rest] = entry
         .slice(Math.max(0, commit.length + 1))
@@ -131,7 +131,7 @@ function gitGrepCommits(
   fs: FileSystem,
   options: GitGrepCommitsOptions
 ): Result {
-  options.denylist = options.denylist || options.blacklist
+  options.denylist ||= options.blacklist
 
   const files = listFiles(fs, options)
   const targets = files.map(file => {

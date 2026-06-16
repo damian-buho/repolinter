@@ -56,19 +56,19 @@ async function fileNotContents(
   )
 
   const filteredResults = results.filter(r => r !== null)
-  const passed = !filteredResults.some(r => !r.passed)
+  const isPassed = filteredResults.every(r => r.passed)
   const aggregatedTargets = filteredResults
     .flatMap(r => r.targets)
     .filter(r => !r.passed)
 
-  if (passed) {
+  if (isPassed) {
     return new Result(
       'Did not find content matching specified patterns',
       aggregatedTargets,
-      passed
+      isPassed
     )
   }
-  return new Result('', aggregatedTargets, passed)
+  return new Result('', aggregatedTargets, isPassed)
 }
 
 export default fileNotContents

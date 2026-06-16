@@ -79,9 +79,9 @@ describe('formatters', () => {
         { slug: 'myrule-other-rule', lvl: 3 }
       ]
 
-      for (let index = 0, length = expected.length; index < length; index++) {
-        assert.strictEqual(filteredSections[index].lvl, expected[index].lvl)
-        assert.ok(filteredSections[index].slug.includes(expected[index].slug))
+      for (const [index, element] of expected.entries()) {
+        assert.strictEqual(filteredSections[index].lvl, element.lvl)
+        assert.ok(filteredSections[index].slug.includes(element.slug))
       }
     })
 

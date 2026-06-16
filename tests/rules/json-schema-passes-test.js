@@ -12,12 +12,8 @@ describe('rule', () => {
     it('returns passes if requested file matches the schema', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return '{ "thing": "hello" }'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => '{ "thing": "hello" }',
         targetDir: '.'
       }
 
@@ -43,12 +39,8 @@ describe('rule', () => {
     it('returns fail if requested file does not match the schema', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return '{ "thing": "nothello" }'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => '{ "thing": "nothello" }',
         targetDir: '.'
       }
 
@@ -74,12 +66,8 @@ describe('rule', () => {
     it('throws if the schema is invalid', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return '{ "thing": "hello" }'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => '{ "thing": "hello" }',
         targetDir: '.'
       }
 
@@ -99,12 +87,8 @@ describe('rule', () => {
     it('returns fail if the file had invalid JSON', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return '{ "thing": "hello"'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => '{ "thing": "hello"',
         targetDir: '.'
       }
 
@@ -191,12 +175,8 @@ describe('rule', () => {
     it('includes human-readable-message in the output', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return '{ "thing": "nothello" }'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => '{ "thing": "nothello" }',
         targetDir: '.'
       }
 

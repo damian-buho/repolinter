@@ -30,17 +30,15 @@ function gitWorkingTree(
     if (options.allowSubDir) {
       result.message = 'The sub-directory is managed with Git.'
       return result
-    } else {
-      result.message =
-        'The sub-directory is managed with Git, but need to check the root directory.'
-      result.passed = false
-      return result
     }
-  } else {
-    result.message = 'The directory is not managed with Git.'
+    result.message =
+      'The sub-directory is managed with Git, but need to check the root directory.'
     result.passed = false
     return result
   }
+  result.message = 'The directory is not managed with Git.'
+  result.passed = false
+  return result
 }
 
 export default gitWorkingTree

@@ -52,8 +52,8 @@ async function fileStartsWith(
         .map(p => new RegExp(p, options['skip-paths-matching']!.flags))
       regexes = [...regexes, ...filteredPatterns]
     }
-    filteredFiles = filteredFiles.filter(
-      file => !regexes.some(regex => regex.test(file))
+    filteredFiles = filteredFiles.filter(file =>
+      regexes.every(regex => !regex.test(file))
     )
   }
 
@@ -69,15 +69,15 @@ async function fileStartsWith(
       })
 
       let message = `The first ${options.lineCount} lines`
-      const passed = misses.length === 0
-      message += passed
+      const isPassed = misses.length === 0
+      message += isPassed
         ? ' contain all of the requested patterns.'
         : ` do not contain the pattern(s): ${
             options['human-readable-pattern'] || misses.join(', ')
           }`
 
       return {
-        passed,
+        passed: isPassed,
         path: file,
         message
       }
@@ -98,8 +98,8 @@ async function fileStartsWith(
     )
   }
 
-  const passed = !targets.some(t => !t.passed)
-  return new Result('', targets, passed)
+  const isPassed = targets.every(t => t.passed)
+  return new Result('', targets, isPassed)
 }
 
 export default fileStartsWith

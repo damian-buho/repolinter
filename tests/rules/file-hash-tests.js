@@ -12,12 +12,8 @@ describe('rule', () => {
     it('returns passes if requested file matches the hash', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -39,12 +35,8 @@ describe('rule', () => {
     it('returns passes if requested file matches the hash with nocase', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -67,12 +59,8 @@ describe('rule', () => {
     it('returns passes if requested file contents exists different algorithm', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -95,12 +83,8 @@ describe('rule', () => {
     it('returns fails if requested file does not match', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 
@@ -162,12 +146,8 @@ describe('rule', () => {
     it('respect the legacy configuration format', async () => {
       /** @type {any} */
       const mockfs = {
-        findFirstFile() {
-          return 'README.md'
-        },
-        getFileContents() {
-          return 'foo'
-        },
+        findFirstFile: () => 'README.md',
+        getFileContents: () => 'foo',
         targetDir: '.'
       }
 

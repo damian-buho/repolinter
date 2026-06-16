@@ -11,6 +11,7 @@ import realFs from 'node:fs'
 import FileSystem from '../../dist/lib/file-system.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const sortCompare = (a, b) => a.localeCompare(b)
 
 describe(
   'lib',
@@ -130,11 +131,11 @@ describe(
           const files = await fs.findAll('**/*.js', false)
 
           var foundIncluded = files.every(file => {
-            return file.search(includedRegex) !== -1
+            return includedRegex.test(file)
           })
 
           var ignoredExcluded = files.every(file => {
-            return file.search(excludedRegex) === -1
+            return !excludedRegex.test(file)
           })
           assert.strictEqual(foundIncluded, true)
           assert.strictEqual(ignoredExcluded, true)
@@ -152,8 +153,8 @@ describe(
             return path.relative(path.resolve('.'), file)
           })
           assert.deepStrictEqual(
-            [...files].toSorted(),
-            [...includedFiles].toSorted()
+            [...files].toSorted(sortCompare),
+            [...includedFiles].toSorted(sortCompare)
           )
         })
 
@@ -166,8 +167,8 @@ describe(
             return path.relative(path.resolve('.'), file)
           })
           assert.deepStrictEqual(
-            [...files].toSorted(),
-            [...includedFiles].toSorted()
+            [...files].toSorted(sortCompare),
+            [...includedFiles].toSorted(sortCompare)
           )
         })
 

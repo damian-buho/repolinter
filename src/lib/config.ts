@@ -38,11 +38,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function deepMerge(target: JsonObject, ...sources: JsonObject[]): JsonObject {
   for (const source of sources) {
-    if (source && typeof source === 'object') {
-      for (const key of Object.keys(source)) {
-        // block prototype pollution via __proto__ and constructor.prototype
-        if (key === '__proto__' || key === 'constructor') continue
-        const sourceValue = source[key]
+    if (!source || typeof source !== 'object') continue
+    for (const [key, sourceValue] of Object.entries(source)) {
+      if (key !== '__proto__' && key !== 'constructor') {
         const tgtValue = target[key]
         if (
           sourceValue &&
@@ -120,7 +118,7 @@ async function resolveExtension(
   if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
     parent = ruleset.extends
   } else if (isAbsoluteURL(sourceLocation)) {
-    parent = new URL(ruleset.extends, sourceLocation).toString()
+    parent = new URL(ruleset.extends, sourceLocation).href
   } else {
     // Disallow absolute paths and parent-directory traversal in local extends
     // to prevent a repo-controlled config from reading arbitrary server files.
@@ -174,20 +172,21 @@ async function validateConfig(
   config: RulesetConfig
 ): Promise<{ passed: boolean; error?: string }> {
   const ajvProperties = new Ajv({ strict: false })
-  const loadSchemasFrom = (
+  const loadSchemasFrom = async (
     registry: Record<string, unknown>,
     subdirectory: string
-  ): Promise<JsonObject[]> =>
-    Promise.all(
-      Object.keys(registry).map(name =>
-        fs.promises
-          .readFile(
-            path.resolve(__dirname, '..', subdirectory, `${name}-config.json`),
-            'utf8'
-          )
-          .then(data => JSON.parse(data) as JsonObject)
-      )
+  ): Promise<JsonObject[]> => {
+    const entries = await Promise.all(
+      Object.keys(registry).map(async name => {
+        const data = await fs.promises.readFile(
+          path.resolve(__dirname, '..', subdirectory, `${name}-config.json`),
+          'utf8'
+        )
+        return JSON.parse(data) as JsonObject
+      })
     )
+    return entries
+  }
 
   const [fixSchemas, ruleSchemas] = await Promise.all([
     loadSchemasFrom(Fixes, 'fixes'),
@@ -261,6 +260,7 @@ async function decodeConfig(
   encodedRuleSet: string,
   processed: string[] = []
 ): Promise<RulesetConfig> {
+  // eslint-disable-next-line unicorn/prefer-uint8array-base64
   const configData = Buffer.from(encodedRuleSet, 'base64').toString()
   const ruleset = parseRawRuleset(configData, 'ruleset')
 
