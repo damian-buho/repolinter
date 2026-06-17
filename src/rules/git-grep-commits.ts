@@ -132,6 +132,13 @@ function gitGrepCommits(
   options: GitGrepCommitsOptions
 ): Result {
   options.denylist ||= options.blacklist
+  if (!options.denylist || options.denylist.length === 0) {
+    return new Result(
+      'No denylisted words configured, all commits pass',
+      [],
+      true
+    )
+  }
 
   const files = listFiles(fs, options)
   const targets = files.map(file => {

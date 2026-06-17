@@ -60,6 +60,13 @@ function extractInfo(commit: string): CommitInfo {
 
 function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
   options.denylist ||= options.blacklist
+  if (!options.denylist || options.denylist.length === 0) {
+    return new Result(
+      'No denylisted words configured, all commit messages pass',
+      [],
+      true
+    )
+  }
 
   const commits = grepLog(fs, options)
 

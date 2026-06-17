@@ -34,7 +34,13 @@ async function fileStartsWith(
 
   let filteredFiles = files
   if (options['skip-binary-files']) {
-    filteredFiles = filteredFiles.filter(file => !fs.isBinaryFile(file))
+    const binaryResults = await Promise.all(
+      filteredFiles.map(async file => ({
+        file,
+        isBinary: await fs.isBinaryFile(file)
+      }))
+    )
+    filteredFiles = binaryResults.filter(r => !r.isBinary).map(r => r.file)
   }
 
   if (options['skip-paths-matching']) {

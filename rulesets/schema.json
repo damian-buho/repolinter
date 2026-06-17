@@ -62,7 +62,7 @@
                 },
                 {
                   "if": {
-                    "properties": { "type": { "const": "bespractices-badge-present" } }
+                    "properties": { "type": { "const": "best-practices-badge-present" } }
                   },
                   "then": {
                     "properties": {
