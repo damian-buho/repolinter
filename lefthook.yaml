@@ -8,7 +8,12 @@ pre-commit:
       # Scope to staged JS/TS only — and stage_fixed re-adds prettier's edits
       # into the same commit so the working tree is clean afterwards. Without
       # it, prettier rewrites land as a dirty diff right after the commit.
-      glob: "{src/**/*.ts,tests/**/*.js}"
+      # Cover both top-level files (src/index.ts) and nested (src/lib/*.ts).
+      # lefthook's glob treats `**` as requiring ≥1 directory segment, so
+      # `src/**/*.ts` alone never matches top-level sources like src/cli.ts and
+      # silently skips them. tests/ has no top-level files today but the
+      # `*.js` alternative future-proofs it and keeps the pattern uniform.
+      glob: "{src/*.ts,src/**/*.ts,tests/*.js,tests/**/*.js}"
       run: pnpm dlx prettier --write {staged_files}
       stage_fixed: true
     lint:

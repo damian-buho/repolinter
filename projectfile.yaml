@@ -1,16 +1,17 @@
+---
 # SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 #
 # SPDX-License-Identifier: Apache-2.0
-
----
 $schema: https://projectfile.org/schema/v1.json
 identity:
   created: "2026-06-23"
   name: repolinter
-  namespace: damian-buho
+  namespace: me.dbuho
   summary: Linter for open source repositories (fork of todogroup/repolinter)
-  title: Repolinter (Damián Búho)
+  title: Repolinter (fork by Damián Búho)
   version: 2.0.0
+includes:
+  - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
 keywords:
   - lint
   - linter
@@ -24,47 +25,52 @@ kind: SoftwareSourceCode
 license:
   spdx: Apache-2.0
 links:
-  - type: bugs
-    url: https://github.com/damian-buho/repolinter/issues
+  - label: Repolinter (fork by Damián Búho) on GitHub
+    type: source-code
+    url: https://github.com/damian-buho/repolinter
   - type: homepage
     url: https://damian-buho.github.io/repolinter/
-  - type: source-code
-    url: https://github.com/damian-buho/repolinter
-  - type: package-registry
+  - label: Issues on GitHub
+    type: bugs
+    url: https://github.com/damian-buho/repolinter/issues
+  - label: Packages on npm
+    type: package-registry
     url: https://www.npmjs.com/package/repolinter
-org:
-  projectfile:
-    cli:
-      derived:
-        - links[type=package-registry]
-people:
-  - family-names: Búho
-    given-names: Damián
-    email: damian.buho@proton.me
-    orcid: 0009-0004-8579-7633
-    url: https://dbuho.me
-    roles:
-      - author
-      - maintainer
-      - copyright
-    from: "2026-06-23"
+  - label: Repolinter (fork by Damián Búho) on Codeberg
+    type: source-code
+    url: https://codeberg.org/damian-buho/repolinter
+  - label: Repolinter (fork by Damián Búho) on kiota.ch
+    type: source-code
+    url: https://kiota.ch/damian-buho/repolinter
+  - label: Issues on Codeberg
+    type: bugs
+    url: https://codeberg.org/damian-buho/repolinter/issues
+organizations:
   - name: TODO Group
-    url: https://todogroup.org/
     roles:
       - author
       - founder
       - copyright
     to: "2026-06-22"
+    url: https://todogroup.org/
+people:
+  - email: damian.buho@proton.me
+    from: "2026-06-23"
 repositories:
   - branch: main
-    primary: true
     role: origin
     type: git
     url: git@github.com:damian-buho/repolinter.git
+  - role: mirror
+    type: git
+    url: ssh://git@codeberg.org/damian-buho/repolinter.git
+  - role: mirror
+    type: git
+    url: ssh://git@kiota.ch/damian-buho/repolinter.git
 requirements:
   runtime:
     node: '>=22.13.0'
-stack:
+technologies:
   - docker
   - node
   - typescript
