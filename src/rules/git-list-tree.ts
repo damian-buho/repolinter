@@ -64,6 +64,13 @@ function listFiles(
 
 function gitListTree(fs: FileSystem, options: GitListTreeOptions): Result {
   options.denylist ||= options.blacklist
+  if (!options.denylist || options.denylist.length === 0) {
+    return new Result(
+      'No denylisted paths configured, all files pass',
+      [],
+      true
+    )
+  }
 
   const files = listFiles(fs, options)
 
