@@ -29,12 +29,29 @@ export default async function bestPracticesBadgePresent(
   if (!readmeContainsBadge.passed || !options.minPercentage) {
     return readmeContainsBadge
   }
-  const readmePath = readmeContainsBadge.targets[0]!.path!
+  const readmeTarget = readmeContainsBadge.targets[0]
+  if (!readmeTarget?.path) {
+    return new Result(
+      'Could not determine README path from badge match',
+      [{ path: '', passed: false }],
+      false
+    )
+  }
+  const readmePath = readmeTarget.path
   const targets = [{ path: readmePath, passed: false }]
   const readmeContents = await fileSystem.getFileContents(readmePath)
-  const bestPracticesUrl = readmeContents!.match(
-    new RegExp(bestPracticesRegExp, 'i')
-  )![0]
+  if (!readmeContents) {
+    return new Result('Could not read README file contents', targets, false)
+  }
+  const match = readmeContents.match(new RegExp(bestPracticesRegExp, 'i'))
+  if (!match) {
+    return new Result(
+      'Could not find Best Practices Badge URL in README',
+      targets,
+      false
+    )
+  }
+  const bestPracticesUrl = match[0]
   const bestPracticesResponse = await fetch(`${bestPracticesUrl}.json`)
   if (!bestPracticesResponse.ok) {
     return new Result('Invalid Best Practices Badge URL', targets, false)
