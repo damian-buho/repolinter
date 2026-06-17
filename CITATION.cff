@@ -24,7 +24,7 @@ contact:
     email: damian.buho@proton.me
     orcid: https://orcid.org/0009-0004-8579-7633
     website: https://dbuho.me
-version: 2.0.0
+version: 2.0.13
 keywords:
   - lint
   - linter
