@@ -1,7 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
-SPDX-FileCopyrightText: 2026 The TODO Group
-
+SPDX-FileCopyrightText: 2026 TODO Group
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -11,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Our Pledge
 
-We pledge to make participation in Repolinter (Damián Búho) welcoming, safe, and
+We pledge to make participation in Repolinter (fork by Damián Búho) welcoming, safe, and
 equitable for all. We are committed to fostering an environment that respects
 and promotes the dignity, rights, and contributions of all individuals,
 regardless of characteristics including race, ethnicity, caste, color, age,
@@ -51,7 +49,7 @@ other status.
 ## Reporting
 
 Instances of unacceptable behaviour may be reported to the community moderators
-at **damian.buho@proton.me**. All reports will be reviewed and investigated
+at **<damian.buho@proton.me>**. All reports will be reviewed and investigated
 promptly and fairly. Community moderators are obligated to respect the
 privacy and security of the reporter of any incident.
 
@@ -62,21 +60,15 @@ consequences for any action they deem in violation of this Code of Conduct:
 
 1. **Warning** — for a single incident or short series of incidents: a
  private, written warning, with an opportunity to make repair.
-2. **Temporarily Limited Activities** — for a repeated incidence of a
- violation that previously resulted in a warning: a time-limited cooldown
- period during which the contributor reflects and adjusts behaviour.
-3. **Temporary Suspension** — for a pattern of repeated violation or a single
- serious violation: removal of access to community spaces for a fixed
- period, with conditions for return.
-4. **Permanent Ban** — for a pattern of repeated violations that other steps
- failed to resolve: permanent removal of access to all community spaces,
- tools, and communication channels.
+2. **Temporarily Limited Activities** — for a repeated incidence of a violation that previously resulted in a warning: a time-limited cooldown period during which the contributor reflects and adjusts behaviour.
+3. **Temporary Suspension** — for a pattern of repeated violation or a single serious violation: removal of access to community spaces for a fixed period, with conditions for return.
+4. **Permanent Ban** — for a pattern of repeated violations that other steps failed to resolve: permanent removal of access to all community spaces, tools, and communication channels.
 
 ## Scope
 
 This Code of Conduct applies within all community spaces — issues, pull
 requests, chat channels, mailing lists, in-person events — and also applies
-when an individual is officially representing Repolinter (Damián Búho) in public
+when an individual is officially representing Repolinter (fork by Damián Búho) in public
 spaces.
 
 ## Attribution
