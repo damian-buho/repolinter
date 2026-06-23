@@ -81,12 +81,14 @@ class FileSystem {
 
     const onlySymlinks = new Set<string>()
     for (const [fullPath, isSymlink] of Object.entries(symlinks)) {
-      if (isSymlink) {
-        const relativeToRepoPath = this.normalizePath(
-          path.relative(this.targetDirectory, fullPath)
-        )
-        onlySymlinks.add(relativeToRepoPath)
+      if (!isSymlink) {
+        continue
       }
+
+      const relativeToRepoPath = this.normalizePath(
+        path.relative(this.targetDirectory, fullPath)
+      )
+      onlySymlinks.add(relativeToRepoPath)
     }
 
     return filePaths.filter(

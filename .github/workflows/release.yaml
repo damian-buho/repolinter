@@ -39,7 +39,7 @@ jobs:
     # head SHA must carry a tag we haven't already released. Any failing fact →
     # all downstream jobs no-op via `if: needs.gate.outputs.tag != ''`.
     name: Gate
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: |
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
@@ -84,7 +84,7 @@ jobs:
     name: Publish npm + GitHub release
     needs: gate
     if:    needs.gate.outputs.tag != ''
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write  # GitHub release creation
       id-token: write  # OIDC for npm trusted publishing + provenance
@@ -130,7 +130,7 @@ jobs:
     name: Update floating tags
     needs: [gate, publish-npm]
     if:    needs.gate.outputs.tag != ''
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
@@ -158,10 +158,10 @@ jobs:
         include:
           - arch:     amd64
             platform: linux/amd64
-            runner:   ubuntu-24.04
+            runner:   ubuntu-26.04
           - arch:     arm64
             platform: linux/arm64
-            runner:   ubuntu-24.04-arm  # native GitHub-hosted arm64, no QEMU
+            runner:   ubuntu-26.04-arm  # native GitHub-hosted arm64, no QEMU
     steps:
       - uses: actions/checkout@v6
         with:
@@ -201,7 +201,7 @@ jobs:
     name: Push image (${{ matrix.arch }})
     needs: [gate, build-image]
     if:    needs.gate.outputs.tag != ''
-    runs-on: ubuntu-24.04  # any runner; imagetools create is registry-side
+    runs-on: ubuntu-26.04  # any runner; imagetools create is registry-side
     permissions:
       contents: read
       id-token: write  # OIDC for GHCR build attestation
@@ -264,7 +264,7 @@ jobs:
     name: Publish manifest
     needs: [gate, push-image]
     if:    needs.gate.outputs.tag != ''
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       id-token:  write  # OIDC for GHCR attestation on the manifest list
       packages:  write  # push the multiarch manifest list

@@ -36,26 +36,33 @@ type JsonObject = Record<string, unknown>
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+function mergeObject(target: JsonObject, source: JsonObject): void {
+  // What we are trying to do: copy each key from source into target, deep-merging
+  // plain objects and overwriting everything else, while never touching prototype
+  // pollution vectors (`__proto__`, `constructor`).
+  for (const [key, sourceValue] of Object.entries(source)) {
+    if (key === '__proto__' || key === 'constructor') continue
+
+    const tgtValue = target[key]
+    if (
+      sourceValue &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      tgtValue &&
+      typeof tgtValue === 'object' &&
+      !Array.isArray(tgtValue)
+    ) {
+      deepMerge(tgtValue as JsonObject, sourceValue as JsonObject)
+    } else {
+      target[key] = sourceValue
+    }
+  }
+}
+
 function deepMerge(target: JsonObject, ...sources: JsonObject[]): JsonObject {
   for (const source of sources) {
     if (!source || typeof source !== 'object') continue
-    for (const [key, sourceValue] of Object.entries(source)) {
-      if (key !== '__proto__' && key !== 'constructor') {
-        const tgtValue = target[key]
-        if (
-          sourceValue &&
-          typeof sourceValue === 'object' &&
-          !Array.isArray(sourceValue) &&
-          tgtValue &&
-          typeof tgtValue === 'object' &&
-          !Array.isArray(tgtValue)
-        ) {
-          deepMerge(tgtValue as JsonObject, sourceValue as JsonObject)
-        } else {
-          target[key] = sourceValue
-        }
-      }
-    }
+    mergeObject(target, source)
   }
   return target
 }
@@ -224,17 +231,17 @@ async function validateConfig(
 function parseConfig(config: RulesetConfig): RuleInfo[] {
   if (config.version === 2) {
     return Object.entries<RuleEntry>(config.rules ?? {}).map(
-      ([name, cfg]) =>
+      ([name, config_]) =>
         new RuleInfo(
           name,
-          cfg.level,
-          cfg.where,
-          cfg.rule.type,
-          cfg.rule.options ?? {},
-          cfg.fix?.type,
-          cfg.fix?.options,
-          cfg.policyInfo,
-          cfg.policyUrl
+          config_.level,
+          config_.where,
+          config_.rule.type,
+          config_.rule.options ?? {},
+          config_.fix?.type,
+          config_.fix?.options,
+          config_.policyInfo,
+          config_.policyUrl
         )
     )
   }

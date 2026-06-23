@@ -50,7 +50,7 @@ export const resultFormatter: Formatter = defaultFormatter
 export async function lint(
   targetDirectory: string,
   filterPaths: string[] = [],
-  ruleset: unknown = undefined,
+  ruleset?: unknown,
   isDryRun: boolean = false
 ): Promise<LintResult> {
   const fileSystem = new FileSystem()
@@ -59,7 +59,7 @@ export async function lint(
     fileSystem.filterPaths = filterPaths
   }
 
-  let rulesetPath: string | undefined = undefined
+  let rulesetPath: string | undefined
 
   if (typeof ruleset === 'string' && config.isBase64(ruleset)) {
     ruleset = await config.decodeConfig(ruleset)

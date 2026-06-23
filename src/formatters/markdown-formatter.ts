@@ -274,29 +274,29 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
       }
     ]
     const relevantSections = sectionConfig.filter(
-      cfg => sorted[cfg.type]!.length > 0
+      config => sorted[config.type]!.length > 0
     )
     formatBase.push('\n')
-    const toc = relevantSections.map(cfg => {
-      const subItems = sorted[cfg.type]!.map(r => {
+    const toc = relevantSections.map(config => {
+      const subItems = sorted[config.type]!.map(r => {
         const heading = MarkdownFormatter.formatRuleHeading(
           r.ruleInfo.name,
-          cfg.symbol
+          config.symbol
         )
         return `\n  - [${heading}](#user-content-${slugger(heading)})`
       })
-      return `\n- [${cfg.name}](#user-content-${slugger(
-        cfg.name
+      return `\n- [${config.name}](#user-content-${slugger(
+        config.name
       )})${subItems.join('')}`
     })
     formatBase.push(...toc)
-    const allSections = relevantSections.map(cfg =>
+    const allSections = relevantSections.map(config =>
       MarkdownFormatter.createSection(
-        cfg.name,
-        sorted[cfg.type]!.map(r =>
-          MarkdownFormatter.formatResult(r, cfg.symbol, isDryRun)
+        config.name,
+        sorted[config.type]!.map(r =>
+          MarkdownFormatter.formatResult(r, config.symbol, isDryRun)
         ).join('\n\n'),
-        cfg.collapse
+        config.collapse
       )
     )
     formatBase.push(...allSections, '\n')

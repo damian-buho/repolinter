@@ -35,9 +35,9 @@ const SymbolFormatter = {
   formatResult(
     result: Result,
     ruleName: string,
-    rulePolicyUrl: string | undefined = undefined,
-    rulePolicyInfo: string | undefined = undefined,
-    errorSymbol: string,
+    rulePolicyUrl?: string | undefined,
+    rulePolicyInfo?: string | undefined,
+    errorSymbol: string = logSymbols.error,
     okSymbol: string = logSymbols.success
   ): string {
     let policyLines = ''
