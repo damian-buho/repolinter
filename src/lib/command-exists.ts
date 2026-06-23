@@ -8,10 +8,10 @@ async function commandExists(
   command: string | string[]
 ): Promise<string | undefined> {
   const commands = Array.isArray(command) ? command : [command]
-  for (const cmd of commands) {
+  for (const command_ of commands) {
     try {
-      await commandExistsLib(cmd)
-      return cmd
+      await commandExistsLib(command_)
+      return command_
     } catch {
       // command not found, try next
     }
