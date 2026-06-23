@@ -6,18 +6,10 @@
 import nodeFs from 'node:fs'
 import nodePath from 'node:path'
 import nodeOs from 'node:os'
-import { createRequire } from 'node:module'
+import { convert as convertAsciiDocument } from '@asciidoctor/core'
 import { check, LinkState, type LinkResult } from 'linkinator'
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
-
-interface AsciidoctorInstance {
-  convert(input: string, options?: object): string
-}
-type AsciidoctorFactory = () => AsciidoctorInstance
-const asciidoctor = createRequire(import.meta.url)(
-  'asciidoctor'
-) as AsciidoctorFactory
 
 interface FileNoBrokenLinksOptions {
   globsAll: string[]
@@ -33,8 +25,6 @@ const LINK_TIMEOUT_MS = Number(process.env.REPOLINTER_LINK_TIMEOUT_MS) || 10_000
 const MD_LINK_RE = /\[[^\]]*\]\(([^)]+)\)/g
 const MARKDOWN_EXTS = new Set(['.md', '.markdown', '.mdown', '.mkd', '.mkdn'])
 const ASCIIDOC_EXTS = new Set(['.adoc', '.asciidoc'])
-
-let asciidoctorInstance: AsciidoctorInstance | undefined
 
 async function checkFile(
   fileSystem: FileSystem,
@@ -74,12 +64,14 @@ async function renderAsciiDocument(
 ): Promise<string | undefined> {
   const content = await fileSystem.getFileContents(file)
   if (content === undefined) return undefined
-  // eslint-disable-next-line unicorn/no-top-level-assignment-in-function
-  asciidoctorInstance ??= asciidoctor()
-  return asciidoctorInstance.convert(content, {
+  // What: asciidoctor v4 exposes a stateless async `convert` named export; no
+  // factory or instance caching is needed. With a string input and no `to_file`
+  // the contract is a converted string, so narrow the `Document | string` union.
+  const rendered = await convertAsciiDocument(content, {
     safe: 'safe',
     standalone: false
-  }) as string
+  })
+  return typeof rendered === 'string' ? rendered : undefined
 }
 
 async function checkMarkdownFile(
