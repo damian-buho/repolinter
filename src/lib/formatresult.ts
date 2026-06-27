@@ -6,11 +6,7 @@ import type Result from './result.js'
 import type RuleInfo from './ruleinfo.js'
 
 export type FormatResultStatus =
-  | 'PASSED'
-  | 'NOT_PASSED_ERROR'
-  | 'NOT_PASSED_WARN'
-  | 'IGNORED'
-  | 'ERROR'
+  'PASSED' | 'NOT_PASSED_ERROR' | 'NOT_PASSED_WARN' | 'IGNORED' | 'ERROR'
 
 export default class FormatResult {
   static readonly RULE_PASSED: FormatResultStatus = 'PASSED'
