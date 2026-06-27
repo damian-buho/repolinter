@@ -170,8 +170,7 @@ export async function lint(
     results: result,
     targets: targetObject,
     formatOptions: parsedRuleset.formatOptions as
-      | Record<string, unknown>
-      | undefined
+      Record<string, unknown> | undefined
   }
 }
 
