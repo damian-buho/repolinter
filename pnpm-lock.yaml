@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@asciidoctor/core':
-        specifier: 4.0.0
-        version: 4.0.0
+        specifier: 4.0.2
+        version: 4.0.2
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -130,8 +130,8 @@ importers:
 
 packages:
 
-  '@asciidoctor/core@4.0.0':
-    resolution: {integrity: sha512-VWBs5HwU2vRutHTwxbXJE5icmps93o9z7i2qFxbz9jDS8Ga7rlMFIa7QKMAMpdBlTrFip60serEns5hB12IX6Q==}
+  '@asciidoctor/core@4.0.2':
+    resolution: {integrity: sha512-Gucc/zEdsrWlwOr3mFLKecWRNTOtB62Z0Fm1KU5GphVlvvmIukqN2SFf1qJE1MSrXGHdlZnrvz4BDkekp9JUbQ==}
     engines: {node: '>=20'}
 
   '@babel/code-frame@7.29.7':
@@ -2480,7 +2480,7 @@ packages:
 
 snapshots:
 
-  '@asciidoctor/core@4.0.0': {}
+  '@asciidoctor/core@4.0.2': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:
