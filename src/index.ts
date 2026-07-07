@@ -174,7 +174,7 @@ export async function lint(
   }
 }
 
-export function shouldRuleRun(
+export function filterRuleTargets(
   validTargets: string[],
   ruleAxioms: string[]
 ): string[] {
@@ -257,7 +257,7 @@ export async function runRuleset(
       return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
     }
     if (typeof targets !== 'boolean' && r.where && r.where.length > 0) {
-      const ignoreReasons = shouldRuleRun(targetArray, r.where)
+      const ignoreReasons = filterRuleTargets(targetArray, r.where)
       if (ignoreReasons.length > 0) {
         return FormatResult.CreateIgnored(
           r,

@@ -44,7 +44,7 @@ tsconfig enables: `strict`, `noUncheckedIndexedAccess`, `noUnusedLocals`,
 
 ```
 src/
-├── index.ts          # Public API: lint(), runRuleset(), shouldRuleRun(), determineTargets()
+├── index.ts          # Public API: lint(), runRuleset(), filterRuleTargets(), determineTargets()
 ├── cli.ts            # yargs CLI; calls lint(), selects formatter, exits with code
 ├── lib/
 │   ├── config.ts     # Config loading/parsing/validation (RulesetConfig exported)

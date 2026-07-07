@@ -106,7 +106,7 @@ export declare function validateConfig (
   config: Record<string, unknown>
 ): Promise<{ passed: boolean; error?: string }>
 export declare function parseConfig (config: Record<string, unknown>): RuleInfo[]
-export declare function shouldRuleRun (
+export declare function filterRuleTargets (
   validTargets: string[],
   ruleAxioms: string[]
 ): string[]
