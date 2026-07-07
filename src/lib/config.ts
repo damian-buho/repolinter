@@ -267,7 +267,6 @@ async function decodeConfig(
   encodedRuleSet: string,
   processed: string[] = []
 ): Promise<RulesetConfig> {
-  // eslint-disable-next-line unicorn/prefer-uint8array-base64
   const configData = Buffer.from(encodedRuleSet, 'base64').toString()
   const ruleset = parseRawRuleset(configData, 'ruleset')
 

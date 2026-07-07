@@ -5,12 +5,12 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { shouldRuleRun } from '../../dist/index.js'
+import { filterRuleTargets } from '../../dist/index.js'
 
 describe('api', () => {
   describe('validateConfig', () => {
     it('should allow a rule to run if axioms match', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         ['language=javascript', 'language=*'],
         ['language=javascript']
       )
@@ -18,7 +18,7 @@ describe('api', () => {
     })
 
     it('should allow a rule to run if axioms wildcard match', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         ['language=javascript', 'language=*'],
         ['language=*']
       )
@@ -26,7 +26,7 @@ describe('api', () => {
     })
 
     it('should not allow a rule to run if no axioms match', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         ['language=javascript', 'language=*'],
         ['language=cheese']
       )
@@ -34,7 +34,7 @@ describe('api', () => {
     })
 
     it('should not allow non-numerical axioms with numerical comparisons', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         ['language=javascript', 'language=*'],
         ['language>=3']
       )
@@ -42,7 +42,7 @@ describe('api', () => {
     })
 
     it('should not allow invalid operators', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         ['language=3', 'language=*'],
         ['language=>3']
       )
@@ -50,7 +50,7 @@ describe('api', () => {
     })
 
     it('should handle a mix of axoims', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'commits=hello',
           'commits=*',
@@ -60,7 +60,7 @@ describe('api', () => {
         ['commits=hello', 'contributor-count=blah']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'commits=hello',
           'commits=*',
@@ -73,7 +73,7 @@ describe('api', () => {
     })
 
     it('should handle a numerical = axiom', () => {
-      const result = shouldRuleRun(
+      const result = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -86,7 +86,7 @@ describe('api', () => {
     })
 
     it('should handle a numerical > axiom', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -96,7 +96,7 @@ describe('api', () => {
         ['contributors>6']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -109,7 +109,7 @@ describe('api', () => {
     })
 
     it('should handle a numerical >= axiom', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -119,7 +119,7 @@ describe('api', () => {
         ['contributors>=7']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -132,7 +132,7 @@ describe('api', () => {
     })
 
     it('should handle a numerical < axiom', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -142,7 +142,7 @@ describe('api', () => {
         ['contributors<8']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -155,7 +155,7 @@ describe('api', () => {
     })
 
     it('should handle a numerical <= axiom', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -165,7 +165,7 @@ describe('api', () => {
         ['contributors<=7']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'language=javascript',
           'language=*',
@@ -178,12 +178,12 @@ describe('api', () => {
     })
 
     it('should handle a mix of numerical axoims', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=7', 'contributors>4', 'commits>500']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         ['commits=700', 'commits=*', 'contributors=7', 'contributors=*'],
         ['contributors<=6', 'contributors>4', 'commits>900']
       )
@@ -191,7 +191,7 @@ describe('api', () => {
     })
 
     it('should handle both numerical and regular axioms', () => {
-      const resultPass = shouldRuleRun(
+      const resultPass = filterRuleTargets(
         [
           'commits=700',
           'commits=*',
@@ -205,7 +205,7 @@ describe('api', () => {
         ['contributors<=7', 'contributors>4', 'commits>600', 'git=*']
       )
       assert.deepStrictEqual(resultPass, [])
-      const resultFail = shouldRuleRun(
+      const resultFail = filterRuleTargets(
         [
           'commits=700',
           'commits=*',
