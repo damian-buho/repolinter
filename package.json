@@ -87,7 +87,7 @@
     "matched": "5.0.1",
     "simple-git": "3.36.0",
     "spdx-license-list": "6.11.0",
-    "undici": "8.5.0",
+    "undici": "8.7.0",
     "yaml": "2.9.0",
     "yargs": "18.0.0"
   },
