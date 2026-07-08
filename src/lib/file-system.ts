@@ -24,12 +24,21 @@ class FileSystem {
     }
   }
 
+  private globCache = new Map<string, string[]>()
   targetDirectory: string
   filterPaths: string[]
 
   constructor(targetDirectory = '.', filterPaths: string[] = []) {
     this.targetDirectory = targetDirectory
     this.filterPaths = filterPaths
+  }
+
+  private globCacheKey(
+    globs: string | string[],
+    options: GlobOptions,
+    mergedIgnore: string[]
+  ): string {
+    return JSON.stringify({ globs, options, ignore: mergedIgnore })
   }
 
   // Resolves a relative path and asserts it stays within targetDirectory,
@@ -112,6 +121,12 @@ class FileSystem {
       : []
     const mergedIgnore = [...defaultIgnore, ...userIgnore]
 
+    const key = this.globCacheKey(fixedGlobs, options, mergedIgnore)
+    const cached = this.globCache.get(key)
+    if (cached !== undefined) {
+      return cached
+    }
+
     const results = await fg(fixedGlobs, {
       cwd: options.cwd ?? this.targetDirectory,
       caseSensitiveMatch: options.nocase !== true,
@@ -133,9 +148,12 @@ class FileSystem {
       }
     }
 
-    return results
+    const normalized = results
       .map(p => this.normalizePath(p))
       .filter(p => this.shouldInclude(p))
+
+    this.globCache.set(key, normalized)
+    return normalized
   }
 
   async findAll(globs: string | string[], isNocase = false): Promise<string[]> {
@@ -194,10 +212,12 @@ class FileSystem {
   }
 
   async setFileContents(relativeFile: string, contents: string): Promise<void> {
+    this.globCache.clear()
     return fs.promises.writeFile(this.resolveContained(relativeFile), contents)
   }
 
   async removeFile(relativeFile: string): Promise<void> {
+    this.globCache.clear()
     return fs.promises.unlink(this.resolveContained(relativeFile))
   }
 
