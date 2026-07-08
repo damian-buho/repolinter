@@ -2,19 +2,11 @@
 // SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 // SPDX-License-Identifier: Apache-2.0
 
-import FormatResultBase from '../lib/formatresult.js'
+import FormatResult from '../lib/formatresult.js'
 import type FormatResultType from '../lib/formatresult.js'
 import type { ResultTarget } from '../lib/result.js'
 import { slug as slugger } from '../lib/github-slugger.js'
 import type { LintResult } from '../index.js'
-
-const FormatResult = FormatResultBase as typeof FormatResultBase & {
-  RULE_PASSED: string
-  RULE_NOT_PASSED_ERROR: string
-  RULE_NOT_PASSED_WARN: string
-  IGNORED: string
-  ERROR: string
-}
 
 const ERROR_SYMBOL = '\u{2757}'
 const FAIL_SYMBOL = '\u{274C}'
