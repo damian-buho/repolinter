@@ -20,7 +20,10 @@ pre-commit:
       run: just lint
     audit:
       run: just audit
+    build:
+      run: just build
     test:
+      depends_on: build
       run: just test
 
 pre-push:
