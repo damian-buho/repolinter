@@ -61,7 +61,7 @@
     "url": "https://github.com/damian-buho/repolinter/issues"
   },
   "repository": {
-    "url": "git@github.com:damian-buho/repolinter.git",
+    "url": "git+ssh://git@github.com/damian-buho/repolinter.git",
     "type": "git"
   },
   "prettier": {
