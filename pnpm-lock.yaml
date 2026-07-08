@@ -18,9 +18,6 @@ importers:
       ajv:
         specifier: 8.20.0
         version: 8.20.0
-      command-exists:
-        specifier: 1.2.9
-        version: 1.2.9
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -986,9 +983,6 @@ packages:
     engines: {node: '>=0.8.0'}
     deprecated: CoffeeScript on NPM has moved to "coffeescript" (no hyphen)
     hasBin: true
-
-  command-exists@1.2.9:
-    resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
 
   commander@14.0.3:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
@@ -3387,8 +3381,6 @@ snapshots:
   clone@2.1.2: {}
 
   coffee-script@1.12.7: {}
-
-  command-exists@1.2.9: {}
 
   commander@14.0.3: {}
 
