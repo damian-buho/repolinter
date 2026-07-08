@@ -23,7 +23,7 @@ just lint          # ESLint (typescript-eslint, unicorn, import-x, promise, n, t
 just format        # Prettier write
 just format-check  # Prettier check (CI)
 just test          # node --test 'tests/**/*.js'
-just pipeline      # format → lint → test → build  (full CI gate)
+just pipeline      # format → lint → build → test  (full CI gate)
 ```
 
 `just build` runs `prebuild` (rm -rf dist) first — always a clean compile.
