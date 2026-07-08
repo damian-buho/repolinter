@@ -78,7 +78,7 @@
   "dependencies": {
     "@asciidoctor/core": "4.0.2",
     "ajv": "8.20.0",
-    "fast-glob": "^3.3.3",
+    "tinyglobby": "^0.2.17",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
     "isbinaryfile": "6.0.0",

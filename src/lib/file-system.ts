@@ -4,7 +4,7 @@
 
 import path from 'node:path'
 import fs from 'node:fs'
-import fg from 'fast-glob'
+import { glob } from 'tinyglobby'
 
 export interface GlobOptions {
   cwd?: string
@@ -127,12 +127,13 @@ class FileSystem {
       return cached
     }
 
-    const results = await fg(fixedGlobs, {
+    const results = await glob(fixedGlobs, {
       cwd: options.cwd ?? this.targetDirectory,
       caseSensitiveMatch: options.nocase !== true,
       onlyFiles: options.nodir !== false,
       ignore: mergedIgnore,
-      dot: true
+      dot: true,
+      expandDirectories: false
     })
 
     if (options.symlinks) {
