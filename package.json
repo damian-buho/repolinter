@@ -76,15 +76,15 @@
     "useTabs": false
   },
   "dependencies": {
-    "ajv": "8.20.0",
     "@asciidoctor/core": "4.0.2",
+    "ajv": "8.20.0",
     "command-exists": "1.2.9",
+    "fast-glob": "^3.3.3",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
     "isbinaryfile": "6.0.0",
     "linguist-js": "3.0.1",
     "linkinator": "7.6.1",
-    "matched": "5.0.1",
     "simple-git": "3.36.0",
     "spdx-license-list": "6.11.0",
     "undici": "8.7.0",

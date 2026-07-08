@@ -300,7 +300,10 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
       )
     )
     formatBase.push(...allSections, '\n')
-    return formatBase.join('').replaceAll(/[^\S\r\n]+$/gm, '')
+    return formatBase
+      .join('')
+      .replaceAll(/\n{3,}/g, '\n\n')
+      .replaceAll(/[^\S\r\n]+$/gm, '')
   }
 }
 

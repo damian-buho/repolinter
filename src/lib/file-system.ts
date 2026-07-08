@@ -3,10 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'node:path'
-import matched from 'matched'
 import fs from 'node:fs'
-
-const glob = matched
+import fg from 'fast-glob'
 
 export interface GlobOptions {
   cwd?: string
@@ -112,12 +110,30 @@ class FileSystem {
         ? options.ignore
         : [options.ignore]
       : []
-    const mergedOptions = {
-      ...options,
-      ignore: [...defaultIgnore, ...userIgnore]
+    const mergedIgnore = [...defaultIgnore, ...userIgnore]
+
+    const results = await fg(fixedGlobs, {
+      cwd: options.cwd ?? this.targetDirectory,
+      caseSensitiveMatch: options.nocase !== true,
+      onlyFiles: options.nodir !== false,
+      ignore: mergedIgnore,
+      dot: true
+    })
+
+    if (options.symlinks) {
+      const cwd = options.cwd ?? this.targetDirectory
+      for (const relative of results) {
+        const fullPath = path.resolve(cwd, relative)
+        try {
+          const stat = await fs.promises.lstat(fullPath)
+          options.symlinks[fullPath] = stat.isSymbolicLink()
+        } catch {
+          options.symlinks[fullPath] = false
+        }
+      }
     }
-    const globbed = await glob(fixedGlobs, mergedOptions)
-    return globbed
+
+    return results
       .map(p => this.normalizePath(p))
       .filter(p => this.shouldInclude(p))
   }
