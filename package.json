@@ -30,7 +30,8 @@
     "prepublishOnly": "pnpm build",
     "pretest": "pnpm lint",
     "test": "node --test 'tests/**/*.js'",
-    "coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
+    "test:coverage": "node --test --experimental-test-coverage 'tests/**/*.js'",
+    "audit": "pnpm audit",
     "lint": "eslint ./",
     "fix": "eslint ./ --fix",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.js'",
@@ -61,7 +62,7 @@
     "url": "https://github.com/damian-buho/repolinter/issues"
   },
   "repository": {
-    "url": "git@github.com:damian-buho/repolinter.git",
+    "url": "git+ssh://git@github.com/damian-buho/repolinter.git",
     "type": "git"
   },
   "prettier": {
@@ -76,20 +77,18 @@
     "useTabs": false
   },
   "dependencies": {
-    "ajv": "8.20.0",
     "@asciidoctor/core": "4.0.2",
-    "command-exists": "1.2.9",
+    "ajv": "8.20.0",
+    "tinyglobby": "^0.2.17",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
     "isbinaryfile": "6.0.0",
     "linguist-js": "3.0.1",
     "linkinator": "7.6.1",
-    "matched": "5.0.1",
     "simple-git": "3.36.0",
     "spdx-license-list": "6.11.0",
     "undici": "8.7.0",
-    "yaml": "2.9.0",
-    "yargs": "18.0.0"
+    "yaml": "2.9.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -97,8 +96,7 @@
     "@stryker-mutator/tap-runner": "9.6.1",
     "@stryker-mutator/typescript-checker": "9.6.1",
     "@types/eslint": "9.6.1",
-    "@types/node": "26.1.0",
-    "@types/yargs": "17.0.35",
+    "@types/node": "26.1.1",
     "eslint": "10.6.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.17.1",

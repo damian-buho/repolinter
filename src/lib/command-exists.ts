@@ -2,7 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 // SPDX-License-Identifier: Apache-2.0
 
-import commandExistsLib from 'command-exists'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
+const execFileAsync = promisify(execFile)
 
 async function commandExists(
   command: string | string[]
@@ -10,7 +13,7 @@ async function commandExists(
   const commands = Array.isArray(command) ? command : [command]
   for (const command_ of commands) {
     try {
-      await commandExistsLib(command_)
+      await execFileAsync('which', [command_])
       return command_
     } catch {
       // command not found, try next

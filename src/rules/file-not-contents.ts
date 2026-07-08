@@ -55,9 +55,8 @@ async function fileNotContents(
     })
   )
 
-  const filteredResults = results.filter(r => r !== null)
-  const isPassed = filteredResults.every(r => r.passed)
-  const aggregatedTargets = filteredResults
+  const isPassed = results.every(r => r.passed)
+  const aggregatedTargets = results
     .flatMap(r => r.targets)
     .filter(r => !r.passed)
 

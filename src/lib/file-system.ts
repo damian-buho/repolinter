@@ -3,10 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'node:path'
-import matched from 'matched'
 import fs from 'node:fs'
-
-const glob = matched
+import { glob } from 'tinyglobby'
 
 export interface GlobOptions {
   cwd?: string
@@ -26,12 +24,21 @@ class FileSystem {
     }
   }
 
+  private globCache = new Map<string, string[]>()
   targetDirectory: string
   filterPaths: string[]
 
   constructor(targetDirectory = '.', filterPaths: string[] = []) {
     this.targetDirectory = targetDirectory
     this.filterPaths = filterPaths
+  }
+
+  private globCacheKey(
+    globs: string | string[],
+    options: GlobOptions,
+    mergedIgnore: string[]
+  ): string {
+    return JSON.stringify({ globs, options, ignore: mergedIgnore })
   }
 
   // Resolves a relative path and asserts it stays within targetDirectory,
@@ -112,14 +119,42 @@ class FileSystem {
         ? options.ignore
         : [options.ignore]
       : []
-    const mergedOptions = {
-      ...options,
-      ignore: [...defaultIgnore, ...userIgnore]
+    const mergedIgnore = [...defaultIgnore, ...userIgnore]
+
+    const key = this.globCacheKey(fixedGlobs, options, mergedIgnore)
+    const cached = this.globCache.get(key)
+    if (cached !== undefined) {
+      return cached
     }
-    const globbed = await glob(fixedGlobs, mergedOptions)
-    return globbed
+
+    const results = await glob(fixedGlobs, {
+      cwd: options.cwd ?? this.targetDirectory,
+      caseSensitiveMatch: options.nocase !== true,
+      onlyFiles: options.nodir !== false,
+      ignore: mergedIgnore,
+      dot: true,
+      expandDirectories: false
+    })
+
+    if (options.symlinks) {
+      const cwd = options.cwd ?? this.targetDirectory
+      for (const relative of results) {
+        const fullPath = path.resolve(cwd, relative)
+        try {
+          const stat = await fs.promises.lstat(fullPath)
+          options.symlinks[fullPath] = stat.isSymbolicLink()
+        } catch {
+          options.symlinks[fullPath] = false
+        }
+      }
+    }
+
+    const normalized = results
       .map(p => this.normalizePath(p))
       .filter(p => this.shouldInclude(p))
+
+    this.globCache.set(key, normalized)
+    return normalized
   }
 
   async findAll(globs: string | string[], isNocase = false): Promise<string[]> {
@@ -178,10 +213,12 @@ class FileSystem {
   }
 
   async setFileContents(relativeFile: string, contents: string): Promise<void> {
+    this.globCache.clear()
     return fs.promises.writeFile(this.resolveContained(relativeFile), contents)
   }
 
   async removeFile(relativeFile: string): Promise<void> {
+    this.globCache.clear()
     return fs.promises.unlink(this.resolveContained(relativeFile))
   }
 

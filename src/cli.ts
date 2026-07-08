@@ -5,131 +5,146 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import os from 'node:os'
-import yargs from 'yargs'
-import { hideBin } from 'yargs/helpers'
+import { parseArgs } from 'node:util'
 import { simpleGit } from 'simple-git'
 import * as repolinter from './index.js'
 import type { Formatter } from './index.js'
 
+const KEBAB_MAP: Record<string, string> = {
+  '--ruleset-file': '--rulesetFile',
+  '--ruleset-url': '--rulesetUrl',
+  '--ruleset-encoded': '--rulesetEncoded'
+}
+
+function normalizeArgv(argv: string[]): string[] {
+  return argv.map(argument => KEBAB_MAP[argument] ?? argument)
+}
+
+function printHelp(): void {
+  console.log(`repolinter - linter for open source repositories
+
+Usage:
+  repolinter lint [directory] [options]
+
+Options:
+  -d, --dryRun               Prevent modifications to disk, generate suggested changes report
+  -a, --allowPaths <paths>   Limit to specified directories (repeatable)
+  -r, --rulesetFile <path>   Alternate ruleset file (mutually exclusive with other ruleset options)
+  -u, --rulesetUrl <url>     Alternate ruleset URL (mutually exclusive with other ruleset options)
+  -c, --rulesetEncoded <b64> Base64-encoded ruleset (mutually exclusive with other ruleset options)
+  -g, --git                  Clone a git repository before linting
+  -f, --format <type>        Output format: "json", "markdown", or "console" (default: "console")
+  -h, --help                 Show this help message`)
+}
+
 const git = simpleGit()
 
-yargs(hideBin(process.argv))
-  .command(
-    ['lint [directory]', '*'],
-    'run repolinter on the specified directory, outputting results to STDOUT.',
-    yargs => {
-      yargs
-        .positional('directory', {
-          describe: 'The target directory to lint',
-          default: './',
-          type: 'string'
-        })
-        .option('dryRun', {
-          alias: 'd',
-          describe:
-            'Prevents repolinter from making any modifications to disk, instead generating a report of suggested modifications.',
-          default: false,
-          type: 'boolean'
-        })
-        .option('allowPaths', {
-          alias: 'a',
-          describe:
-            'Limits repolinter to the specified list of directories (directories must still be contained in the target directory).',
-          default: [],
-          type: 'array'
-        })
-        .option('rulesetFile', {
-          alias: 'r',
-          describe:
-            'Specify an alternate file location for repolinter configuration to use. This option is mutually exclusive from all other "ruleset*" options. If no "ruleset*" option provided, repolinter will use default repolinter.json/repolinter.yaml at the root of the project.',
-          type: 'string'
-        })
-        .option('rulesetUrl', {
-          alias: 'u',
-          describe:
-            'Specify an alternate URL location for repolinter configuration to use. This option is mutually exclusive from all other "ruleset*" options. If no "ruleset*" option provided, repolinter will use default repolinter.json/repolinter.yaml at the root of the project.',
-          type: 'string'
-        })
-        .option('rulesetEncoded', {
-          alias: 'c',
-          describe:
-            'Specify a base64 encoded ruleset that repolinter will decode and use instead. This option is mutually exclusive from all other "ruleset*" options. If no "ruleset*" option provided, repolinter will use default repolinter.json/repolinter.yaml at the root of the project',
-          type: 'string'
-        })
-        .option('git', {
-          alias: 'g',
-          describe:
-            'Lint a git repository instead of a directory. The URL specified in the directory parameter will be cloned into a temporary directory in order for repolinter to process it.',
-          default: false,
-          type: 'boolean'
-        })
-        .option('format', {
-          alias: 'f',
-          describe:
-            'Specify the formatter to use for the output ("json", "markdown", or "console")',
-          default: 'console',
-          type: 'string'
-        })
-        .conflicts('rulesetFile', ['rulesetUrl', 'rulesetEncoded'])
-        .conflicts('rulesetEncoded', 'rulesetUrl')
+try {
+  const { values, positionals } = parseArgs({
+    args: normalizeArgv(process.argv.slice(2)),
+    options: {
+      dryRun: { type: 'boolean', short: 'd', default: false },
+      allowPaths: { type: 'string', short: 'a', multiple: true, default: [] },
+      rulesetFile: { type: 'string', short: 'r' },
+      rulesetUrl: { type: 'string', short: 'u' },
+      rulesetEncoded: { type: 'string', short: 'c' },
+      git: { type: 'boolean', short: 'g', default: false },
+      format: { type: 'string', short: 'f', default: 'console' },
+      help: { type: 'boolean', short: 'h', default: false }
     },
-    async argv => {
-      let temporaryDirectory: string | undefined
-      if (argv.git) {
-        temporaryDirectory = await fs.promises.mkdtemp(
-          path.join(os.tmpdir(), 'repolinter-')
-        )
-        const result = await git.clone(
-          argv.directory as string,
-          temporaryDirectory
-        )
-        if (result) {
-          console.error(result)
-          process.exitCode = 1
-          try {
-            await fs.promises.rm(temporaryDirectory, {
-              recursive: true,
-              force: true
-            })
-          } catch {}
-          return
-        }
-      }
-      const output = await repolinter.lint(
-        temporaryDirectory ??
-          path.resolve(process.cwd(), argv.directory as string),
-        argv.allowPaths as string[],
-        argv.rulesetUrl || argv.rulesetFile || argv.rulesetEncoded,
-        argv.dryRun as boolean
+    strict: true,
+    allowPositionals: true
+  })
+
+  if (values.help) {
+    printHelp()
+  } else {
+    const command = positionals[0]
+    if (command && command !== 'lint') {
+      console.error(`Unknown command: ${command}`)
+      process.exitCode = 1
+    } else if (
+      values.rulesetFile &&
+      (values.rulesetUrl || values.rulesetEncoded)
+    ) {
+      console.error(
+        'Error: --rulesetFile is mutually exclusive with --rulesetUrl and --rulesetEncoded'
       )
-      let formatter: Formatter
-      if (argv.format && (argv.format as string).toLowerCase() === 'json') {
-        formatter = repolinter.jsonFormatter
-      } else if (
-        argv.format &&
-        (argv.format as string).toLowerCase() === 'markdown'
-      ) {
-        formatter = repolinter.markdownFormatter
-      } else {
-        formatter = repolinter.defaultFormatter
-      }
-      const formattedOutput = formatter.formatOutput(
-        output,
-        argv.dryRun as boolean
+      process.exitCode = 1
+    } else if (values.rulesetEncoded && values.rulesetUrl) {
+      console.error(
+        'Error: --rulesetEncoded is mutually exclusive with --rulesetUrl'
       )
-      console.log(formattedOutput)
-      process.exitCode = output.passed ? 0 : 1
-      if (temporaryDirectory) {
-        try {
-          await fs.promises.rm(temporaryDirectory, {
-            recursive: true,
-            force: true
-          })
-        } catch {}
-      }
+      process.exitCode = 1
+    } else {
+      const directory =
+        command === 'lint' ? (positionals[1] ?? './') : (positionals[0] ?? './')
+
+      await runLint(directory, values)
     }
+  }
+} catch (error: unknown) {
+  if (error instanceof Error && error.message.startsWith('Unknown option')) {
+    console.error(error.message)
+    process.exitCode = 1
+  } else {
+    throw error
+  }
+}
+
+async function runLint(
+  directory: string,
+  values: {
+    git?: boolean
+    dryRun?: boolean
+    allowPaths?: string[]
+    rulesetFile?: string
+    rulesetUrl?: string
+    rulesetEncoded?: string
+    format?: string
+  }
+): Promise<void> {
+  let temporaryDirectory: string | undefined
+  if (values.git) {
+    temporaryDirectory = await fs.promises.mkdtemp(
+      path.join(os.tmpdir(), 'repolinter-')
+    )
+    const result = await git.clone(directory, temporaryDirectory)
+    if (result) {
+      console.error(result)
+      process.exitCode = 1
+      try {
+        await fs.promises.rm(temporaryDirectory, {
+          recursive: true,
+          force: true
+        })
+      } catch {}
+      return
+    }
+  }
+  const output = await repolinter.lint(
+    temporaryDirectory ?? path.resolve(process.cwd(), directory),
+    values.allowPaths ?? [],
+    values.rulesetUrl || values.rulesetFile || values.rulesetEncoded,
+    values.dryRun ?? false
   )
-  .demandCommand()
-  .help()
-  .strict()
-  .parse()
+  let formatter: Formatter
+  if (values.format && values.format.toLowerCase() === 'json') {
+    formatter = repolinter.jsonFormatter
+  } else if (values.format && values.format.toLowerCase() === 'markdown') {
+    formatter = repolinter.markdownFormatter
+  } else {
+    formatter = repolinter.defaultFormatter
+  }
+  const formattedOutput = formatter.formatOutput(output, values.dryRun ?? false)
+  console.log(formattedOutput)
+  process.exitCode = output.passed ? 0 : 1
+  if (temporaryDirectory) {
+    try {
+      await fs.promises.rm(temporaryDirectory, {
+        recursive: true,
+        force: true
+      })
+    } catch {}
+  }
+}

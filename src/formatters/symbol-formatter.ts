@@ -3,18 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { styleText } from 'node:util'
-import FormatResultBase from '../lib/formatresult.js'
+import FormatResult from '../lib/formatresult.js'
 import type { ResultTarget } from '../lib/result.js'
 import type Result from '../lib/result.js'
 import type { LintResult } from '../index.js'
-
-const FormatResult = FormatResultBase as typeof FormatResultBase & {
-  RULE_PASSED: string
-  RULE_NOT_PASSED_ERROR: string
-  RULE_NOT_PASSED_WARN: string
-  IGNORED: string
-  ERROR: string
-}
 
 const logSymbols = {
   info: 'i',

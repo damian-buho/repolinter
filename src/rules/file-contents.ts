@@ -160,9 +160,8 @@ async function fileContents(
               })
               continue
             }
-            console.trace('Error trace:')
             throw new Error(
-              'Please open an issue on https://github.com/damian-buho/repolinter'
+              `Regex matched in split but not on line (regex: ${options.content}, flags: ${regexFlags})`
             )
           }
 

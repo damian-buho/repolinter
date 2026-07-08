@@ -17,10 +17,16 @@ pre-commit:
       run: pnpm dlx prettier --write {staged_files}
       stage_fixed: true
     lint:
-      run: just lint
+      # Scoped to staged sources only — much faster than eslint ./ and
+      # naturally inert for commits that don't touch source files.
+      glob: "{src/*.ts,src/**/*.ts,tests/*.js,tests/**/*.js}"
+      run: npx eslint {staged_files}
     audit:
       run: just audit
+    build:
+      run: just build
     test:
+      depends_on: build
       run: just test
 
 pre-push:

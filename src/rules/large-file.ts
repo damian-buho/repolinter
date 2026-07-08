@@ -24,8 +24,7 @@ interface FileStat {
 
 async function largeFile(
   fs: FileSystem,
-  options: LargeFileOptions,
-  isNot = false
+  options: LargeFileOptions
 ): Promise<Result> {
   const fileList = options.globsAll ?? options.files ?? []
   const files = await fs.findAllFiles(fileList, !!options.nocase)
@@ -52,7 +51,7 @@ async function largeFile(
       const message = `File size ${readerFriendlySize} bytes`
 
       return {
-        passed: isNot ? !isPassed : isPassed,
+        passed: isPassed,
         path: filePath,
         message,
         size: stat.size
@@ -67,16 +66,15 @@ async function largeFile(
       return stat2.size - stat1.size
     })
 
-  const filteredResults = results.filter(r => r !== null)
-  const isPassed = filteredResults.every(r => r.passed)
-  if (filteredResults.length === 0 || isPassed) {
+  const isPassed = results.every(r => r.passed)
+  if (results.length === 0 || isPassed) {
     return new Result(
       `No file larger than ${options.size} bytes found.`,
-      filteredResults,
+      results,
       isPassed
     )
   }
-  return new Result('Large file(s) found:', filteredResults, isPassed)
+  return new Result('Large file(s) found:', results, isPassed)
 }
 
 export default largeFile
