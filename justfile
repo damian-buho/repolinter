@@ -33,6 +33,12 @@ fix:
 format:
     pnpm format
 
+check-outdated:
+    pnpm outdated || true
+
+update:
+    pnpm update
+
 audit:
     npm run audit
 

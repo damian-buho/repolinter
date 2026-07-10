@@ -117,3 +117,17 @@ export function rmRepo(directory) {
 export function mktempPlainDirectory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'repolinter-nogit-'))
 }
+
+// Create a unique temp directory, pass it to `callback`, then remove it
+// unconditionally — even if the callback throws.  Use this instead of
+// hard-coded paths so tests never race on shared filesystem state.
+export async function withTestDirectory(callback) {
+  const testDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'repolinter-test-')
+  )
+  try {
+    return await callback(testDirectory)
+  } finally {
+    fs.rmSync(testDirectory, { recursive: true, force: true })
+  }
+}
