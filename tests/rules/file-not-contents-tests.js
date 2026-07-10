@@ -102,8 +102,11 @@ describe('rule', () => {
 
     describe('broken symlink handling', () => {
       const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      before(() => fs.symlinkSync('nonexistantfile', brokenSymlink))
-      after(() => fs.unlinkSync(brokenSymlink))
+      before(() => {
+        fs.rmSync(brokenSymlink, { force: true })
+        fs.symlinkSync('nonexistantfile', brokenSymlink)
+      })
+      after(() => fs.rmSync(brokenSymlink, { force: true }))
 
       it('should handle broken symlinks', async () => {
         const stat = fs.lstatSync(brokenSymlink)
