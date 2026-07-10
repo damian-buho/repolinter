@@ -79,7 +79,7 @@
   "dependencies": {
     "@asciidoctor/core": "4.0.2",
     "ajv": "8.20.0",
-    "tinyglobby": "^0.2.17",
+    "tinyglobby": "0.2.17",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
     "isbinaryfile": "6.0.0",
@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/core": "9.6.1",
     "@stryker-mutator/tap-runner": "9.6.1",
     "@stryker-mutator/typescript-checker": "9.6.1",
     "@types/eslint": "9.6.1",
