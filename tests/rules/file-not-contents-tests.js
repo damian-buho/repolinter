@@ -5,10 +5,11 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { describe, it, before, after } from 'node:test'
+import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../dist/lib/file-system.js'
 import fileNotContents from '../../dist/rules/file-not-contents.js'
+import { withTestDirectory } from '../lib/git-fixture.js'
 
 describe('rule', () => {
   describe('files_not_contents', () => {
@@ -101,25 +102,25 @@ describe('rule', () => {
     })
 
     describe('broken symlink handling', () => {
-      const brokenSymlink = './tests/rules/broken_symlink_for_test'
-      before(() => {
-        fs.rmSync(brokenSymlink, { force: true })
-        fs.symlinkSync('nonexistantfile', brokenSymlink)
-      })
-      after(() => fs.rmSync(brokenSymlink, { force: true }))
-
       it('should handle broken symlinks', async () => {
-        const stat = fs.lstatSync(brokenSymlink)
-        assert.strictEqual(stat.isSymbolicLink(), true)
-        const fsInstance = new FileSystem(path.resolve('.'))
+        await withTestDirectory(async testDirectory => {
+          const brokenSymlink = path.join(
+            testDirectory,
+            'broken_symlink_for_test'
+          )
+          fs.symlinkSync('nonexistantfile', brokenSymlink)
+          const stat = fs.lstatSync(brokenSymlink)
+          assert.strictEqual(stat.isSymbolicLink(), true)
+          const fsInstance = new FileSystem(testDirectory)
 
-        const ruleopts = {
-          globsAll: [brokenSymlink],
-          lineCount: 1,
-          content: 'something'
-        }
-        const actual = await fileNotContents(fsInstance, ruleopts)
-        assert.strictEqual(actual.passed, true)
+          const ruleopts = {
+            globsAll: [brokenSymlink],
+            lineCount: 1,
+            content: 'something'
+          }
+          const actual = await fileNotContents(fsInstance, ruleopts)
+          assert.strictEqual(actual.passed, true)
+        })
       })
     })
 
