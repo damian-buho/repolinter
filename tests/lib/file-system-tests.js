@@ -5,10 +5,11 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, it, before, after } from 'node:test'
+import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import realFs from 'node:fs'
 import FileSystem from '../../dist/lib/file-system.js'
+import { withTestDirectory } from './git-fixture.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const sortCompare = (a, b) => a.localeCompare(b)
@@ -101,19 +102,16 @@ describe(
 
       describe('findAllFiles', () => {
         describe('symlink handling', () => {
-          const symlink = './tests/lib/symlink_for_test'
-          before(() => realFs.symlinkSync('file-system-tests.js', symlink))
-          after(() => realFs.unlinkSync(symlink))
-
           it('should ignore symlinks for ** globs', async () => {
-            const stats = realFs.lstatSync(symlink)
-            assert.strictEqual(stats.isSymbolicLink(), true)
-            const fs = new FileSystem(path.resolve('./tests'))
-            const files = await fs.findAllFiles(
-              '**/lib/symlink_for_test',
-              false
-            )
-            assert.strictEqual(files.length, 0)
+            await withTestDirectory(async testDirectory => {
+              const symlink = path.join(testDirectory, 'symlink_for_test')
+              realFs.symlinkSync('file-system-tests.js', symlink)
+              const stats = realFs.lstatSync(symlink)
+              assert.strictEqual(stats.isSymbolicLink(), true)
+              const fs = new FileSystem(testDirectory)
+              const files = await fs.findAllFiles('**/*', false)
+              assert.strictEqual(files.length, 0)
+            })
           })
         })
       })
@@ -228,29 +226,32 @@ describe(
       })
 
       describe('setFileContents', async () => {
-        const fs = new FileSystem(__dirname)
-        const filePath = path.resolve(__dirname, 'text_file_for_test.txt')
-        let contents
-
-        before(async () => {
-          contents = await realFs.promises.readFile(filePath, 'utf8')
-        })
-
         it('should return undefined if the file does not exist', async () => {
-          const actual = await fs.getFileContents('notAFile')
-          assert.strictEqual(actual, undefined)
+          await withTestDirectory(async testDirectory => {
+            const fs = new FileSystem(testDirectory)
+            const actual = await fs.getFileContents('notAFile')
+            assert.strictEqual(actual, undefined)
+          })
         })
 
         it('should change the contents of a file', async () => {
-          const expected = 'somefilecontents\nmorecontents\n'
-          await fs.setFileContents('text_file_for_test.txt', expected)
-          const fileContents = await realFs.promises.readFile(filePath, 'utf8')
-          const realFileContents = fileContents.replaceAll('\r', '')
-          assert.strictEqual(realFileContents, expected)
-        })
-
-        after(async () => {
-          await realFs.promises.writeFile(filePath, contents)
+          await withTestDirectory(async testDirectory => {
+            const source = path.resolve(__dirname, 'text_file_for_test.txt')
+            const destination = path.join(
+              testDirectory,
+              'text_file_for_test.txt'
+            )
+            realFs.copyFileSync(source, destination)
+            const fs = new FileSystem(testDirectory)
+            const expected = 'somefilecontents\nmorecontents\n'
+            await fs.setFileContents('text_file_for_test.txt', expected)
+            const fileContents = await realFs.promises.readFile(
+              destination,
+              'utf8'
+            )
+            const realFileContents = fileContents.replaceAll('\r', '')
+            assert.strictEqual(realFileContents, expected)
+          })
         })
       })
 
