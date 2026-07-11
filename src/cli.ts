@@ -33,7 +33,7 @@ Options:
   -u, --rulesetUrl <url>     Alternate ruleset URL (mutually exclusive with other ruleset options)
   -c, --rulesetEncoded <b64> Base64-encoded ruleset (mutually exclusive with other ruleset options)
   -g, --git                  Clone a git repository before linting
-  -f, --format <type>        Output format: "json", "markdown", or "console" (default: "console")
+  -f, --format <type>        Output format: "json", "markdown", "pr-comment", or "console" (default: "console")
   -h, --help                 Show this help message`)
 }
 
@@ -133,6 +133,8 @@ async function runLint(
     formatter = repolinter.jsonFormatter
   } else if (values.format && values.format.toLowerCase() === 'markdown') {
     formatter = repolinter.markdownFormatter
+  } else if (values.format && values.format.toLowerCase() === 'pr-comment') {
+    formatter = repolinter.prCommentFormatter
   } else {
     formatter = repolinter.defaultFormatter
   }
