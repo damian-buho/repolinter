@@ -45,12 +45,12 @@ function mergeObject(target: JsonObject, source: JsonObject): void {
 
     const tgtValue = target[key]
     if (
-      sourceValue &&
-      typeof sourceValue === 'object' &&
-      !Array.isArray(sourceValue) &&
       tgtValue &&
+      sourceValue &&
       typeof tgtValue === 'object' &&
-      !Array.isArray(tgtValue)
+      typeof sourceValue === 'object' &&
+      !Array.isArray(tgtValue) &&
+      !Array.isArray(sourceValue)
     ) {
       deepMerge(tgtValue as JsonObject, sourceValue as JsonObject)
     } else {
@@ -251,7 +251,7 @@ function parseConfig(config: RulesetConfig): RuleInfo[] {
   >
   return Object.entries(v1Rules).flatMap(([where, rules]) => {
     return Object.entries(rules).map(([rulename, configray]) => {
-      const [name = '', type] = rulename.split(':')
+      const [name = '', type] = rulename.split(':', 2)
       return new RuleInfo(
         name,
         configray[0] as 'off' | 'warning' | 'error',

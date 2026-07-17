@@ -20,7 +20,7 @@ async function fileCreate(
 ): Promise<Result> {
   const exists =
     targets.length > 0 || (await fs.relativeFileExists(options.file))
-  if (!options.replace && exists) {
+  if (exists && !options.replace) {
     if (targets.length > 0) {
       return new Result(
         '',
