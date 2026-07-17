@@ -28,8 +28,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       linguist-js:
-        specifier: 3.0.1
-        version: 3.0.1
+        specifier: 3.0.2
+        version: 3.0.2
       linkinator:
         specifier: 7.6.1
         version: 7.6.1
@@ -1381,10 +1381,6 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  ignore@7.0.5:
-    resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
-    engines: {node: '>= 4'}
-
   ignore@7.0.6:
     resolution: {integrity: sha512-BAg6QkE8W+TuQLrrw0Ugr7HegXduRuuj8/ti2kSOc+jz1dmx8/WNcjr6XGnq5YpDWxFwwaavqD0+jIUOKelTsw==}
     engines: {node: '>= 4'}
@@ -1506,8 +1502,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  linguist-js@3.0.1:
-    resolution: {integrity: sha512-OLaRg4s0cV7zdR/UNNzdwhuYSbnzgX1wph5QqdZoB3bFpAVQDi1s0hQ1LRqiPkc/q2mEqd2pecdpgEub2Vno4A==}
+  linguist-js@3.0.2:
+    resolution: {integrity: sha512-1VpWhFUPg8vSVQAAD8jgMw0Hx8dCev3snFd3JSV7wN0XJbYyyry9UTTU2gNmVVKHotAxGFvT37CQoJA+i8b9EA==}
     engines: {node: '>=26', npm: '>=10'}
     hasBin: true
 
@@ -3565,8 +3561,6 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  ignore@7.0.5: {}
-
   ignore@7.0.6: {}
 
   imurmurhash@0.1.4: {}
@@ -3656,12 +3650,12 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  linguist-js@3.0.1:
+  linguist-js@3.0.2:
     dependencies:
       binary-extensions: 3.1.0
       commander: 14.0.3
       common-path-prefix: 3.0.0
-      ignore: 7.0.5
+      ignore: 7.0.6
       isbinaryfile: 6.0.0
       js-yaml: 4.2.0
       node-cache: 5.1.2

@@ -5,7 +5,7 @@
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { existsSync, statSync } from 'node:fs'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises'
 
 const require = createRequire(import.meta.url)
 
@@ -13,31 +13,53 @@ class Linguist {
   private async ensureBinaryExtensionsFixture(): Promise<void> {
     const linguistPackagePath = require.resolve('linguist-js/package.json')
     const linguistPackageDirectory = path.dirname(linguistPackagePath)
-    const fixturePath = path.join(
+    const fixtureDirectory = path.join(
       linguistPackageDirectory,
       'node_modules',
-      'binary-extensions',
-      'binary-extensions.json'
+      'binary-extensions'
     )
+    const indexPath = path.join(fixtureDirectory, 'index.js')
 
-    if (existsSync(fixturePath) && statSync(fixturePath).size > 0) {
+    if (existsSync(indexPath) && statSync(indexPath).size > 0) {
       return
     }
 
-    const hoistedBinaryExtensionsPath = path.join(
+    const hoistedBinaryExtensionsDirectory = path.join(
       linguistPackageDirectory,
       '..',
-      'binary-extensions',
-      'binary-extensions.json'
+      'binary-extensions'
     )
+
+    if (existsSync(hoistedBinaryExtensionsDirectory)) {
+      if (existsSync(fixtureDirectory)) {
+        await rm(fixtureDirectory, { recursive: true })
+      }
+      await cp(hoistedBinaryExtensionsDirectory, fixtureDirectory, {
+        recursive: true
+      })
+      return
+    }
+
     const fallbackContent = '[]'
-
-    const extensionsContent = existsSync(hoistedBinaryExtensionsPath)
-      ? await readFile(hoistedBinaryExtensionsPath, 'utf8')
-      : fallbackContent
-
-    await mkdir(path.dirname(fixturePath), { recursive: true })
-    await writeFile(fixturePath, extensionsContent, 'utf8')
+    if (existsSync(fixtureDirectory)) {
+      await rm(fixtureDirectory, { recursive: true })
+    }
+    await mkdir(fixtureDirectory, { recursive: true })
+    await writeFile(
+      path.join(fixtureDirectory, 'package.json'),
+      JSON.stringify({ name: 'binary-extensions', type: 'module' }),
+      'utf8'
+    )
+    await writeFile(
+      path.join(fixtureDirectory, 'index.js'),
+      `export default ${fallbackContent};`,
+      'utf8'
+    )
+    await writeFile(
+      path.join(fixtureDirectory, 'binary-extensions.json'),
+      fallbackContent,
+      'utf8'
+    )
   }
 
   async identifyLanguages(
