@@ -92,8 +92,8 @@ importers:
         specifier: 17.7.0
         version: 17.7.0
       markdownlint:
-        specifier: 0.41.0
-        version: 0.41.0
+        specifier: 0.41.1
+        version: 0.41.1
       mock-http-server:
         specifier: 1.4.5
         version: 1.4.5
@@ -1544,8 +1544,8 @@ packages:
     resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
     hasBin: true
 
-  markdownlint@0.41.0:
-    resolution: {integrity: sha512-xMUI3ChBuRuxuLF4ENvCZyS8z/+Jly1coUcZwErKLIB3sDj7ojpaTBa1e9YVPhSN4jGEIjYGQCldbTJS/hqS+A==}
+  markdownlint@0.41.1:
+    resolution: {integrity: sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==}
     engines: {node: '>=22'}
 
   marked-gfm-heading-id@4.1.4:
@@ -3712,7 +3712,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  markdownlint@0.41.0:
+  markdownlint@0.41.1:
     dependencies:
       micromark: 4.0.2
       micromark-core-commonmark: 2.0.3
