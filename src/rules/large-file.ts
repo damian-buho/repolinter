@@ -67,7 +67,7 @@ async function largeFile(
     })
 
   const isPassed = results.every(r => r.passed)
-  if (results.length === 0 || isPassed) {
+  if (isPassed || results.length === 0) {
     return new Result(
       `No file larger than ${options.size} bytes found.`,
       results,

@@ -8,8 +8,17 @@ import { fileURLToPath } from 'node:url'
 import { lint as markdownlint } from 'markdownlint/promise'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import toc from 'markdown-toc'
 import { slug as slugger } from '../../dist/lib/github-slugger.js'
+
+function extractHeadings(markdown) {
+  return markdown
+    .split('\n')
+    .filter(line => /^#{1,6}\s/.test(line))
+    .map(line => {
+      const match = line.match(/^(#{1,6})\s+(.*)/)
+      return { lvl: match[1].length, slug: slugger(match[2]) }
+    })
+}
 import FormatResult from '../../dist/lib/formatresult.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'
@@ -66,10 +75,7 @@ describe('formatters', () => {
 
     it('generates the correct sections with sample output', () => {
       const output = formatter.formatOutput(result, false)
-      const sections = toc(output, {
-        slugify: slugger,
-        firsth1: true
-      }).json
+      const sections = extractHeadings(output)
       const filteredSections = sections.filter(s => s.lvl !== 1)
 
       const expected = [
