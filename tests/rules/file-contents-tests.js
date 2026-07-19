@@ -52,7 +52,6 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts)
-      console.log(actual)
       assert.strictEqual(actual.passed, true)
       assert.strictEqual(actual.targets.length, 1)
       assert.deepStrictEqual(actual.targets[0], {
@@ -78,7 +77,6 @@ describe('rule', () => {
       }
 
       const actual = await fileContents(mockfs, ruleopts, true)
-      console.log(actual)
       assert.strictEqual(actual.passed, false)
       assert.strictEqual(actual.targets.length, 1)
       assert.deepStrictEqual(actual.targets[0], {

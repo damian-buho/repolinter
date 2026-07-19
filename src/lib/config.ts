@@ -13,6 +13,7 @@ import Rules from '../rules/rules.js'
 import RuleInfo from './ruleinfo.js'
 import Fixes from '../fixes/fixes.js'
 import { safeFetch } from './safe-fetch.js'
+import { logger } from '../logger.js'
 
 interface RuleEntry {
   level: 'off' | 'warning' | 'error'
@@ -80,15 +81,27 @@ function isAbsoluteURL(url: string): boolean {
 }
 
 function findConfig(directory?: string): string {
-  return (
-    findFile('repolint.json', { cwd: directory }) ||
-    findFile('repolint.yaml', { cwd: directory }) ||
-    findFile('repolint.yml', { cwd: directory }) ||
-    findFile('repolinter.json', { cwd: directory }) ||
-    findFile('repolinter.yaml', { cwd: directory }) ||
-    findFile('repolinter.yml', { cwd: directory }) ||
-    path.join(__dirname, '../rulesets/default.json')
+  const candidates = [
+    'repolint.json',
+    'repolint.yaml',
+    'repolint.yml',
+    'repolinter.json',
+    'repolinter.yaml',
+    'repolinter.yml'
+  ]
+  for (const name of candidates) {
+    const found = findFile(name, { cwd: directory })
+    if (found) {
+      logger.debug({ directory, found: name, path: found }, 'Found config file')
+      return found
+    }
+  }
+  const defaultPath = path.join(__dirname, '../rulesets/default.json')
+  logger.debug(
+    { directory, fallback: defaultPath },
+    'No config found, using default'
   )
+  return defaultPath
 }
 
 function parseRawRuleset(
@@ -118,28 +131,50 @@ async function resolveExtension(
 
   processed.push(sourceLocation)
   if (processed.length > 20) {
+    logger.error(
+      { depth: processed.length, sourceLocation },
+      'Exceeded maximum ruleset extension depth'
+    )
     throw new Error('exceeded maximum 20 ruleset extensions')
   }
 
   let parent: string
+  let resolutionMethod: string
   if (isAbsoluteURL(ruleset.extends) || isBase64(ruleset.extends)) {
     parent = ruleset.extends
+    resolutionMethod = isBase64(ruleset.extends) ? 'base64' : 'url'
   } else if (isAbsoluteURL(sourceLocation)) {
     parent = new URL(ruleset.extends, sourceLocation).href
+    resolutionMethod = 'url-relative'
   } else {
     // Disallow absolute paths and parent-directory traversal in local extends
     // to prevent a repo-controlled config from reading arbitrary server files.
     const normalized = path.normalize(ruleset.extends)
     if (path.isAbsolute(normalized) || normalized.startsWith('..')) {
+      logger.warn(
+        { extends: ruleset.extends, normalized },
+        'Blocked parent-directory traversal in extends'
+      )
       throw new Error(
         `extends path '${ruleset.extends}' must be a relative path that does not traverse parent directories`
       )
     }
     parent = path.resolve(path.dirname(sourceLocation), ruleset.extends)
+    resolutionMethod = 'local'
   }
 
-  if (processed.includes(parent)) return ruleset
+  if (processed.includes(parent)) {
+    logger.warn(
+      { parent, processed },
+      'Circular extends detected, skipping parent'
+    )
+    return ruleset
+  }
 
+  logger.debug(
+    { extends: ruleset.extends, parent, resolutionMethod },
+    'Resolving extends parent'
+  )
   const parentRuleset = isBase64(parent)
     ? await decodeConfig(parent, processed)
     : await loadConfig(parent, processed)
@@ -160,14 +195,20 @@ async function loadConfig(
 
   let configData: string
   if (isAbsoluteURL(configLocation)) {
+    logger.debug({ url: configLocation }, 'Fetching remote config')
     const response = await safeFetch(configLocation)
     if (!response.ok) {
+      logger.debug(
+        { url: configLocation, status: response.status },
+        'Config fetch failed'
+      )
       throw new Error(
         `Failed to fetch config from ${configLocation} with status code ${response.status}`
       )
     }
     configData = await response.text()
   } else {
+    logger.debug({ path: configLocation }, 'Reading local config file')
     configData = await fs.promises.readFile(configLocation, 'utf8')
   }
 
@@ -230,7 +271,12 @@ async function validateConfig(
 
 function parseConfig(config: RulesetConfig): RuleInfo[] {
   if (config.version === 2) {
-    return Object.entries<RuleEntry>(config.rules ?? {}).map(
+    const ruleEntries = Object.entries<RuleEntry>(config.rules ?? {})
+    logger.debug(
+      { version: 2, ruleCount: ruleEntries.length },
+      'Parsing v2 ruleset'
+    )
+    return ruleEntries.map(
       ([name, config_]) =>
         new RuleInfo(
           name,
@@ -249,7 +295,12 @@ function parseConfig(config: RulesetConfig): RuleInfo[] {
     string,
     Record<string, unknown[]>
   >
-  return Object.entries(v1Rules).flatMap(([where, rules]) => {
+  const v1Entries = Object.entries(v1Rules)
+  logger.debug(
+    { version: 1, whereCount: v1Entries.length },
+    'Parsing legacy v1 ruleset'
+  )
+  return v1Entries.flatMap(([where, rules]) => {
     return Object.entries(rules).map(([rulename, configray]) => {
       const [name = '', type] = rulename.split(':', 2)
       return new RuleInfo(
@@ -270,10 +321,17 @@ async function decodeConfig(
   const configData = Buffer.from(encodedRuleSet, 'base64').toString()
   const ruleset = parseRawRuleset(configData, 'ruleset')
 
-  if (!ruleset.extends) return ruleset
+  if (!ruleset.extends) {
+    logger.debug({ hasExtends: false }, 'Decoded base64 ruleset (no extends)')
+    return ruleset
+  }
 
   processed.push(encodedRuleSet)
   if (processed.length > 20) {
+    logger.error(
+      { depth: processed.length },
+      'Exceeded maximum ruleset extension depth in base64 chain'
+    )
     throw new Error('exceeded maximum 20 ruleset extensions')
   }
 
@@ -283,6 +341,10 @@ async function decodeConfig(
   }
 
   if (parent !== undefined && !processed.includes(parent)) {
+    logger.debug(
+      { extends: ruleset.extends, isBase64: isBase64(parent) },
+      'Loading parent in base64 extends chain'
+    )
     const parentRuleset = isBase64(parent)
       ? await decodeConfig(parent, processed)
       : await loadConfig(parent, processed)

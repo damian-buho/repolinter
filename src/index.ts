@@ -15,6 +15,7 @@ import FileSystem from './lib/file-system.js'
 import Rules from './rules/rules.js'
 import Fixes from './fixes/fixes.js'
 import Axioms from './axioms/axioms.js'
+import { logger } from './logger.js'
 
 const FormatResult = FormatResultBase as typeof FormatResultBase & {
   RULE_PASSED: string
@@ -93,6 +94,10 @@ export async function lint(
       try {
         ruleset = await config.loadConfig(rulesetPath)
       } catch (error) {
+        logger.debug(
+          { rulesetPath, error: String(error) },
+          'Failed to load config'
+        )
         return {
           params: {
             targetDirectory,
@@ -116,6 +121,7 @@ export async function lint(
 
   const value = await config.validateConfig(ruleset as RulesetConfig)
   if (!value.passed) {
+    logger.debug({ error: value.error }, 'Config validation failed')
     return {
       params: {
         targetDirectory,
@@ -254,11 +260,19 @@ export async function runRuleset(
           ])
   const results = ruleset.map(async (r: RuleInfo) => {
     if (r.level === 'off') {
+      logger.debug(
+        { rule: r.name, ruleType: r.ruleType },
+        'Skipping rule (level is off)'
+      )
       return FormatResult.CreateIgnored(r, 'ignored because level is "off"')
     }
     if (typeof targets !== 'boolean' && r.where && r.where.length > 0) {
       const ignoreReasons = filterRuleTargets(targetArray, r.where)
       if (ignoreReasons.length > 0) {
+        logger.debug(
+          { rule: r.name, reasons: ignoreReasons },
+          'Skipping rule (unsatisfied conditions)'
+        )
         return FormatResult.CreateIgnored(
           r,
           `ignored due to unsatisfied condition(s): "${ignoreReasons.join(
@@ -268,6 +282,10 @@ export async function runRuleset(
       }
     }
     if (!Object.hasOwn(Rules, r.ruleType)) {
+      logger.warn(
+        { rule: r.name, ruleType: r.ruleType },
+        'Unknown rule type, skipping'
+      )
       return FormatResult.CreateError(r, `${r.ruleType} is not a valid rule`)
     }
     let result: Result
@@ -276,6 +294,10 @@ export async function runRuleset(
       result = await ruleFunction(fileSystem, r.ruleConfig)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
+      logger.error(
+        { rule: r.name, ruleType: r.ruleType, err: message },
+        'Rule threw an error'
+      )
       return FormatResult.CreateError(
         r,
         `${r.ruleType} threw an error: ${message}`
@@ -293,6 +315,10 @@ export async function runRuleset(
       return FormatResult.CreateLintOnly(r, result)
     }
     if (!Object.hasOwn(Fixes, r.fixType)) {
+      logger.warn(
+        { rule: r.name, fixType: r.fixType },
+        'Unknown fix type, skipping'
+      )
       return FormatResult.CreateError(r, `${r.fixType} is not a valid fix`)
     }
     let fixresult: Result
@@ -306,6 +332,10 @@ export async function runRuleset(
       )
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
+      logger.error(
+        { rule: r.name, fixType: r.fixType, err: message },
+        'Fix threw an error'
+      )
       return FormatResult.CreateError(
         r,
         `${r.fixType} threw an error: ${message}`
@@ -324,6 +354,7 @@ export async function determineTargets(
   const ruleresults = await Promise.all(
     Object.entries(axiomconfig).map(async ([axiomId, axiomName]) => {
       if (!Object.hasOwn(Axioms, axiomId)) {
+        logger.warn({ axiomId }, 'Unknown axiom ID, skipping')
         return [
           axiomName,
           new Result(`invalid axiom name ${axiomId}`, [], false)

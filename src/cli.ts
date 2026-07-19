@@ -9,6 +9,7 @@ import { parseArgs } from 'node:util'
 import { simpleGit } from 'simple-git'
 import * as repolinter from './index.js'
 import type { Formatter } from './index.js'
+import { logger, setLogLevel } from './logger.js'
 
 const KEBAB_MAP: Record<string, string> = {
   '--ruleset-file': '--rulesetFile',
@@ -34,6 +35,8 @@ Options:
   -c, --rulesetEncoded <b64> Base64-encoded ruleset (mutually exclusive with other ruleset options)
   -g, --git                  Clone a git repository before linting
   -f, --format <type>        Output format: "json", "markdown", "pr-comment", or "console" (default: "console")
+  -v, --verbose              Enable debug-level logging
+  -q, --quiet                Suppress info-level logs (show warnings and errors only)
   -h, --help                 Show this help message`)
 }
 
@@ -50,29 +53,37 @@ try {
       rulesetEncoded: { type: 'string', short: 'c' },
       git: { type: 'boolean', short: 'g', default: false },
       format: { type: 'string', short: 'f', default: 'console' },
+      verbose: { type: 'boolean', short: 'v', default: false },
+      quiet: { type: 'boolean', short: 'q', default: false },
       help: { type: 'boolean', short: 'h', default: false }
     },
     strict: true,
     allowPositionals: true
   })
 
-  if (values.help) {
+  if (values.verbose && values.quiet) {
+    logger.error('Error: --verbose and --quiet are mutually exclusive')
+    process.exitCode = 1
+  } else if (values.help) {
     printHelp()
   } else {
+    if (values.verbose) setLogLevel('debug')
+    else if (values.quiet) setLogLevel('warn')
+
     const command = positionals[0]
     if (command && command !== 'lint') {
-      console.error(`Unknown command: ${command}`)
+      logger.error({ command }, 'Unknown command')
       process.exitCode = 1
     } else if (
       values.rulesetFile &&
       (values.rulesetUrl || values.rulesetEncoded)
     ) {
-      console.error(
+      logger.error(
         'Error: --rulesetFile is mutually exclusive with --rulesetUrl and --rulesetEncoded'
       )
       process.exitCode = 1
     } else if (values.rulesetEncoded && values.rulesetUrl) {
-      console.error(
+      logger.error(
         'Error: --rulesetEncoded is mutually exclusive with --rulesetUrl'
       )
       process.exitCode = 1
@@ -85,7 +96,7 @@ try {
   }
 } catch (error: unknown) {
   if (error instanceof Error && error.message.startsWith('Unknown option')) {
-    console.error(error.message)
+    logger.error(error.message)
     process.exitCode = 1
   } else {
     throw error
@@ -111,17 +122,27 @@ async function runLint(
     )
     const result = await git.clone(directory, temporaryDirectory)
     if (result) {
-      console.error(result)
+      logger.error({ result }, 'Git clone failed')
       process.exitCode = 1
       try {
         await fs.promises.rm(temporaryDirectory, {
           recursive: true,
           force: true
         })
-      } catch {}
+      } catch (cleanupError) {
+        logger.warn(
+          { tmpDir: temporaryDirectory, err: cleanupError },
+          'Failed to clean up after clone failure'
+        )
+      }
       return
     }
+    logger.debug(
+      { repo: directory, dest: temporaryDirectory },
+      'Clone succeeded'
+    )
   }
+  logger.debug({ directory, format: values.format }, 'Starting lint')
   const output = await repolinter.lint(
     temporaryDirectory ?? path.resolve(process.cwd(), directory),
     values.allowPaths ?? [],
@@ -129,24 +150,50 @@ async function runLint(
     values.dryRun ?? false
   )
   let formatter: Formatter
+  let selectedFormatter: string
   if (values.format && values.format.toLowerCase() === 'json') {
     formatter = repolinter.jsonFormatter
+    selectedFormatter = 'json'
   } else if (values.format && values.format.toLowerCase() === 'markdown') {
     formatter = repolinter.markdownFormatter
+    selectedFormatter = 'markdown'
   } else if (values.format && values.format.toLowerCase() === 'pr-comment') {
     formatter = repolinter.prCommentFormatter
+    selectedFormatter = 'pr-comment'
   } else {
     formatter = repolinter.defaultFormatter
+    selectedFormatter = 'console'
   }
+  logger.debug(
+    { format: values.format, selected: selectedFormatter },
+    'Selected output formatter'
+  )
   const formattedOutput = formatter.formatOutput(output, values.dryRun ?? false)
+  logger.debug(
+    {
+      passed: output.passed,
+      errored: output.errored,
+      results: output.results.length
+    },
+    'Lint completed'
+  )
   console.log(formattedOutput)
   process.exitCode = output.passed ? 0 : 1
+  logger.debug(
+    { exitCode: process.exitCode, passed: output.passed },
+    'Set exit code'
+  )
   if (temporaryDirectory) {
     try {
       await fs.promises.rm(temporaryDirectory, {
         recursive: true,
         force: true
       })
-    } catch {}
+    } catch (cleanupError) {
+      logger.warn(
+        { tmpDir: temporaryDirectory, err: cleanupError },
+        'Failed to clean up temporary directory'
+      )
+    }
   }
 }

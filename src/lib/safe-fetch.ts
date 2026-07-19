@@ -3,6 +3,7 @@
 
 import { BlockList } from 'node:net'
 import { Agent } from 'undici'
+import { logger } from '../logger.js'
 
 // Defense-in-depth wrapper around fetch: ruleset-supplied URLs cannot reach
 // loopback, link-local, RFC1918, or non-http(s) targets. The block check
@@ -47,12 +48,18 @@ async function safeFetch(
 ): Promise<Response> {
   const url = new URL(target)
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    logger.warn(
+      { protocol: url.protocol, target },
+      'Refusing non-http(s) fetch'
+    )
     throw new Error(`refusing non-http(s) URL: ${url.protocol}`)
   }
-  const dispatcher =
+  const shouldBypassPrivate =
     process.env['REPOLINTER_ALLOW_PRIVATE_FETCH'] === '1'
-      ? undefined
-      : blockingDispatcher
+  if (shouldBypassPrivate) {
+    logger.debug({ target }, 'Private fetch bypass enabled')
+  }
+  const dispatcher = shouldBypassPrivate ? undefined : blockingDispatcher
   const fetchInit: FetchInitWithDispatcher = { ...init, dispatcher }
   return fetch(target, fetchInit as RequestInit)
 }

@@ -4,10 +4,12 @@
 
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
+import path from 'node:path'
 import prCommentFormatter from '../../dist/formatters/pr-comment-formatter.js'
 import FormatResult from '../../dist/lib/formatresult.js'
 import RuleInfo from '../../dist/lib/ruleinfo.js'
 import Result from '../../dist/lib/result.js'
+import * as repolinter from '../../dist/index.js'
 
 const SYMBOLS = {
   success: '\u{2714}',
@@ -180,5 +182,133 @@ describe('formatters', () => {
       assert.ok(result.includes(`${SYMBOLS.error} README.md`))
       assert.ok(result.includes(`${SYMBOLS.error} CONTRIBUTING.md`))
     })
+
+    it('never returns empty output when results exist', () => {
+      const cases = [
+        {
+          label: 'all passing',
+          results: [
+            FormatResult.CreateLintOnly(
+              new RuleInfo('file-existence', 'error', [], 'file-existence', {}),
+              new Result(
+                'Found',
+                [{ path: 'LICENSE', passed: true, message: 'Found file' }],
+                true
+              )
+            )
+          ]
+        },
+        {
+          label: 'all failing',
+          results: [
+            FormatResult.CreateLintOnly(
+              new RuleInfo('file-existence', 'error', [], 'file-existence', {}),
+              new Result(
+                'Missing',
+                [{ path: 'LICENSE', passed: false, message: 'not found' }],
+                false
+              )
+            )
+          ]
+        },
+        {
+          label: 'mixed pass/fail',
+          results: [
+            FormatResult.CreateLintOnly(
+              new RuleInfo('rule-a', 'error', [], 'file-existence', {}),
+              new Result(
+                'Found',
+                [{ path: 'README.md', passed: true, message: 'Found file' }],
+                true
+              )
+            ),
+            FormatResult.CreateLintOnly(
+              new RuleInfo('rule-b', 'error', [], 'file-existence', {}),
+              new Result(
+                'Missing',
+                [{ path: 'LICENSE', passed: false, message: 'not found' }],
+                false
+              )
+            )
+          ]
+        },
+        {
+          label: 'ignored rules',
+          results: [
+            FormatResult.CreateIgnored(
+              new RuleInfo(
+                'ruby-package-metadata-exists',
+                'error',
+                [],
+                'file-existence',
+                {}
+              ),
+              'ignored due to unsatisfied condition(s): "language=ruby"'
+            )
+          ]
+        },
+        {
+          label: 'error rules',
+          results: [
+            FormatResult.CreateError(
+              new RuleInfo('bad-rule', 'error', [], 'bad-rule', {}),
+              'bad-rule is not a valid rule'
+            )
+          ]
+        }
+      ]
+
+      for (const { label, results } of cases) {
+        const output = {
+          passed: true,
+          errored: false,
+          results,
+          targets: {},
+          params: { targetDirectory: '.', filterPaths: [], ruleset: {} }
+        }
+        const result = prCommentFormatter.formatOutput(output, false)
+        assert.ok(
+          result.trim().length > 0,
+          `pr-comment formatter returned empty output for case: ${label}`
+        )
+      }
+    })
+
+    it(
+      'produces non-empty output against the real codebase',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve('.'))
+        const result = prCommentFormatter.formatOutput(lintres, false)
+        assert.ok(
+          result.trim().length > 0,
+          'pr-comment formatter returned empty output for the real codebase'
+        )
+        assert.ok(result.includes(SYMBOLS.success))
+      },
+      { timeout: 30_000 }
+    )
+
+    it(
+      'produces non-empty output with error symbols for a broken repo',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve('tests/package'))
+        assert.strictEqual(lintres.passed, false, 'expected lint to fail')
+
+        const result = prCommentFormatter.formatOutput(lintres, false)
+        assert.ok(
+          result.trim().length > 0,
+          'pr-comment formatter returned empty output for a broken repo'
+        )
+        assert.ok(
+          result.includes(SYMBOLS.error),
+          'output should contain error symbol for failing rules'
+        )
+        assert.ok(
+          result.includes('readme-file-exists'),
+          'output should mention the failing rule'
+        )
+      },
+      { timeout: 30_000 }
+    )
   })
 })
