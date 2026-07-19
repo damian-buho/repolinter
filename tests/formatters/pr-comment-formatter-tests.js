@@ -287,5 +287,28 @@ describe('formatters', () => {
       },
       { timeout: 30_000 }
     )
+
+    it(
+      'produces non-empty output with error symbols for a broken repo',
+      async () => {
+        const lintres = await repolinter.lint(path.resolve('tests/package'))
+        assert.strictEqual(lintres.passed, false, 'expected lint to fail')
+
+        const result = prCommentFormatter.formatOutput(lintres, false)
+        assert.ok(
+          result.trim().length > 0,
+          'pr-comment formatter returned empty output for a broken repo'
+        )
+        assert.ok(
+          result.includes(SYMBOLS.error),
+          'output should contain error symbol for failing rules'
+        )
+        assert.ok(
+          result.includes('readme-file-exists'),
+          'output should mention the failing rule'
+        )
+      },
+      { timeout: 30_000 }
+    )
   })
 })
