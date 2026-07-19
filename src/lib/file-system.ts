@@ -5,6 +5,7 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { glob } from 'tinyglobby'
+import { logger } from '../logger.js'
 
 export interface GlobOptions {
   cwd?: string
@@ -47,6 +48,10 @@ class FileSystem {
     const base = path.resolve(this.targetDirectory)
     const resolved = path.resolve(base, relativeFile)
     if (resolved !== base && !resolved.startsWith(base + path.sep)) {
+      logger.warn(
+        { relativeFile, base, resolved },
+        'Path resolved outside target directory'
+      )
       throw new Error(
         `path '${relativeFile}' resolves outside target directory '${base}'`
       )
@@ -98,9 +103,21 @@ class FileSystem {
       onlySymlinks.add(relativeToRepoPath)
     }
 
-    return filePaths.filter(
+    const filtered = filePaths.filter(
       filePath => !onlySymlinks.has(this.normalizePath(filePath))
     )
+    if (onlySymlinks.size > 0) {
+      logger.debug(
+        {
+          globs,
+          before: filePaths.length,
+          after: filtered.length,
+          symlinksExcluded: onlySymlinks.size
+        },
+        'Filtered symlinks from glob results'
+      )
+    }
+    return filtered
   }
 
   async glob(
@@ -124,6 +141,10 @@ class FileSystem {
     const key = this.globCacheKey(fixedGlobs, options, mergedIgnore)
     const cached = this.globCache.get(key)
     if (cached !== undefined) {
+      logger.debug(
+        { globs: fixedGlobs, cacheHit: true, resultCount: cached.length },
+        'Glob cache hit'
+      )
       return cached
     }
 
@@ -214,11 +235,16 @@ class FileSystem {
 
   async setFileContents(relativeFile: string, contents: string): Promise<void> {
     this.globCache.clear()
+    logger.debug(
+      { relativeFile, bytes: contents.length },
+      'Writing file contents'
+    )
     return fs.promises.writeFile(this.resolveContained(relativeFile), contents)
   }
 
   async removeFile(relativeFile: string): Promise<void> {
     this.globCache.clear()
+    logger.debug({ relativeFile }, 'Removing file')
     return fs.promises.unlink(this.resolveContained(relativeFile))
   }
 

@@ -129,9 +129,18 @@ async function runLint(
           recursive: true,
           force: true
         })
-      } catch {}
+      } catch (cleanupError) {
+        logger.warn(
+          { tmpDir: temporaryDirectory, err: cleanupError },
+          'Failed to clean up after clone failure'
+        )
+      }
       return
     }
+    logger.debug(
+      { repo: directory, dest: temporaryDirectory },
+      'Clone succeeded'
+    )
   }
   logger.debug({ directory, format: values.format }, 'Starting lint')
   const output = await repolinter.lint(
@@ -141,15 +150,24 @@ async function runLint(
     values.dryRun ?? false
   )
   let formatter: Formatter
+  let selectedFormatter: string
   if (values.format && values.format.toLowerCase() === 'json') {
     formatter = repolinter.jsonFormatter
+    selectedFormatter = 'json'
   } else if (values.format && values.format.toLowerCase() === 'markdown') {
     formatter = repolinter.markdownFormatter
+    selectedFormatter = 'markdown'
   } else if (values.format && values.format.toLowerCase() === 'pr-comment') {
     formatter = repolinter.prCommentFormatter
+    selectedFormatter = 'pr-comment'
   } else {
     formatter = repolinter.defaultFormatter
+    selectedFormatter = 'console'
   }
+  logger.debug(
+    { format: values.format, selected: selectedFormatter },
+    'Selected output formatter'
+  )
   const formattedOutput = formatter.formatOutput(output, values.dryRun ?? false)
   logger.debug(
     {
@@ -161,12 +179,21 @@ async function runLint(
   )
   console.log(formattedOutput)
   process.exitCode = output.passed ? 0 : 1
+  logger.debug(
+    { exitCode: process.exitCode, passed: output.passed },
+    'Set exit code'
+  )
   if (temporaryDirectory) {
     try {
       await fs.promises.rm(temporaryDirectory, {
         recursive: true,
         force: true
       })
-    } catch {}
+    } catch (cleanupError) {
+      logger.warn(
+        { tmpDir: temporaryDirectory, err: cleanupError },
+        'Failed to clean up temporary directory'
+      )
+    }
   }
 }
