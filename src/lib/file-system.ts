@@ -185,7 +185,8 @@ class FileSystem {
         : globs.map(g => this.normalizePath(g))
     return this.glob(fixedGlobs, {
       cwd: this.targetDirectory,
-      nocase: !!isNocase
+      nocase: !!isNocase,
+      nodir: false
     })
   }
 
