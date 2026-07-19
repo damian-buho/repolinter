@@ -138,7 +138,6 @@ describe('rule', () => {
       }
 
       const actual = await fileNotContents(mockfs, ruleopts)
-      console.log(actual)
       assert.strictEqual(actual.passed, true)
       assert.strictEqual(actual.targets.length, 0)
       assert.strictEqual(
