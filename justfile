@@ -15,10 +15,10 @@ build-docker:
     docker buildx build -t repolinter:dev --load .
 
 test:
-    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR node --test 'tests/**/*.js'
+    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR pnpm exec tsx --test 'tests/**/*.ts'
 
 test-verbose:
-    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR node --test --test-reporter spec 'tests/**/*.js'
+    env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_COMMON_DIR pnpm exec tsx --test --test-reporter spec 'tests/**/*.ts'
 
 coverage:
     npm run test:coverage

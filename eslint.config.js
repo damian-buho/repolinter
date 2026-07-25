@@ -76,7 +76,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ['tests/**/*.js'],
+    files: ['tests/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.mocha
