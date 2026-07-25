@@ -37,6 +37,20 @@ type JsonObject = Record<string, unknown>
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// When running from dist/lib/ (compiled), JSON schemas are at dist/{rules,fixes,rulesets}/.
+// When running from src/lib/ (tsx), they are at the project root {rules,fixes,rulesets}/.
+const projectRoot = path.resolve(__dirname, '..', '..')
+
+function resolveSchemaPath(subdirectory: string, filename: string): string {
+  const compiledPath = path.resolve(__dirname, '..', subdirectory, filename)
+  try {
+    fs.accessSync(compiledPath)
+    return compiledPath
+  } catch {
+    return path.resolve(projectRoot, subdirectory, filename)
+  }
+}
+
 function mergeObject(target: JsonObject, source: JsonObject): void {
   // What we are trying to do: copy each key from source into target, deep-merging
   // plain objects and overwriting everything else, while never touching prototype
@@ -96,7 +110,7 @@ function findConfig(directory?: string): string {
       return found
     }
   }
-  const defaultPath = path.join(__dirname, '../rulesets/default.json')
+  const defaultPath = resolveSchemaPath('rulesets', 'default.json')
   logger.debug(
     { directory, fallback: defaultPath },
     'No config found, using default'
@@ -242,7 +256,7 @@ async function validateConfig(
     const entries = await Promise.all(
       Object.keys(registry).map(async name => {
         const data = await fs.promises.readFile(
-          path.resolve(__dirname, '..', subdirectory, `${name}-config.json`),
+          resolveSchemaPath(subdirectory, `${name}-config.json`),
           'utf8'
         )
         return JSON.parse(data) as JsonObject
@@ -261,7 +275,7 @@ async function validateConfig(
 
   const mainSchema = JSON.parse(
     await fs.promises.readFile(
-      path.resolve(__dirname, '../rulesets/schema.json'),
+      resolveSchemaPath('rulesets', 'schema.json'),
       'utf8'
     )
   ) as JsonObject
