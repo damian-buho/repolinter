@@ -5,10 +5,6 @@
 allowBuilds:
   unrs-resolver: false
 
-minimumReleaseAgeExclude:
-  # 8.0.1 is a fresh release; exempt it from the release-age gate until it ages in.
-  - linkinator@8.0.1
-
 overrides:
   qs: 6.15.2
   js-yaml: 4.3.0
