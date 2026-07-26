@@ -33,5 +33,5 @@ jobs:
 
       - uses: ./
         with:
-          config_file: .github/repolinter.yaml
+          config_file: rulesets/default.json
           comment:     ${{ github.event_name == 'pull_request' }}

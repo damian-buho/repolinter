@@ -20,4 +20,4 @@ rules:
       type: file-existence
       options:
         globsAny:
-          - lint-tests.js
+          - lint-tests.ts

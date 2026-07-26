@@ -222,6 +222,15 @@ runs:
         ignored=$( jq '[.results[] | select(.status == "IGNORED")]                                 | length' "$REPORT_JSON")
         echo "Counts: errors=$errors warnings=$warnings passed=$passed ignored=$ignored"
 
+        # A run that errored out (bad ruleset, unreadable target) produces an
+        # empty `results` array, which would otherwise score as a clean pass.
+        errored=$(jq -r '.errored // false' "$REPORT_JSON")
+        err_msg=$(jq -r '.errMsg  // ""'    "$REPORT_JSON")
+        echo "Run errored=$errored"
+        if [ "$errored" = "true" ]; then
+          echo "::error::Repolinter could not complete the run: ${err_msg:-unknown error}"
+        fi
+
         echo "errors=$errors"     >> "$GITHUB_OUTPUT"
         echo "warnings=$warnings" >> "$GITHUB_OUTPUT"
         echo "passed=$passed"     >> "$GITHUB_OUTPUT"
@@ -252,15 +261,15 @@ runs:
         case "$FAIL_ON" in
           none)
             fail=0
-            echo "fail_on=none → never fail"
+            echo "fail_on=none → never fail (errored=$errored)"
             ;;
           warn)
-            if [ "$errors" -gt 0 ] || [ "$warnings" -gt 0 ]; then fail=1; else fail=0; fi
-            echo "fail_on=warn → fail=$fail (errors=$errors, warnings=$warnings)"
+            if [ "$errored" = "true" ] || [ "$errors" -gt 0 ] || [ "$warnings" -gt 0 ]; then fail=1; else fail=0; fi
+            echo "fail_on=warn → fail=$fail (errored=$errored, errors=$errors, warnings=$warnings)"
             ;;
           error)
-            if [ "$errors" -gt 0 ]; then fail=1; else fail=0; fi
-            echo "fail_on=error → fail=$fail (errors=$errors)"
+            if [ "$errored" = "true" ] || [ "$errors" -gt 0 ]; then fail=1; else fail=0; fi
+            echo "fail_on=error → fail=$fail (errored=$errored, errors=$errors)"
             ;;
           *)
             echo "::error::Invalid fail_on='$FAIL_ON' (expected: none | warn | error)"
@@ -278,6 +287,10 @@ runs:
           echo
           echo "errors: $errors · warnings: $warnings · passed: $passed · ignored: $ignored"
           echo
+          if [ "$errored" = "true" ]; then
+            echo "> Repolinter could not complete the run: ${err_msg:-unknown error}"
+            echo
+          fi
           cat "$REPORT_MD"
         } >> "$GITHUB_STEP_SUMMARY"
 
