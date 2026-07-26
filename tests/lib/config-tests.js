@@ -199,6 +199,30 @@ describe(
           )
         })
 
+        it('should reject a ruleset that does not parse to an object', async () => {
+          const tmpdir = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'repolinter-test-')
+          )
+          try {
+            const cases = [
+              ['comments-only.yaml', '# nothing but a comment\n', /null/],
+              ['scalar.yaml', '42\n', /42/],
+              ['sequence.yaml', '- one\n- two\n', /array/]
+            ]
+            for (const [name, contents, expected] of cases) {
+              const configPath = path.join(tmpdir, name)
+              fs.writeFileSync(configPath, contents)
+              await assert.rejects(
+                () => Config.loadConfig(configPath),
+                expected,
+                `expected ${name} to be rejected`
+              )
+            }
+          } finally {
+            fs.rmSync(tmpdir, { recursive: true })
+          }
+        })
+
         it('should reject extends with parent-directory traversal', async () => {
           const tmpdir = fs.mkdtempSync(
             path.join(os.tmpdir(), 'repolinter-test-')

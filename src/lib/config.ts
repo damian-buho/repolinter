@@ -108,11 +108,12 @@ function parseRawRuleset(
   raw: string,
   locationDescription: string
 ): RulesetConfig {
+  let parsed: unknown
   try {
-    return JSON.parse(raw) as RulesetConfig
+    parsed = JSON.parse(raw)
   } catch (error: unknown) {
     try {
-      return YAML.parse(raw) as RulesetConfig
+      parsed = YAML.parse(raw)
     } catch (error_: unknown) {
       throw new Error(
         `unable to parse ${locationDescription} as either JSON (error: ${error}) or YAML (error: ${error_})`,
@@ -120,6 +121,20 @@ function parseRawRuleset(
       )
     }
   }
+
+  // An empty or comments-only document parses to null, and any non-object
+  // document cannot carry rules — both fault on the first property read.
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    const shape = Array.isArray(parsed) ? 'array' : String(parsed)
+    logger.error(
+      { location: locationDescription, shape },
+      'Ruleset did not parse to an object'
+    )
+    throw new Error(
+      `ruleset ${locationDescription} must be an object defining 'rules'; it parsed to ${shape}`
+    )
+  }
+  return parsed as RulesetConfig
 }
 
 async function resolveExtension(
