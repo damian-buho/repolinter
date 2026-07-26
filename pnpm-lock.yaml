@@ -45,8 +45,8 @@ importers:
         specifier: 3.36.0
         version: 3.36.0
       spdx-license-list:
-        specifier: 6.11.0
-        version: 6.11.0
+        specifier: 6.12.0
+        version: 6.12.0
       tinyglobby:
         specifier: 0.2.17
         version: 0.2.17
@@ -2201,8 +2201,8 @@ packages:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
     engines: {node: '>= 12'}
 
-  spdx-license-list@6.11.0:
-    resolution: {integrity: sha512-p5ICd51dSnh7zIMtPgbB9ShBg3HMT77OeI6WVhrFFvxa5KIFYNcqxD4joAE+n1zZ7wlJdEkrOMwC75JUMMmsJA==}
+  spdx-license-list@6.12.0:
+    resolution: {integrity: sha512-+nUYqm3aZMSHbjsthK+i/HHI2okTElCvqwUd4k8QcSk+FTGgjq+fsdFj2wZOaX6XmR2JdWhf/NeflNnvKOjcnQ==}
     engines: {node: '>=8'}
 
   split2@4.2.0:
@@ -4645,7 +4645,7 @@ snapshots:
 
   source-map@0.7.6: {}
 
-  spdx-license-list@6.11.0: {}
+  spdx-license-list@6.12.0: {}
 
   split2@4.2.0: {}
 
