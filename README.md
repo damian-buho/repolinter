@@ -18,6 +18,7 @@ Lints open source repositories for common issues.
 ![NPM Last Update](https://img.shields.io/npm/last-update/%40damian-buho%2Frepolinter?style=flat-square)
 ![NPM License](https://img.shields.io/npm/l/%40damian-buho%2Frepolinter?style=flat-square)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/damian-buho/repolinter)
 
 [![Documentation](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/documentation.yaml)
 [![Pipeline](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml/badge.svg)](https://github.com/damian-buho/repolinter/actions/workflows/pipeline.yaml)
