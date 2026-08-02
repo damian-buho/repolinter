@@ -33,8 +33,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2
       linkinator:
-        specifier: 8.0.2
-        version: 8.0.2
+        specifier: 8.0.3
+        version: 8.0.3
       pino:
         specifier: 10.3.1
         version: 10.3.1
@@ -1103,6 +1103,10 @@ packages:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  chalk@6.0.0:
+    resolution: {integrity: sha512-2uNTXIuTTxk7ciZgAU1BQcgnchcG0xXnrs6jzkQfj9SsRa9M2s5zE8WT96hS6KmG4MzWHSrvH43DF1m4XRkrFg==}
+    engines: {node: '>=22'}
+
   change-case@5.4.4:
     resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
 
@@ -1726,8 +1730,8 @@ packages:
   linkify-it@5.0.2:
     resolution: {integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==}
 
-  linkinator@8.0.2:
-    resolution: {integrity: sha512-WZcGP5nW2GZ6uWskA2QZLu4KKZm0YYuocUzXh6nRuxHeObh5KqHi8rxA3rK5NAmJRHGC5uDAybgdeSstF1PLNg==}
+  linkinator@8.0.3:
+    resolution: {integrity: sha512-1WG/oEMICKXtXZEH92UQJr3R7PBJqAl/xAZQwc71Pej30QCcNyb69PpzizM+5sgpLw3jKF52ob6LFJv5/k/+rA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3451,6 +3455,8 @@ snapshots:
 
   chalk@5.6.2: {}
 
+  chalk@6.0.0: {}
+
   change-case@5.4.4: {}
 
   character-entities-legacy@3.0.0: {}
@@ -4081,9 +4087,9 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  linkinator@8.0.2:
+  linkinator@8.0.3:
     dependencies:
-      chalk: 5.6.2
+      chalk: 6.0.0
       escape-html: 1.0.3
       glob: 13.0.6
       htmlparser2: 12.0.0
