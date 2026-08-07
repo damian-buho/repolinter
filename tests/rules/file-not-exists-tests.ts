@@ -10,7 +10,9 @@ import fileNotExists from '../../src/rules/file-not-exists.js'
 describe('rule', () => {
   describe('files_not_exists', () => {
     it('returns a passed result if no files exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => [],
         targetDir: '.'
@@ -28,7 +30,9 @@ describe('rule', () => {
     })
 
     it('returns a passed result if no directories or files exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAll: (): string[] => [],
         targetDir: '.'
@@ -47,7 +51,9 @@ describe('rule', () => {
     })
 
     it('returns a failure result if requested file exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => ['somefile'],
         targetDir: '.'
@@ -68,7 +74,9 @@ describe('rule', () => {
     })
 
     it("returns a pass result if requested file doesn't exist with a pass message", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => [],
         targetDir: '.'

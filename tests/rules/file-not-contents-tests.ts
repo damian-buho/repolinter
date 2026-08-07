@@ -14,7 +14,9 @@ import { withTestDirectory } from '../lib/git-fixture.js'
 describe('rule', () => {
   describe('files_not_contents', () => {
     it('returns passes if requested file content do not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -38,7 +40,9 @@ describe('rule', () => {
     })
 
     it('returns fails if requested file content exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -62,7 +66,9 @@ describe('rule', () => {
     })
 
     it('returns success if success flag enabled but file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         getFileContents() {},
@@ -83,7 +89,9 @@ describe('rule', () => {
     })
 
     it('returns success if requested file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         getFileContents() {},
@@ -125,7 +133,9 @@ describe('rule', () => {
     })
 
     it('returns passes if requested file contents do not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -147,7 +157,9 @@ describe('rule', () => {
     })
 
     it('returns fails if requested file contents exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foobar',

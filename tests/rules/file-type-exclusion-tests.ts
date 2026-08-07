@@ -10,7 +10,9 @@ import fileTypeExclusion from '../../src/rules/file-type-exclusion.js'
 describe('rule', () => {
   describe('file_type_exclusion', () => {
     it("returns passed result if requested file type doesn't exist", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAll: (): string[] => [],
         targetDir: '.'
@@ -26,7 +28,9 @@ describe('rule', () => {
     })
 
     it('returns failed result if requested file type exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAll: (): string[] => ['foo.dll'],
         targetDir: '.'

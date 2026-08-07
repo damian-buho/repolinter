@@ -16,7 +16,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => false,
         setFileContents(file: string, contents: string) {
@@ -39,7 +41,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => false,
         setFileContents(file: string, contents: string) {
@@ -62,7 +66,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => false,
         setFileContents(file: string, contents: string) {
@@ -82,7 +88,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => true,
         setFileContents(file: string, contents: string) {
@@ -102,7 +110,9 @@ describe('fixes', () => {
         text: { file: 'sourcefile' }
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findFirstFile: () => 'sourcefile',
         getFileContents: () => 'this is text',
@@ -127,7 +137,9 @@ describe('fixes', () => {
         text: { url: 'https://example.com' }
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => false,
         setFileContents(file: string, contents: string) {
@@ -157,7 +169,9 @@ describe('fixes', () => {
       }
       let mockContents
       let mockRemove
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         relativeFileExists: () => false,
         setFileContents(file: string, contents: string) {

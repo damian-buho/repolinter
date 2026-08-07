@@ -10,7 +10,9 @@ import fileExistence from '../../src/rules/file-existence.js'
 describe('rule', () => {
   describe('files_existence', () => {
     it('returns a passed result if requested file exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: () => 'LICENSE.md',
         targetDir: '.'
@@ -32,7 +34,9 @@ describe('rule', () => {
     })
 
     it('returns a passed result if requested file exists case-insensitivly', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: () => 'LICENSE.md',
         targetDir: '.'
@@ -55,7 +59,9 @@ describe('rule', () => {
     })
 
     it("returns a failure result if requested file doesn't exist", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile() {},
         targetDir: '.'
@@ -71,7 +77,9 @@ describe('rule', () => {
     })
 
     it("returns a failure result if requested file doesn't exist with a failure message", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile() {},
         targetDir: '.'

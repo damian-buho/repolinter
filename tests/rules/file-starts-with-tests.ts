@@ -29,7 +29,9 @@ describe('rule', () => {
     })
 
     it("returns a failure result if requested file doesn't match all the patterns", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['somefile.js'],
         getFileLines: () => 'some javascript code',
@@ -68,7 +70,9 @@ describe('rule', () => {
     })
 
     it('returns a single result when glob has no matches and has succeed-on-non-existent option', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         targetDir: '.'
@@ -89,7 +93,9 @@ describe('rule', () => {
     })
 
     it('skips files with the `skip-paths-matching` option', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [
           'Skip/paBle-path.js',
@@ -120,7 +126,9 @@ describe('rule', () => {
     })
 
     it("returns failure if the requested files don't exist", async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         targetDir: '.'
