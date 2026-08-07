@@ -11,7 +11,9 @@ describe('fixes', () => {
   describe('file-remove', () => {
     it('removes a file', async () => {
       const removePaths: string[] = []
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         removeFile(path: string) {
           removePaths.push(path)
@@ -28,7 +30,9 @@ describe('fixes', () => {
 
     it('does nothing if dryRun is true', async () => {
       const removePaths: string[] = []
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         removeFile(path: string) {
           removePaths.push(path)
@@ -45,7 +49,9 @@ describe('fixes', () => {
 
     it('removes multiple files', async () => {
       const removePaths: string[] = []
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         removeFile(path: string) {
           removePaths.push(path)
@@ -69,7 +75,9 @@ describe('fixes', () => {
 
     it('uses the glob option', async () => {
       const removePaths: string[] = []
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         removeFile(path: string) {
           removePaths.push(path)
@@ -92,7 +100,9 @@ describe('fixes', () => {
 
     it('overrides targets with the glob option', async () => {
       const removePaths: string[] = []
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         removeFile(path: string) {
           removePaths.push(path)
@@ -114,7 +124,9 @@ describe('fixes', () => {
     })
 
     it('returns failure if no files are found', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {}
 
       const result = await fileRemove(mockFs, {}, [], false)

@@ -14,7 +14,9 @@ import { withTestDirectory } from '../lib/git-fixture.js'
 describe('rule', () => {
   describe('files_contents', () => {
     it('returns passes if requested file contents exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -37,7 +39,9 @@ describe('rule', () => {
     })
 
     it('returns passes and display context if requested file contents exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo get test',
@@ -62,7 +66,9 @@ describe('rule', () => {
     })
 
     it('returns failure and display context if requested file contents exists', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo get test',
@@ -87,7 +93,9 @@ describe('rule', () => {
     })
 
     it('returns passes if requested file contents exists with human-readable contents', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -113,7 +121,9 @@ describe('rule', () => {
     })
 
     it('returns fails if requested file contents does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => ['README.md'],
         getFileContents: () => 'foo',
@@ -138,7 +148,9 @@ describe('rule', () => {
     })
 
     it('returns the pattern if requested file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         getFileContents() {},
@@ -157,7 +169,9 @@ describe('rule', () => {
     })
 
     it('returns failure if file does not exist with failure flag', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: () => [],
         getFileContents() {},

@@ -10,7 +10,9 @@ import fileContents from '../../src/rules/file-hash.js'
 describe('rule', () => {
   describe('files_hash', () => {
     it('returns passes if requested file matches the hash', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => 'foo',
@@ -33,7 +35,9 @@ describe('rule', () => {
     })
 
     it('returns passes if requested file matches the hash with nocase', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => 'foo',
@@ -57,7 +61,9 @@ describe('rule', () => {
     })
 
     it('returns passes if requested file contents exists different algorithm', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => 'foo',
@@ -81,7 +87,9 @@ describe('rule', () => {
     })
 
     it('returns fails if requested file does not match', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => 'foo',
@@ -104,7 +112,9 @@ describe('rule', () => {
     })
 
     it('returns failure if requested file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile(): undefined {
           return
@@ -123,7 +133,9 @@ describe('rule', () => {
     })
 
     it('returns success if file does not exist with success flag', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile(): undefined {
           return
@@ -144,7 +156,9 @@ describe('rule', () => {
     })
 
     it('respect the legacy configuration format', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => 'foo',

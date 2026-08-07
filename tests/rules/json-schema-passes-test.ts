@@ -10,7 +10,9 @@ import jsonSchemaPasses from '../../src/rules/json-schema-passes.js'
 describe('rule', () => {
   describe('json_schema_passes', () => {
     it('returns passes if requested file matches the schema', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => '{ "thing": "hello" }',
@@ -37,7 +39,9 @@ describe('rule', () => {
     })
 
     it('returns fail if requested file does not match the schema', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => '{ "thing": "nothello" }',
@@ -64,7 +68,9 @@ describe('rule', () => {
     })
 
     it('throws if the schema is invalid', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => '{ "thing": "hello" }',
@@ -85,7 +91,9 @@ describe('rule', () => {
     })
 
     it('returns fail if the file had invalid JSON', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => '{ "thing": "hello"',
@@ -112,7 +120,9 @@ describe('rule', () => {
     })
 
     it('succeeds if the file does not exist and succeed-on-non-existent is set', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile(): undefined {
           return
@@ -143,7 +153,9 @@ describe('rule', () => {
     })
 
     it('returns fail if the file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile(): undefined {
           return
@@ -173,7 +185,9 @@ describe('rule', () => {
     })
 
     it('includes human-readable-message in the output', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findFirstFile: (): string => 'README.md',
         getFileContents: (): string => '{ "thing": "nothello" }',

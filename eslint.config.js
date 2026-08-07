@@ -59,12 +59,10 @@ export default tseslint.config(
       'import-x/no-unresolved': 'off',
       'n/hashbang': 'off',
       'unicorn/throw-new-error': 'off',
-      'unicorn/consistent-boolean-name': [
-        'error',
-        {
-          checkProperties: false
-        }
-      ],
+      // `consistent-boolean-name`: unicorn v73 split `checkProperties` into
+      // `checkMethods`/`checkFields`, both defaulting to 'never' — i.e. the old
+      // `checkProperties: false`. Recommended preset already enables the rule,
+      // so no override is needed.
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',

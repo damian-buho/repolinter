@@ -89,7 +89,7 @@
     "simple-git": "3.36.0",
     "spdx-license-list": "6.12.0",
     "tinyglobby": "0.2.17",
-    "undici": "8.9.0",
+    "undici": "8.10.0",
     "yaml": "2.9.0"
   },
   "devDependencies": {
@@ -105,16 +105,16 @@
     "eslint-plugin-n": "18.2.2",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-tsdoc": "0.5.2",
-    "eslint-plugin-unicorn": "72.0.0",
+    "eslint-plugin-unicorn": "73.0.0",
     "globals": "17.9.0",
     "markdownlint": "0.41.1",
     "mock-http-server": "1.4.5",
     "nock": "14.0.17",
     "prettier": "3.9.6",
-    "tsx": "4.23.4",
+    "tsx": "4.23.8",
     "typedoc": "0.28.20",
     "typedoc-rhineai-theme": "1.2.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.65.0"
+    "typescript-eslint": "8.66.0"
   }
 }

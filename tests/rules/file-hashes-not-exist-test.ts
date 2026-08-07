@@ -11,7 +11,9 @@ import filesNotHash from '../../src/rules/file-hashes-not-exist.js'
 describe('rule', () => {
   describe('files_not_hash', () => {
     it('returns pass if requested files not matches the hashes', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => ['README.md'],
         getFileContents: (): string => 'foo',
@@ -28,7 +30,9 @@ describe('rule', () => {
     })
 
     it('returns failure if requested files matches the hash', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => ['README.md'],
         getFileContents: (): string => 'foo',
@@ -53,7 +57,9 @@ describe('rule', () => {
     })
 
     it('returns failed if requested file contents exists different algorithm', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => ['README.md'],
         getFileContents: (): string => 'foo',
@@ -79,7 +85,9 @@ describe('rule', () => {
     })
 
     it('returns success if requested file does not exist', async () => {
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockfs = {
         findAllFiles: (): string[] => [],
         getFileContents(): void {},

@@ -16,7 +16,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents = ''
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
@@ -41,7 +43,9 @@ describe('fixes', () => {
         write_mode: 'prepend'
       }
       let mockContents = ''
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
@@ -65,7 +69,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
@@ -88,7 +94,9 @@ describe('fixes', () => {
         text: 'this is text'
       }
       let mockContents = ''
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
@@ -110,7 +118,9 @@ describe('fixes', () => {
       const options = {
         text: 'this is text'
       }
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {}
 
       const result = await fileModify(mockFs, options, [], false)
@@ -125,7 +135,9 @@ describe('fixes', () => {
         'skip-paths-matching': { extensions: ['exe'] }
       }
       let mockFile
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile.exe', 'otherfile'],
         getFileContents: () => 'the file contents',
@@ -149,7 +161,9 @@ describe('fixes', () => {
         'skip-paths-matching': { patterns: ['exe'] }
       }
       let mockFile
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile.exe', 'otherfile'],
         getFileContents: () => 'the file contents',
@@ -173,7 +187,9 @@ describe('fixes', () => {
         text: { file: 'sourcefile' }
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findFirstFile: () => 'sourcefile',
         findAllFiles: () => ['myfile'],
@@ -199,7 +215,9 @@ describe('fixes', () => {
         text: { url: 'https://example.com' }
       }
       let mockContents
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
@@ -229,7 +247,9 @@ describe('fixes', () => {
         newlines: { begin: 3, end: 4 }
       }
       let mockContents = ''
-      /** @type {any} */
+      /**
+      @type {any}
+      */
       const mockFs = {
         findAllFiles: () => ['myfile'],
         getFileContents: () => 'the file contents',
