@@ -26,6 +26,11 @@ license:
   spdx: Apache-2.0
 links:
   - label: Repolinter (fork by Damián Búho) on GitHub
+    preferred: true
+    tags:
+      - public
+      - badges
+      - badges-github
     type: source-code
     url: https://github.com/damian-buho/repolinter
   - type: homepage
@@ -37,6 +42,10 @@ links:
     type: package-registry
     url: https://www.npmjs.com/package/repolinter
   - label: Repolinter (fork by Damián Búho) on Codeberg
+    tags:
+      - public
+      - badges
+      - badges-gitea
     type: source-code
     url: https://codeberg.org/damian-buho/repolinter
   - label: Repolinter (fork by Damián Búho) on kiota.ch
