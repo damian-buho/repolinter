@@ -7,10 +7,16 @@ identity:
   created: "2026-06-23"
   name: repolinter
   namespace: me.dbuho
-  summary: Linter for open source repositories (fork of todogroup/repolinter)
+  summary:
+    en: Linter for open source repositories (fork of todogroup/repolinter)
+    es: Linter para repositorios de código abierto (fork de todogroup/repolinter)
+    uk: Лінтер для репозиторіїв з відкритим кодом (форк todogroup/repolinter)
   title: Repolinter (fork by Damián Búho)
   version: 2.0.0
-  description: Linter that checks open-source repositories for community-health files and common issues, including license, README, contributing guide and test setup. A heavily modernized, maintained fork of the now-archived todogroup/repolinter.
+  description:
+    en: Linter that checks open-source repositories for community-health files and common issues, including license, README, contributing guide and test setup. A heavily modernized, maintained fork of the now-archived todogroup/repolinter.
+    es: Linter que comprueba los repositorios de código abierto en busca de archivos de salud de la comunidad y problemas comunes, incluyendo licencia, README, guía de contribución y configuración de pruebas. Un fork muy modernizado y mantenido del hoy archivado todogroup/repolinter.
+    uk: Лінтер, який перевіряє репозиторії з відкритим кодом на наявність файлів здоровʼя спільноти та типових проблем, зокрема ліцензії, README, інструкції для контрибʼюторів і налаштування тестів. Глибоко осучаснений і підтримуваний форк заархівованого todogroup/repolinter.
 includes:
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
 keywords:
