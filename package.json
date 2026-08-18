@@ -1,6 +1,6 @@
 {
   "name": "@damian-buho/repolinter",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Linter for open source repositories (fork of todogroup/repolinter)",
   "type": "module",
   "main": "dist/index.js",
