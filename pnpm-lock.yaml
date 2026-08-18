@@ -33,8 +33,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2
       linkinator:
-        specifier: 8.0.3
-        version: 8.0.3
+        specifier: 8.0.4
+        version: 8.0.4
       pino:
         specifier: 10.3.1
         version: 10.3.1
@@ -1726,8 +1726,8 @@ packages:
   linkify-it@5.0.2:
     resolution: {integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==}
 
-  linkinator@8.0.3:
-    resolution: {integrity: sha512-1WG/oEMICKXtXZEH92UQJr3R7PBJqAl/xAZQwc71Pej30QCcNyb69PpzizM+5sgpLw3jKF52ob6LFJv5/k/+rA==}
+  linkinator@8.0.4:
+    resolution: {integrity: sha512-ZXRkx7zdg2slGNZFm3WTmwIepq+kMbcx++iZ4kZM/tec6PT4qopLvxgLK7uIHJLDoD79swrWK2aynj5tJZZ6xA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -4078,7 +4078,7 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  linkinator@8.0.3:
+  linkinator@8.0.4:
     dependencies:
       chalk: 6.0.0
       escape-html: 1.0.3
