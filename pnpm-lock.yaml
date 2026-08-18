@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       '@asciidoctor/core':
-        specifier: 4.0.8
-        version: 4.0.8
+        specifier: 4.0.10
+        version: 4.0.10
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -129,8 +129,8 @@ importers:
 
 packages:
 
-  '@asciidoctor/core@4.0.8':
-    resolution: {integrity: sha512-Yg/ILwZbjoBIhdQV4PZ5VtCnfn+DQgdt6iBI4wqpZv3y8e7d2tU663os9RsQmaTxSa6XyitASpUn4JxG6PYtFg==}
+  '@asciidoctor/core@4.0.10':
+    resolution: {integrity: sha512-nOnzCQzM220lf7TwgEdlCek+1XxLLR1dbDDY3s2LJfXQy/6fL2Q07oKyLoTZ/6afC59tUNARHQpmJgMSCj+8PA==}
     engines: {node: '>=20'}
 
   '@babel/code-frame@7.29.7':
@@ -2446,7 +2446,7 @@ packages:
 
 snapshots:
 
-  '@asciidoctor/core@4.0.8': {}
+  '@asciidoctor/core@4.0.10': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:
