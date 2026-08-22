@@ -47,7 +47,7 @@ format-check:
 
 stryker:
     mkdir --parents reports
-    REPOLINTER_LINK_TIMEOUT_MS=2000 REPOLINTER_GIT_TIMEOUT_MS=5000 pnpm dlx stryker run --concurrency $(( ${NUMPROCS:-$(nproc)} / 8 )) 2>&1 | tee reports/stryker.log
+    REPOLINTER_LINK_TIMEOUT_MS=2000 REPOLINTER_GIT_TIMEOUT_MS=5000 pnpm exec stryker run --concurrency $(( ${NUMPROCS:-$(nproc)} / 8 )) 2>&1 | tee reports/stryker.log
 
 pipeline: format lint build test build-docker
 

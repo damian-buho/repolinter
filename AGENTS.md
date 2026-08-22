@@ -59,7 +59,7 @@ src/
 rules/                # JSON Schema per rule options  (copied to dist/rules/)
 fixes/                # JSON Schema per fix options   (copied to dist/fixes/)
 rulesets/             # Bundled ruleset configs + schema.json (copied to dist/rulesets/)
-tests/                # Mirrors src/ layout; plain .js files using node:test + node:assert
+tests/                # Mirrors src/ layout; .ts files using node:test via tsx
 ```
 
 ## Data flow
@@ -135,9 +135,16 @@ Signature: `(fileSystem: FileSystem) => Promise<Result>`. Register in
 
 ## Testing
 
-Tests use the native Node.js test runner (`node:test` + `node:assert`). No mocha
-or jest. Each test file in `tests/` targets the corresponding compiled output
-in `dist/` (run `just build` before `just test`, or use `just pipeline`).
+Tests use the native Node.js test runner (`node:test` + `node:assert`) executed
+through tsx. No mocha or jest. Each test file in `tests/` targets the
+corresponding compiled output in `dist/` (run `just build` before `just test`,
+or use `just pipeline`).
+
+Mutation testing (`just stryker`) uses @stryker-mutator/tap-runner over the same
+ts tests (`--import tsx`). The explicit `plugins` array in `stryker.config.json`
+is required: Stryker's default `@stryker-mutator/*` glob scans core's own
+`.pnpm` directory for siblings, where pnpm's isolated layout hides tap-runner
+and typescript-checker.
 
 `pretest` in package.json runs ESLint — `just test` alone will lint first.
 
