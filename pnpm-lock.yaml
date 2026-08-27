@@ -30,8 +30,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       linguist-js:
-        specifier: 3.0.2
-        version: 3.0.2
+        specifier: 3.0.3
+        version: 3.0.3
       linkinator:
         specifier: 8.0.4
         version: 8.0.4
@@ -1760,8 +1760,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  linguist-js@3.0.2:
-    resolution: {integrity: sha512-1VpWhFUPg8vSVQAAD8jgMw0Hx8dCev3snFd3JSV7wN0XJbYyyry9UTTU2gNmVVKHotAxGFvT37CQoJA+i8b9EA==}
+  linguist-js@3.0.3:
+    resolution: {integrity: sha512-egV9nG7vgX0mn/yJJ4FIyv9b6jjT+IPFF8vbdQeCXBWSTJteOJ7HctrsoCwWaHQaCiOLXX0t4jFZtqvXOJl3/w==}
     engines: {node: '>=26', npm: '>=10'}
     hasBin: true
 
@@ -4105,7 +4105,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  linguist-js@3.0.2:
+  linguist-js@3.0.3:
     dependencies:
       binary-extensions: 3.1.0
       commander: 14.0.3
