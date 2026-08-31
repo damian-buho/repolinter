@@ -111,7 +111,7 @@
     "mock-http-server": "1.4.5",
     "nock": "14.0.17",
     "prettier": "3.9.6",
-    "tsx": "4.23.12",
+    "tsx": "4.23.13",
     "typedoc": "0.28.20",
     "typedoc-rhineai-theme": "1.2.0",
     "typescript": "6.0.3",
