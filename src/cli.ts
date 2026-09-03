@@ -120,9 +120,10 @@ async function runLint(
     temporaryDirectory = await fs.promises.mkdtemp(
       path.join(os.tmpdir(), 'repolinter-')
     )
-    const result = await git.clone(directory, temporaryDirectory)
-    if (result) {
-      logger.error({ result }, 'Git clone failed')
+    try {
+      await git.clone(directory, temporaryDirectory)
+    } catch (error) {
+      logger.error({ err: error }, 'Git clone failed')
       process.exitCode = 1
       try {
         await fs.promises.rm(temporaryDirectory, {
