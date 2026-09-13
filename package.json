@@ -90,7 +90,7 @@
     "spdx-license-list": "6.12.0",
     "tinyglobby": "0.2.17",
     "undici": "8.10.2",
-    "yaml": "2.9.0"
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
