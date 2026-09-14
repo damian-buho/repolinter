@@ -12,7 +12,7 @@ identity:
     es: Linter para repositorios de código abierto (fork de todogroup/repolinter)
     uk: Лінтер для репозиторіїв з відкритим кодом (форк todogroup/repolinter)
   title: Repolinter (fork by Damián Búho)
-  version: 2.0.0
+  version: 2.2.5
   description:
     en: Linter that checks open-source repositories for community-health files and common issues, including license, README, contributing guide and test setup. A heavily modernized, maintained fork of the now-archived todogroup/repolinter.
     es: Linter que comprueba los repositorios de código abierto en busca de archivos de salud de la comunidad y problemas comunes, incluyendo licencia, README, guía de contribución y configuración de pruebas. Un fork muy modernizado y mantenido del hoy archivado todogroup/repolinter.
@@ -102,5 +102,6 @@ repositories:
     type: git
     url: ssh://git@kiota.ch/damian-buho/repolinter.git
 technologies:
+  - docker
   - node
   - typescript
