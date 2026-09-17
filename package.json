@@ -110,7 +110,7 @@
     "markdownlint": "0.41.1",
     "mock-http-server": "1.4.5",
     "nock": "14.0.17",
-    "prettier": "3.9.6",
+    "prettier": "3.9.7",
     "tsx": "4.23.13",
     "typedoc": "0.28.20",
     "typedoc-rhineai-theme": "1.2.0",
