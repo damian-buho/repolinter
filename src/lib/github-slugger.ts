@@ -9,14 +9,14 @@ const specials =
 const emojiRegex = /\p{RGI_Emoji}/gv
 
 function slug(string: unknown): string {
-  if (typeof string !== 'string') return ''
-
-  return string
-    .toLowerCase()
-    .trim()
-    .replaceAll(specials, '')
-    .replaceAll(emojiRegex, '')
-    .replaceAll(whitespace, '-')
+  return typeof string === 'string'
+    ? string
+        .toLowerCase()
+        .trim()
+        .replaceAll(specials, '')
+        .replaceAll(emojiRegex, '')
+        .replaceAll(whitespace, '-')
+    : ''
 }
 
 export { slug }

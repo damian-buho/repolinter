@@ -21,26 +21,21 @@ async function fileCreate(
   const exists =
     targets.length > 0 || (await fs.relativeFileExists(options.file))
   if (exists && !options.replace) {
-    if (targets.length > 0) {
-      return new Result(
-        '',
-        targets.map(t => ({
-          passed: false,
-          path: t,
-          message: `${t} already exists (options.replace is set to false)`
-        })),
-        false
-      )
-    }
     return new Result(
       '',
-      [
-        {
-          message: `${options.file} already exists (options.replace is set to false)`,
-          passed: false,
-          path: options.file
-        }
-      ],
+      targets.length > 0
+        ? targets.map(t => ({
+            passed: false,
+            path: t,
+            message: `${t} already exists (options.replace is set to false)`
+          }))
+        : [
+            {
+              message: `${options.file} already exists (options.replace is set to false)`,
+              passed: false,
+              path: options.file
+            }
+          ],
       false
     )
   }

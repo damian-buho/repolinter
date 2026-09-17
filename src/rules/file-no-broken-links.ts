@@ -38,14 +38,13 @@ async function checkFile(
 
   if (ASCIIDOC_EXTS.has(extension)) {
     const rendered = await renderAsciiDocument(fileSystem, file)
-    if (rendered === undefined) {
-      return {
-        passed: true,
-        path: file,
-        message: 'Ignored due to unknown file format.'
-      }
-    }
-    return checkRenderedHtml(fileSystem, file, rendered, options)
+    return rendered === undefined
+      ? {
+          passed: true,
+          path: file,
+          message: 'Ignored due to unknown file format.'
+        }
+      : checkRenderedHtml(fileSystem, file, rendered, options)
   }
 
   // Historically rendered via Ruby github-markup (.rst, .org, .textile, .rdoc,

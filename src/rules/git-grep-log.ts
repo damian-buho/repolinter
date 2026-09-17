@@ -31,11 +31,9 @@ function grepLog(
     '--all',
     '--format=full',
     '-E',
-    ...denylist.map(pattern => `--grep=${pattern}`)
+    ...denylist.map(pattern => `--grep=${pattern}`),
+    ...(options.ignoreCase ? ['-i'] : [])
   ]
-  if (options.ignoreCase) {
-    arguments_.push('-i')
-  }
   const log = spawnSync('git', arguments_, {
     timeout: GIT_TIMEOUT_MS
   }).stdout.toString()

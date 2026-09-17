@@ -120,8 +120,7 @@ async function fileContents(
 
         const fileLines = contents.split('\n')
         const chunkLineCounts = split.map(fileChunk => {
-          if (fileChunk !== undefined) return fileChunk.split('\n').length
-          return 1
+          return fileChunk === undefined ? 1 : fileChunk.split('\n').length
         })
         const lineNumbers: number[] = []
         for (const [index, current] of chunkLineCounts.entries()) {

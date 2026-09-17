@@ -29,8 +29,7 @@ function opWrap(
   base: string | number | undefined | false,
   suf: string | undefined
 ): string {
-  if (base) return (pre || '') + base + (suf || '')
-  return ''
+  return base ? (pre || '') + base + (suf || '') : ''
 }
 
 const MarkdownFormatter = {
@@ -136,15 +135,12 @@ const MarkdownFormatter = {
             const base = `- \`${
               lintTarget.path || lintTarget.pattern
             }\`${opWrap(': ', lintTarget.message, '.')}`
-            if (!fixTarget || !fixTarget.passed) {
-              return base
-            }
-            return (
-              base +
-              `\n  - ${isDryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
-                fixTarget.message || result.fixResult!.message
-              }`
-            )
+            return !fixTarget || !fixTarget.passed
+              ? base
+              : base +
+                  `\n  - ${isDryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
+                    fixTarget.message || result.fixResult!.message
+                  }`
           })
           .join('\n')
         formatBase.push(list)

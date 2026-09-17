@@ -14,9 +14,9 @@ function resolveLevel(): LogLevel {
     )
     return 'info'
   }
-  if (environmentLevel && isValidLogLevel(environmentLevel))
-    return environmentLevel
-  return 'info'
+  return environmentLevel && isValidLogLevel(environmentLevel)
+    ? environmentLevel
+    : 'info'
 }
 
 function isValidLogLevel(value: string): value is LogLevel {
