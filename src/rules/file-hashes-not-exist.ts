@@ -65,10 +65,11 @@ async function fileHashesNotExist(
 
   const isPassed = results.length === 0
 
-  if (isPassed) {
-    return new Result('No file matching hash found', results, isPassed)
-  }
-  return new Result('File matching has found', results, isPassed)
+  return new Result(
+    isPassed ? 'No file matching hash found' : 'File matching has found',
+    results,
+    isPassed
+  )
 }
 
 export default fileHashesNotExist

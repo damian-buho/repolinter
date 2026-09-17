@@ -115,10 +115,9 @@ function thresholdFromEnvironment(): number {
   const raw = process.env.REPOLINTER_LICENSE_THRESHOLD
   if (!raw) return DEFAULT_THRESHOLD
   const parsed = Number(raw)
-  if (Number.isNaN(parsed) || parsed <= 0 || parsed > 1) {
-    return DEFAULT_THRESHOLD
-  }
-  return parsed
+  return Number.isNaN(parsed) || parsed <= 0 || parsed > 1
+    ? DEFAULT_THRESHOLD
+    : parsed
 }
 
 // Contract matches the Ruby `licensee detect --json` consumer:
@@ -148,12 +147,13 @@ export async function identifyLicense(
   let bestScore = 0
   for (const template of TEMPLATES) {
     const score = diceCoefficient(candidate, template.bigrams)
-    if (score > bestScore) {
-      bestScore = score
-      bestId = template.id
+    if (!(score > bestScore)) {
+      continue
     }
+
+    bestScore = score
+    bestId = template.id
   }
 
-  if (bestId && bestScore >= threshold) return [bestId]
-  return ['NOASSERTION']
+  return [bestId && bestScore >= threshold ? bestId : 'NOASSERTION']
 }

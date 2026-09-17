@@ -22,10 +22,7 @@ export default class FormatResult {
     if (ruleInfo.level === 'warning') {
       return this.RULE_NOT_PASSED_WARN
     }
-    if (ruleInfo.level === 'error') {
-      return this.RULE_NOT_PASSED_ERROR
-    }
-    return this.ERROR
+    return ruleInfo.level === 'error' ? this.RULE_NOT_PASSED_ERROR : this.ERROR
   }
 
   static getAllStatus(): FormatResultStatus[] {

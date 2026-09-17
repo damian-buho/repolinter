@@ -225,13 +225,14 @@ export function filterRuleTargets(
   const failedNumerical = numericalRuleAxioms
     .filter(({ name, operand, number }) => {
       const target = numericalTargetsMap.get(name)
-      if (target === undefined) return true
-      return !(
-        (operand === '<' && target < number) ||
-        (operand === '<=' && target <= number) ||
-        (operand === '>' && target > number) ||
-        (operand === '>=' && target >= number)
-      )
+      return target === undefined
+        ? true
+        : !(
+            (operand === '<' && target < number) ||
+            (operand === '<=' && target <= number) ||
+            (operand === '>' && target > number) ||
+            (operand === '>=' && target >= number)
+          )
     })
     .map(({ axiom }) => axiom)
   return [...failedNumerical, ...failedRuleAxioms]

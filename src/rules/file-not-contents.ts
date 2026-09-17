@@ -60,14 +60,11 @@ async function fileNotContents(
     .flatMap(r => r.targets)
     .filter(r => !r.passed)
 
-  if (isPassed) {
-    return new Result(
-      'Did not find content matching specified patterns',
-      aggregatedTargets,
-      isPassed
-    )
-  }
-  return new Result('', aggregatedTargets, isPassed)
+  return new Result(
+    isPassed ? 'Did not find content matching specified patterns' : '',
+    aggregatedTargets,
+    isPassed
+  )
 }
 
 export default fileNotContents

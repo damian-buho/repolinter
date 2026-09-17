@@ -87,14 +87,16 @@ const SymbolFormatter = {
   },
 
   formatOutput(output: LintResult, isDryRun: boolean): string {
-    const returnValue = [`Target directory: ${output.params.targetDirectory}`]
-    if (output.params.filterPaths.length > 0) {
-      returnValue.push(
-        `\nPaths to include in checks:\n\t${output.params.filterPaths.join(
-          '\n\t'
-        )}`
-      )
-    }
+    const returnValue = [
+      `Target directory: ${output.params.targetDirectory}`,
+      ...(output.params.filterPaths.length > 0
+        ? [
+            `\nPaths to include in checks:\n\t${output.params.filterPaths.join(
+              '\n\t'
+            )}`
+          ]
+        : [])
+    ]
     if (output.errored) {
       return returnValue.join('') + `\n${styleText('red', output.errMsg!)}`
     }
@@ -117,19 +119,18 @@ const SymbolFormatter = {
                 `${result.ruleInfo.name} failed to run:`
               )} ${result.runMessage}`
             }
-            if (result.status === FormatResult.IGNORED) {
-              return `\n${styleText('gray', logSymbols.info)} ${styleText(
-                'gray',
-                `${result.ruleInfo.name}: ${result.runMessage}`
-              )}`
-            }
-            return SymbolFormatter.formatResult(
-              result.lintResult!,
-              result.ruleInfo.name,
-              result.ruleInfo.policyUrl,
-              result.ruleInfo.policyInfo,
-              SymbolFormatter.getSymbol(result.ruleInfo.level)
-            )
+            return result.status === FormatResult.IGNORED
+              ? `\n${styleText('gray', logSymbols.info)} ${styleText(
+                  'gray',
+                  `${result.ruleInfo.name}: ${result.runMessage}`
+                )}`
+              : SymbolFormatter.formatResult(
+                  result.lintResult!,
+                  result.ruleInfo.name,
+                  result.ruleInfo.policyUrl,
+                  result.ruleInfo.policyInfo,
+                  SymbolFormatter.getSymbol(result.ruleInfo.level)
+                )
           })
           .join('')
     )

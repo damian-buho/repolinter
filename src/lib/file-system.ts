@@ -219,10 +219,9 @@ class FileSystem {
   }
 
   normalizePath(filepath: string): string {
-    if (process.platform === 'win32') {
-      return filepath.split(path.sep).join('/')
-    }
-    return filepath
+    return process.platform === 'win32'
+      ? filepath.split(path.sep).join('/')
+      : filepath
   }
 
   async getFileContents(relativeFile: string): Promise<string | undefined> {
