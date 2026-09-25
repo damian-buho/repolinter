@@ -173,8 +173,8 @@ importers:
   .:
     dependencies:
       '@asciidoctor/core':
-        specifier: 4.0.11
-        version: 4.0.11
+        specifier: 4.1.0
+        version: 4.1.0
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -287,9 +287,14 @@ importers:
 
 packages:
 
-  '@asciidoctor/core@4.0.11':
-    resolution: {integrity: sha512-5uWPTLTiPJVQp9q4MllSROM2avdECzoT7oeVw/onT9H2PIdCCtQwKrSTvztwxMbSu/8cqHqZox/2qTBrQN454g==}
+  '@asciidoctor/core@4.1.0':
+    resolution: {integrity: sha512-3PpZu3m0V2lT2jljqsH0LJukaMdm8cpv0tuTMijiiwTBSUrVlEd8NBwzH5iyGlS3yPI6i3ZaaNL6enXelOVpRg==}
     engines: {node: '>=20'}
+    peerDependencies:
+      highlight.js: ^11.0.0
+    peerDependenciesMeta:
+      highlight.js:
+        optional: true
 
   '@babel/code-frame@8.0.0':
     resolution: {integrity: sha512-dYYg153EyN2Ekbqw2zAsbd6/JR+9N2SEoC7YV2GyyqMM7x9bLDTjBD6XBhSMLH0wtIVyJj03jWNriQhaN+eoCw==}
@@ -2672,7 +2677,7 @@ packages:
 
 snapshots:
 
-  '@asciidoctor/core@4.0.11': {}
+  '@asciidoctor/core@4.1.0': {}
 
   '@babel/code-frame@8.0.0':
     dependencies:
