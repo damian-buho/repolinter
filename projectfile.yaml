@@ -54,7 +54,7 @@ links:
     url: https://github.com/damian-buho/repolinter/issues
   - label: Packages on npm
     type: package-registry
-    url: https://www.npmjs.com/package/repolinter
+    url: https://www.npmjs.com/package/@damian-buho/repolinter
   - label:
       en: Repolinter (fork by Damián Búho) on Codeberg
       es: Repolinter (fork by Damián Búho) en Codeberg

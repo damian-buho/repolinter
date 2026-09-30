@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/master/docs/images/repolinter-small.svg)
+# Repolinter ![Repo Linter](https://raw.githubusercontent.com/damian-buho/repolinter/main/docs/images/repolinter-small.svg)
 
 [The original Repolinter project](https://github.com/todogroup/repolinter) has been archived.
 
@@ -35,11 +35,11 @@ docker run --rm -it -v ${PWD}:/app/ws -w /app/ws ghcr.io/damian-buho/repolinter:
 
 ## Installation
 
-Repolinter requires [Node.JS](https://nodejs.org/en/) >= v22 to function properly.
+Repolinter requires [Node.JS](https://nodejs.org/en/) >= 22.13.0 to function properly.
 Once Node.js is installed, you can install Repolinter using [pnpm](https://pnpm.io/):
 
 ```shell
-pnpm install -g repolinter
+pnpm install -g @damian-buho/repolinter
 ```
 
 ## Linting a Local Repository
@@ -76,17 +76,18 @@ repolinter lint -g https://github.com/damian-buho/repolinter.git
 
 ## Formatting the Output
 
-The Repolinter CLI currently supports three output formatting modes:
+The Repolinter CLI currently supports four output formatting modes:
 
-- Default (also referred to as result)
+- Console (default)
 - JSON
 - Markdown
+- PR comment (`pr-comment`)
 
 You can switch formatters using the `--format` flag. An example of using the JSON formatter:
 
 ```console
 repolinter % repolinter lint --format json .
-{"params":{"targetDir":"/Users/nkoontz/Documents/code/repolinter","filterPaths":[],...
+{"params":{"targetDir":"<directory>","filterPaths":[],...
 ```
 
 An example of using the Markdown formatter:
@@ -112,7 +113,7 @@ repolinter lint --allowPaths ./a/path --allowPaths /another/path
 
 ## Disabling Modifications
 
-By default Repolinter will automatically execute fixes as specified by the [ruleset](#rulesets). If this is not desired functionality, you can disable this with the `--dryRun` flag.
+By default Repolinter will automatically execute fixes as specified by the [ruleset](#ruleset-configuration). If this is not desired functionality, you can disable this with the `--dryRun` flag.
 
 ## Ruleset Configuration
 
@@ -137,7 +138,7 @@ Any ruleset starts with the following base, shown in both JSON and YAML format:
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
+  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/main/rulesets/schema.json",
   "version": 2,
   "axioms": {},
   "rules": {}
@@ -297,7 +298,7 @@ An example configuration using an axiom to detect the packaging system for a pro
 
 ```javascript
 {
-  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/schema.json",
+  "$schema": "https://raw.githubusercontent.com/damian-buho/repolinter/main/rulesets/schema.json",
   "version": 2,
   "axioms": {
     "packagers": "package-type"
@@ -363,9 +364,9 @@ or file path:
 
 ```javascript
 {
-  "extends": "https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json",
+  "extends": "https://raw.githubusercontent.com/damian-buho/repolinter/main/rulesets/default.json",
   "rules": {
-    # disable CI check
+    // disable CI check
     "integrates-with-ci":
     {
       "level": "off"
@@ -375,7 +376,7 @@ or file path:
 ```
 
 ```yaml
-extends: https://raw.githubusercontent.com/damian-buho/repolinter/master/rulesets/default.json
+extends: https://raw.githubusercontent.com/damian-buho/repolinter/main/rulesets/default.json
 rules:
   # disable CI check
   integrates-with-ci:
@@ -387,7 +388,7 @@ Relative paths are resolved relative to the location used to access the
 extending file. For example, if repolinter is invoked as:
 
 ```
-repolinter -u http://example.com/custom-rules.yaml
+repolinter lint -u http://example.com/custom-rules.yaml
 ```
 
 And that ruleset includes `extends: "./default.yaml"`, the path will be resolved
@@ -395,7 +396,7 @@ relative to the original URL as `http://example.com/default.yaml`. If instead
 repolinter is invoked as:
 
 ```
-repolinter -r /etc/repolinter/custom-rules.yaml
+repolinter lint -r /etc/repolinter/custom-rules.yaml
 ```
 
 And that ruleset includes `extends: "./default.yaml"`, the path will be resolved
@@ -408,7 +409,7 @@ YAML and JSON rulesets can be extended from either format.
 Repolinter also includes an extensible JavaScript API:
 
 ```javascript
-const repolinter = require('repolinter')
+const repolinter = require('@damian-buho/repolinter')
 const result = await repolinter.lint('.')
 ```
 

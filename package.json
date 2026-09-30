@@ -77,7 +77,7 @@
     "useTabs": false
   },
   "dependencies": {
-    "@asciidoctor/core": "4.0.11",
+    "@asciidoctor/core": "4.1.0",
     "ajv": "8.20.0",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",
@@ -89,7 +89,7 @@
     "simple-git": "3.36.0",
     "spdx-license-list": "6.12.0",
     "tinyglobby": "0.2.17",
-    "undici": "8.10.2",
+    "undici": "8.11.2",
     "yaml": "2.9.1"
   },
   "devDependencies": {
@@ -98,11 +98,11 @@
     "@stryker-mutator/tap-runner": "10.0.0",
     "@stryker-mutator/typescript-checker": "10.0.0",
     "@types/eslint": "9.6.1",
-    "@types/node": "26.6.2",
+    "@types/node": "26.6.3",
     "eslint": "10.11.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import-x": "4.17.1",
-    "eslint-plugin-n": "18.3.0",
+    "eslint-plugin-n": "18.4.0",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-tsdoc": "0.5.3",
     "eslint-plugin-unicorn": "76.0.0",
@@ -110,11 +110,11 @@
     "markdownlint": "0.41.1",
     "mock-http-server": "1.4.5",
     "nock": "14.0.17",
-    "prettier": "3.9.8",
-    "tsx": "4.23.13",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
     "typedoc": "0.28.20",
     "typedoc-rhineai-theme": "1.2.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.70.0"
+    "typescript-eslint": "8.71.0"
   }
 }
