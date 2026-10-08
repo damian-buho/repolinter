@@ -175,8 +175,8 @@ importers:
   .:
     dependencies:
       '@asciidoctor/core':
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: 4.1.1
+        version: 4.1.1
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -289,8 +289,8 @@ importers:
 
 packages:
 
-  '@asciidoctor/core@4.1.0':
-    resolution: {integrity: sha512-3PpZu3m0V2lT2jljqsH0LJukaMdm8cpv0tuTMijiiwTBSUrVlEd8NBwzH5iyGlS3yPI6i3ZaaNL6enXelOVpRg==}
+  '@asciidoctor/core@4.1.1':
+    resolution: {integrity: sha512-kwynyx6FXXi985Q9tfIPUitZ/2vzISYmcUVVZXkSamwD91I5nL7TJt33HXjnBYwfzugLu36RZuhNA/DB4fogEA==}
     engines: {node: '>=20'}
     peerDependencies:
       highlight.js: ^11.0.0
@@ -2649,7 +2649,7 @@ packages:
 
 snapshots:
 
-  '@asciidoctor/core@4.1.0': {}
+  '@asciidoctor/core@4.1.1': {}
 
   '@babel/code-frame@8.0.6':
     dependencies:
@@ -3413,7 +3413,7 @@ snapshots:
   '@typescript-eslint/project-service@8.71.0(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.71.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.71.0
+      '@typescript-eslint/types': 8.71.1
       debug: 4.4.3
       typescript: 6.0.3
     transitivePeerDependencies:
