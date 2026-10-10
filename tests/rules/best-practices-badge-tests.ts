@@ -6,7 +6,7 @@
 
 import { describe, it, before } from 'node:test'
 import assert from 'node:assert/strict'
-import nock from 'nock'
+import { withMockedGet } from '../lib/mock-fetch.js'
 
 describe('rule', () => {
   describe('Best Practices Badge', () => {
@@ -105,39 +105,36 @@ describe('rule', () => {
       })
 
       it('fails when minPercentage is > than percentage returned by API', async () => {
-        const scope = nock('https://bestpractices.coreinfrastructure.org')
-          .get('/projects/100.json')
-          .reply(200, { tiered_percentage: 99 })
-
-        const actual = await BestpracticesBadgePresent(mockfs, {
-          minPercentage: 100
-        })
+        const actual = await withMockedGet(
+          'https://bestpractices.coreinfrastructure.org',
+          '/projects/100.json',
+          200,
+          { tiered_percentage: 99 },
+          () => BestpracticesBadgePresent(mockfs, { minPercentage: 100 })
+        )
         assert.strictEqual(actual.passed, false)
-        scope.done()
       })
 
       it('fails when minPercentage is set but API does not return 200', async () => {
-        const scope = nock('https://bestpractices.coreinfrastructure.org')
-          .get('/projects/100.json')
-          .reply(404)
-
-        const actual = await BestpracticesBadgePresent(mockfs, {
-          minPercentage: 100
-        })
+        const actual = await withMockedGet(
+          'https://bestpractices.coreinfrastructure.org',
+          '/projects/100.json',
+          404,
+          undefined,
+          () => BestpracticesBadgePresent(mockfs, { minPercentage: 100 })
+        )
         assert.strictEqual(actual.passed, false)
-        scope.done()
       })
 
       it('passes when minPercentage is <= than percentage returned by API', async () => {
-        const scope = nock('https://bestpractices.coreinfrastructure.org')
-          .get('/projects/100.json')
-          .reply(200, { tiered_percentage: 100 })
-
-        const actual = await BestpracticesBadgePresent(mockfs, {
-          minPercentage: 100
-        })
+        const actual = await withMockedGet(
+          'https://bestpractices.coreinfrastructure.org',
+          '/projects/100.json',
+          200,
+          { tiered_percentage: 100 },
+          () => BestpracticesBadgePresent(mockfs, { minPercentage: 100 })
+        )
         assert.strictEqual(actual.passed, true)
-        scope.done()
       })
     })
   })

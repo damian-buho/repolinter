@@ -265,9 +265,6 @@ importers:
       mock-http-server:
         specifier: 1.4.5
         version: 1.4.5
-      nock:
-        specifier: 15.0.1
-        version: 15.0.1
       prettier:
         specifier: 3.9.9
         version: 3.9.9
@@ -888,19 +885,12 @@ packages:
   '@microsoft/tsdoc@0.17.1':
     resolution: {integrity: sha512-VHyYyyoH63jFoO3shpw9Zfijk5v/9p/VrClW35z0/q6ooK7sSmxpzOkS4iZPxs3vO4XtBW4H38HRAKkAMIK7DA==}
 
-  '@mswjs/interceptors@0.44.0':
-    resolution: {integrity: sha512-IYHevRStF4ijM20GI9c9Ndhw483NSAjCydQhUr4/zIB0BNLsTVw3vFAxTo6TlvX4QnV60wEHttUa9539TTAq+A==}
-    engines: {node: '>=22'}
-
   '@napi-rs/wasm-runtime@1.2.5':
     resolution: {integrity: sha512-HshSvXzmBxNzqejd3k/KemgQ3hdREUYFRRrgxOZ+gPljDIsO2SDZrVZMd4Z/HsxudQbE62OVyVFE8z9BCurfjA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
     peerDependencies:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
-
-  '@open-draft/until@3.0.1':
-    resolution: {integrity: sha512-s7/9ELP4aP9YZtW7RJaa0Xf3RISaRH9+EFN18FtykJYRHGNrl8f9ymvoNXzjhrjmftFvkQudtuDU9RYhk0xs3A==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -1897,9 +1887,6 @@ packages:
   is-hexadecimal@2.0.1:
     resolution: {integrity: sha512-DgZQp241c8oO6cA1SbTEWiXeoxV42vlcJxgH+B3hi1AiqqKruZR3ZGF8In3fj4+/y/7rHvlOZLZtgJ/4ttYGZg==}
 
-  is-node-process@1.2.0:
-    resolution: {integrity: sha512-Vg4o6/fqPxIjtxgUH5QLJhwZ7gW5diGCVlXpuUfELC62CuxM1iHcRe51f2W1FDy04Ai4KJkagKjx3XaqyfRKXw==}
-
   is-plain-obj@4.1.0:
     resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
     engines: {node: '>=12'}
@@ -2172,10 +2159,6 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  nock@15.0.1:
-    resolution: {integrity: sha512-Mjx5Xl4t9vP13eUZPWqwwpjjXNjvhUTo1qTdryVM3+7t6Z2w6WHZ9GVZk/zQ8Ym1vbmloWaglye3cloyHAJ8FA==}
-    engines: {node: '>=20.12.1'}
-
   node-cache@5.1.2:
     resolution: {integrity: sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==}
     engines: {node: '>= 8.0.0'}
@@ -2218,9 +2201,6 @@ packages:
   os-homedir@1.0.2:
     resolution: {integrity: sha512-B5JU3cabzk8c67mRRd3ECmROafjYMXbuzlwtqdM8IbS8ktlTix8aFGb2bAGKrSRIlnfKwovGUUr72JUPyOb6kQ==}
     engines: {node: '>=0.10.0'}
-
-  outvariant@1.4.3:
-    resolution: {integrity: sha512-+Sl2UErvtsoajRDKCE5/dBz4DIvHXQQnAxtQTF04OJxY0+DyZXSo5P5Bb7XYWOh81syohlYL24hbDwxedPUJCA==}
 
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
@@ -2361,9 +2341,6 @@ packages:
     resolution: {integrity: sha512-Dj/cW9zBV2aRj6XzCxuGIs3ESZKv02jixne3q6jFZYZ3/Tg09gHHviSMDL4kObh9pqSahdRHEnDoaP2gn8YLhA==}
     engines: {node: '>= 0.4'}
     hasBin: true
-
-  rettime@0.11.12:
-    resolution: {integrity: sha512-5ExtR1ppiDBQkVoPw5NAqdbfH4Iq2VOmQKHMtUoaFxA9bo2krzFYBtyq6K40xxbYp+2w/YOr6D+1ToF6tTN53A==}
 
   rxjs@7.8.2:
     resolution: {integrity: sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==}
@@ -3222,25 +3199,12 @@ snapshots:
 
   '@microsoft/tsdoc@0.17.1': {}
 
-  '@mswjs/interceptors@0.44.0':
-    dependencies:
-      '@open-draft/until': 3.0.1
-      '@types/debug': 4.1.13
-      debug: 4.4.3
-      is-node-process: 1.2.0
-      outvariant: 1.4.3
-      rettime: 0.11.12
-    transitivePeerDependencies:
-      - supports-color
-
   '@napi-rs/wasm-runtime@1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.4
     optional: true
-
-  '@open-draft/until@3.0.1': {}
 
   '@pinojs/redact@0.4.0': {}
 
@@ -4327,8 +4291,6 @@ snapshots:
 
   is-hexadecimal@2.0.1: {}
 
-  is-node-process@1.2.0: {}
-
   is-plain-obj@4.1.0: {}
 
   is-stream@4.0.1: {}
@@ -4681,12 +4643,6 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  nock@15.0.1:
-    dependencies:
-      '@mswjs/interceptors': 0.44.0
-    transitivePeerDependencies:
-      - supports-color
-
   node-cache@5.1.2:
     dependencies:
       clone: 2.1.2
@@ -4726,8 +4682,6 @@ snapshots:
       word-wrap: 1.2.5
 
   os-homedir@1.0.2: {}
-
-  outvariant@1.4.3: {}
 
   p-limit@3.1.0:
     dependencies:
@@ -4867,8 +4821,6 @@ snapshots:
       is-core-module: 2.17.0
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
-
-  rettime@0.11.12: {}
 
   rxjs@7.8.2:
     dependencies:
