@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import nock from 'nock'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
+import { withMockedGet } from '../lib/mock-fetch.js'
 import fileModify from '../../src/fixes/file-modify.js'
 
 describe('fixes', () => {
@@ -225,19 +225,19 @@ describe('fixes', () => {
           mockContents = c
         }
       }
-      const scope = nock('https://example.com')
-        .get('/')
-        .reply(200, 'this is text')
-
-      const result = await fileModify(mockFs, options, [], false)
+      const result = await withMockedGet(
+        'https://example.com',
+        '/',
+        200,
+        'this is text',
+        () => fileModify(mockFs, options, [], false)
+      )
 
       assert.strictEqual(result.passed, true)
       assert.strictEqual(result.targets.length, 1)
       assert.strictEqual(result.targets[0].path, 'myfile')
       assert.strictEqual(result.targets[0].passed, true)
       assert.strictEqual(mockContents, 'the file contentsthis is text')
-
-      scope.done()
     })
 
     it('adds newlines correctly', async () => {

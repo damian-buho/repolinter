@@ -3,9 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import nock from 'nock'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
+import { withMockedGet } from '../lib/mock-fetch.js'
 import fileCreate from '../../src/fixes/file-create.js'
 
 describe('fixes', () => {
@@ -146,19 +146,19 @@ describe('fixes', () => {
           mockContents = contents
         }
       }
-      const scope = nock('https://example.com')
-        .get('/')
-        .reply(200, 'this is text')
-
-      const result = await fileCreate(mockFs, options, [], false)
+      const result = await withMockedGet(
+        'https://example.com',
+        '/',
+        200,
+        'this is text',
+        () => fileCreate(mockFs, options, [], false)
+      )
 
       assert.strictEqual(result.passed, true)
       assert.strictEqual(result.targets.length, 1)
       assert.strictEqual(result.targets[0].path, 'myfile')
       assert.strictEqual(result.targets[0].passed, true)
       assert.strictEqual(mockContents, 'this is text')
-
-      scope.done()
     })
 
     it('removes old files if replace is true', async () => {

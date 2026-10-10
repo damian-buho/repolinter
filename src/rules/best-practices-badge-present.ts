@@ -6,6 +6,7 @@
 
 import type FileSystem from '../lib/file-system.js'
 import Result from '../lib/result.js'
+import { safeFetch } from '../lib/safe-fetch.js'
 import fileContents from './file-contents.js'
 
 interface BestPracticesBadgeOptions {
@@ -52,7 +53,7 @@ export default async function bestPracticesBadgePresent(
     )
   }
   const bestPracticesUrl = match[0]
-  const bestPracticesResponse = await fetch(`${bestPracticesUrl}.json`)
+  const bestPracticesResponse = await safeFetch(`${bestPracticesUrl}.json`)
   if (!bestPracticesResponse.ok) {
     return new Result('Invalid Best Practices Badge URL', targets, false)
   }

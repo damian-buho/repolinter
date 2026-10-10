@@ -14,3 +14,5 @@ overrides:
   js-yaml: 4.3.2
   fast-uri: 3.1.8
   brace-expansion: 5.0.12
+  katex: 0.19.0
+  source-map-js: 1.2.2
