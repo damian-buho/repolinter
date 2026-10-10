@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import nock from 'nock'
+import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici'
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import fileModify from '../../src/fixes/file-modify.js'
@@ -225,11 +225,23 @@ describe('fixes', () => {
           mockContents = c
         }
       }
-      const scope = nock('https://example.com')
-        .get('/')
+      const original = getGlobalDispatcher()
+      const agent = new MockAgent()
+      agent.disableNetConnect()
+      agent
+        .get('https://example.com')
+        .intercept({ path: '/' })
         .reply(200, 'this is text')
+      setGlobalDispatcher(agent)
+      process.env['REPOLINTER_ALLOW_PRIVATE_FETCH'] = '1'
 
-      const result = await fileModify(mockFs, options, [], false)
+      let result
+      try {
+        result = await fileModify(mockFs, options, [], false)
+      } finally {
+        setGlobalDispatcher(original)
+        delete process.env['REPOLINTER_ALLOW_PRIVATE_FETCH']
+      }
 
       assert.strictEqual(result.passed, true)
       assert.strictEqual(result.targets.length, 1)
@@ -237,7 +249,7 @@ describe('fixes', () => {
       assert.strictEqual(result.targets[0].passed, true)
       assert.strictEqual(mockContents, 'the file contentsthis is text')
 
-      scope.done()
+      agent.assertNoPendingInterceptors()
     })
 
     it('adds newlines correctly', async () => {

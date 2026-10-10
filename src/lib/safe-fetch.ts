@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { BlockList } from 'node:net'
-import { Agent } from 'undici'
+import { Agent, fetch, type RequestInit, type Response } from 'undici'
 import { logger } from '../logger.js'
 
 // Defense-in-depth wrapper around fetch: ruleset-supplied URLs cannot reach
@@ -38,10 +38,6 @@ const blockList = buildBlockList()
 
 const blockingDispatcher = new Agent({ connect: { blockList } })
 
-interface FetchInitWithDispatcher extends RequestInit {
-  dispatcher?: Agent
-}
-
 async function safeFetch(
   target: string,
   init: RequestInit = {}
@@ -60,8 +56,7 @@ async function safeFetch(
     logger.debug({ target }, 'Private fetch bypass enabled')
   }
   const dispatcher = shouldBypassPrivate ? undefined : blockingDispatcher
-  const fetchInit: FetchInitWithDispatcher = { ...init, dispatcher }
-  return fetch(target, fetchInit as RequestInit)
+  return fetch(target, { ...init, dispatcher })
 }
 
 export { safeFetch }
