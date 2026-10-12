@@ -11,7 +11,11 @@ const __dirname: string = path.dirname(fileURLToPath(import.meta.url))
 import { exec as cpExec } from 'node:child_process'
 import realFs from 'node:fs'
 import ServerMock from 'mock-http-server'
-import { mktempRepo, commitFile, rmRepo } from '../lib/git-fixture.js'
+import {
+  mktempRepository,
+  commitFile,
+  rmRepository
+} from '../lib/git-fixture.js'
 const ESC = '\u{1B}'
 const ANSI_RE = new RegExp(`${ESC}${String.raw`\[[0-9;]*m`}`, 'g')
 const stripAnsi = (s: string): string => s.replaceAll(ANSI_RE, '')
@@ -27,12 +31,9 @@ interface ExecResult {
   code: number
 }
 
-async function execAsync(
-  command: string,
-  options: Record<string, unknown> = {}
-): Promise<ExecResult> {
+async function execAsync(command: string): Promise<ExecResult> {
   return new Promise((resolve, reject) => {
-    cpExec(command, { timeout: 10_000, ...options }, (error, outstd, errstd) =>
+    cpExec(command, { timeout: 10_000 }, (error, outstd, errstd) =>
       error !== null && error.code === undefined
         ? reject(error)
         : resolve({
@@ -194,7 +195,7 @@ describe(
       let fixtureDirectory: string
 
       before(() => {
-        fixtureDirectory = mktempRepo()
+        fixtureDirectory = mktempRepository()
         commitFile(fixtureDirectory, 'README.md', '# fixture\n', 'add readme')
         // Empty in-repo ruleset → repolinter auto-discovers it and produces
         // a passing run regardless of what files the fixture does/doesn't have.
@@ -208,7 +209,7 @@ describe(
         fixtureUrl = pathToFileURL(fixtureDirectory).href
       })
 
-      after(() => rmRepo(fixtureDirectory))
+      after(() => rmRepository(fixtureDirectory))
 
       it('runs repolinter on a remote git repository', async () => {
         const [actual, actual2] = await Promise.all([

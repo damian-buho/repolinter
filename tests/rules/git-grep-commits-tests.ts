@@ -7,7 +7,11 @@ import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../src/lib/file-system.js'
 import gitGrepCommits from '../../src/rules/git-grep-commits.js'
-import { mktempRepo, commitFile, rmRepo } from '../lib/git-fixture.js'
+import {
+  mktempRepository,
+  commitFile,
+  rmRepository
+} from '../lib/git-fixture.js'
 
 describe('rule', () => {
   describe('git_grep_commits', () => {
@@ -20,7 +24,7 @@ describe('rule', () => {
     let tmpdir: string
 
     before(() => {
-      tmpdir = mktempRepo()
+      tmpdir = mktempRepository()
       commitFile(
         tmpdir,
         'src/with-copyright.js',
@@ -35,7 +39,7 @@ describe('rule', () => {
       )
     })
 
-    after(() => rmRepo(tmpdir))
+    after(() => rmRepository(tmpdir))
 
     it('passes if the denylist pattern does not match any commit', () => {
       const ruleopts = {

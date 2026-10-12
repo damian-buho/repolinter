@@ -10,10 +10,10 @@ import path from 'node:path'
 import FileSystem from '../../src/lib/file-system.js'
 import gitWorkingTree from '../../src/rules/git-working-tree.js'
 import {
-  mktempRepo,
+  mktempRepository,
   commitFile,
   mktempPlainDirectory,
-  rmRepo
+  rmRepository
 } from '../lib/git-fixture.js'
 
 describe(
@@ -24,26 +24,26 @@ describe(
       //   repoDirectory  — a fresh git repo (root of a working tree)
       //   subdirectory   — a subdirectory inside that repo
       //   plainDirectory — a temp dir that is NOT a git repo
-      let repoDirectory: string
+      let repositoryDirectory: string
       let subdirectory: string
       let plainDirectory: string
 
       before(() => {
-        repoDirectory = mktempRepo()
+        repositoryDirectory = mktempRepository()
         // Seed at least one commit so the working tree is in a normal state.
-        commitFile(repoDirectory, 'README.md', '# fixture\n', 'init')
-        subdirectory = path.join(repoDirectory, 'nested')
+        commitFile(repositoryDirectory, 'README.md', '# fixture\n', 'init')
+        subdirectory = path.join(repositoryDirectory, 'nested')
         fs.mkdirSync(subdirectory)
         plainDirectory = mktempPlainDirectory()
       })
 
       after(() => {
-        rmRepo(repoDirectory)
-        rmRepo(plainDirectory)
+        rmRepository(repositoryDirectory)
+        rmRepository(plainDirectory)
       })
 
       it('passes if the specified directory is managed with Git', () => {
-        const result = gitWorkingTree(new FileSystem(repoDirectory), {
+        const result = gitWorkingTree(new FileSystem(repositoryDirectory), {
           allowSubDir: false
         })
 

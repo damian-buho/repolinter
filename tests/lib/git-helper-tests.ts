@@ -6,7 +6,7 @@
 import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import { gitAllCommits } from '../../src/lib/git-helper.js'
-import { mktempRepo, commitEmpty, rmRepo } from './git-fixture.js'
+import { mktempRepository, commitEmpty, rmRepository } from './git-fixture.js'
 
 describe('gitAllCommits', () => {
   describe('non-empty repo', () => {
@@ -16,13 +16,13 @@ describe('gitAllCommits', () => {
     let tmpdir: string
 
     before(() => {
-      tmpdir = mktempRepo()
+      tmpdir = mktempRepository()
       for (let index: number = 0; index < COMMIT_COUNT; index++) {
         commitEmpty(tmpdir, `commit ${index}`)
       }
     })
 
-    after(() => rmRepo(tmpdir))
+    after(() => rmRepository(tmpdir))
 
     it('returns every commit reachable from any ref', () => {
       const actual: string[] = gitAllCommits(tmpdir)
@@ -40,10 +40,10 @@ describe('gitAllCommits', () => {
     let tmpdir: string
 
     before(() => {
-      tmpdir = mktempRepo()
+      tmpdir = mktempRepository()
     })
 
-    after(() => rmRepo(tmpdir))
+    after(() => rmRepository(tmpdir))
 
     it('returns [] when the repo has no commits', () => {
       assert.deepEqual(gitAllCommits(tmpdir), [])

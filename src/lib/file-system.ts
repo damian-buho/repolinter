@@ -97,10 +97,10 @@ class FileSystem {
         continue
       }
 
-      const relativeToRepoPath = this.normalizePath(
+      const relativeToRepositoryPath = this.normalizePath(
         path.relative(this.targetDirectory, fullPath)
       )
-      onlySymlinks.add(relativeToRepoPath)
+      onlySymlinks.add(relativeToRepositoryPath)
     }
 
     const filtered = filePaths.filter(
