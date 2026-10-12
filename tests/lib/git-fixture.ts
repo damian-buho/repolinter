@@ -64,7 +64,7 @@ function gitWithEnvironment(
 }
 
 // Build an empty git repo in a fresh temp dir and return its path.
-export function mktempRepo(): string {
+export function mktempRepository(): string {
   const directory = fs.mkdtempSync(
     path.join(os.tmpdir(), 'repolinter-fixture-')
   )
@@ -79,22 +79,25 @@ export function mktempRepo(): string {
 // Write `content` at `relativePath` inside `repoDirectory` and commit it.
 // Creates intermediate directories as needed.
 export function commitFile(
-  repoDirectory: string,
+  repositoryDirectory: string,
   relativePath: string,
   content: string,
   message: string
 ): void {
-  const full = path.join(repoDirectory, relativePath)
+  const full = path.join(repositoryDirectory, relativePath)
   fs.mkdirSync(path.dirname(full), { recursive: true })
   fs.writeFileSync(full, content)
-  git(repoDirectory, 'add', '--', relativePath)
-  git(repoDirectory, 'commit', '--no-verify', '-q', '-m', message)
+  git(repositoryDirectory, 'add', '--', relativePath)
+  git(repositoryDirectory, 'commit', '--no-verify', '-q', '-m', message)
 }
 
 // Empty commit — cheap way to grow the rev-list count without touching files.
-export function commitEmpty(repoDirectory: string, message: string): void {
+export function commitEmpty(
+  repositoryDirectory: string,
+  message: string
+): void {
   git(
-    repoDirectory,
+    repositoryDirectory,
     'commit',
     '--allow-empty',
     '--no-verify',
@@ -107,13 +110,13 @@ export function commitEmpty(repoDirectory: string, message: string): void {
 // Empty commit attributed to a specific author. Used by tests that exercise
 // commit-history aggregation (e.g. contributor counting).
 export function commitEmptyAs(
-  repoDirectory: string,
+  repositoryDirectory: string,
   message: string,
   authorName: string
 ): void {
   const email = `${authorName.toLowerCase().replaceAll(' ', '.')}@example.com`
   gitWithEnvironment(
-    repoDirectory,
+    repositoryDirectory,
     ['commit', '--allow-empty', '--no-verify', '-q', '-m', message],
     {
       GIT_AUTHOR_NAME: authorName,
@@ -124,7 +127,7 @@ export function commitEmptyAs(
   )
 }
 
-export function rmRepo(directory: string): void {
+export function rmRepository(directory: string): void {
   fs.rmSync(directory, { recursive: true, force: true })
 }
 

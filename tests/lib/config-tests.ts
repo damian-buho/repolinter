@@ -17,9 +17,7 @@ process.env.REPOLINTER_ALLOW_PRIVATE_FETCH = '1'
 
 const __dirname: string = path.dirname(fileURLToPath(import.meta.url))
 
-const serveDirectory = (
-  directory: string
-): {
+const serveDirectory = (): {
   method: string
   path: string
   reply: { status: number; body: (request: { pathname: string }) => Buffer }
@@ -29,7 +27,7 @@ const serveDirectory = (
   reply: {
     status: 200,
     body: (request: { pathname: string }): Buffer =>
-      fs.readFileSync(path.resolve(directory, request.pathname.slice(1)))
+      fs.readFileSync(path.resolve(__dirname, request.pathname.slice(1)))
   }
 })
 
@@ -118,7 +116,7 @@ describe(
         })
 
         it('should load URL config file', async () => {
-          server.on(serveDirectory(__dirname))
+          server.on(serveDirectory())
           const actual = await Config.loadConfig(
             `http://127.0.0.1:${port}/default.json`
           )
@@ -135,7 +133,7 @@ describe(
         })
 
         it('should handle relative URL extends', async () => {
-          server.on(serveDirectory(__dirname))
+          server.on(serveDirectory())
           const actual = await Config.loadConfig(
             `http://127.0.0.1:${port}/repolinter.yaml`
           )
@@ -144,7 +142,7 @@ describe(
         })
 
         it('should handle absolute URL extends', async () => {
-          server.on(serveDirectory(__dirname))
+          server.on(serveDirectory())
           const tmpdir: string = fs.mkdtempSync(
             path.join(os.tmpdir(), 'repolinter-test-')
           )
@@ -174,7 +172,7 @@ describe(
         })
 
         it('should handle encoded rulesets extends', async () => {
-          server.on(serveDirectory(__dirname))
+          server.on(serveDirectory())
           const actual = await Config.loadConfig(
             path.join(__dirname, 'override-encoded.yaml')
           )
@@ -204,7 +202,7 @@ describe(
         })
 
         it('should throw error on non existant URL', async () => {
-          server.on(serveDirectory(__dirname))
+          server.on(serveDirectory())
           await assert.rejects(
             () => Config.loadConfig(`http://127.0.0.1:${port}/404`),
             /404/

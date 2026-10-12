@@ -7,7 +7,11 @@ import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import FileSystem from '../../src/lib/file-system.js'
 import axioms from '../../src/axioms/axioms.js'
-import { mktempRepo, commitEmptyAs, rmRepo } from '../lib/git-fixture.js'
+import {
+  mktempRepository,
+  commitEmptyAs,
+  rmRepository
+} from '../lib/git-fixture.js'
 
 const contributors = axioms['contributor-count']
 
@@ -18,13 +22,13 @@ describe('contributors axiom', () => {
   let tmpdir: string
 
   before(() => {
-    tmpdir = mktempRepo()
+    tmpdir = mktempRepository()
     commitEmptyAs(tmpdir, 'first commit by alice', 'Alice')
     commitEmptyAs(tmpdir, 'first commit by bob', 'Bob')
     commitEmptyAs(tmpdir, 'second commit by alice', 'Alice')
   })
 
-  after(() => rmRepo(tmpdir))
+  after(() => rmRepository(tmpdir))
 
   it('counts distinct authors across all commits', async () => {
     const fileSystem = new FileSystem(tmpdir)
