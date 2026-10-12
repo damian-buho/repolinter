@@ -72,4 +72,6 @@ class Linguist {
   }
 }
 
-export default new Linguist()
+const linguist = new Linguist()
+
+export default linguist

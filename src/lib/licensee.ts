@@ -10,4 +10,6 @@ class Licensee {
   }
 }
 
-export default new Licensee()
+const licensee = new Licensee()
+
+export default licensee

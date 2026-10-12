@@ -25,11 +25,11 @@ const COLLAPSE_TOP = `<details>
 const COLLAPSE_BOTTOM = '</details>'
 
 function opWrap(
-  pre: string | undefined,
+  pre: string = '',
   base: string | number | undefined | false,
-  suf: string | undefined
+  suf: string = ''
 ): string {
-  return base ? (pre || '') + base + (suf || '') : ''
+  return base ? pre + base + suf : ''
 }
 
 const MarkdownFormatter = {
