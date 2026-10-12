@@ -16,3 +16,6 @@ reports/
 
 # pnpm auto-generated
 # pnpm-workspace.yaml
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
