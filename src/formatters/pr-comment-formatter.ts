@@ -34,7 +34,12 @@ function formatLintResult(result: FormatResultType): string {
     return `${result.ruleInfo.name}: ignored \u{2014} ${result.runMessage}`
   }
 
-  const lint = result.lintResult!
+  const lint = result.lintResult
+  if (!lint) {
+    throw new Error(
+      `pr_comment_formatter: status ${result.status} carries no lint result`
+    )
+  }
   const sym = symbolFor(result.ruleInfo.level, lint.passed)
   const failed = lint.targets.filter((t: ResultTarget) => !t.passed)
 
@@ -43,7 +48,8 @@ function formatLintResult(result: FormatResultType): string {
   }
 
   if (lint.targets.length === 1) {
-    const t = lint.targets[0]!
+    const t = lint.targets[0]
+    if (!t) throw new Error('pr_comment_formatter: single target missing')
     const path = t.path || t.pattern || ''
     const message = t.message ? ` \u{2014} ${t.message}` : ''
     return `${sym} ${result.ruleInfo.name}${path ? ` (${path})` : ''}${message}`
@@ -54,7 +60,9 @@ function formatLintResult(result: FormatResultType): string {
   }
 
   if (failed.length === 1) {
-    const t = failed[0]!
+    const t = failed[0]
+    if (!t)
+      throw new Error('pr_comment_formatter: single failed target missing')
     const path = t.path || t.pattern || ''
     const message = t.message ? `: ${t.message}` : ''
     return `${sym} ${result.ruleInfo.name}${path ? ` (${path})` : ''}${message}`
@@ -79,7 +87,8 @@ function formatFixResult(result: FormatResultType): string | undefined {
     return `${sym} ${result.ruleInfo.name}: ${fix.message}`
   }
   if (targets.length === 1) {
-    const t = targets[0]!
+    const t = targets[0]
+    if (!t) throw new Error('pr_comment_formatter: single fix target missing')
     return `${sym} ${result.ruleInfo.name}: ${t.path || t.pattern}${t.message ? ` \u{2014} ${t.message}` : ''}`
   }
   const lines = [`${sym} ${result.ruleInfo.name}: ${targets.length} files`]

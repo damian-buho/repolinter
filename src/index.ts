@@ -154,15 +154,16 @@ export async function lint(
     fileSystem,
     isDryRun
   )
-  const isPassed = result.every(
-    r =>
-      !(
-        r.status === FormatResult.ERROR ||
-        (r.status !== FormatResult.IGNORED &&
-          r.ruleInfo.level === 'error' &&
-          !r.lintResult!.passed)
-      )
-  )
+  const isPassed = result.every(r => {
+    if (r.status === FormatResult.ERROR) return false
+    if (r.status === FormatResult.IGNORED || r.ruleInfo.level !== 'error') {
+      return true
+    }
+    const lint = r.lintResult
+    if (!lint)
+      throw new Error('lint: error-level result carries no lint result')
+    return lint.passed
+  })
 
   return {
     params: {
@@ -283,7 +284,8 @@ export async function runRuleset(
         )
       }
     }
-    if (!Object.hasOwn(Rules, r.ruleType)) {
+    const ruleFunction = Rules[r.ruleType]
+    if (!ruleFunction) {
       logger.warn(
         { rule: r.name, ruleType: r.ruleType },
         'Unknown rule type, skipping'
@@ -292,7 +294,6 @@ export async function runRuleset(
     }
     let result: Result
     try {
-      const ruleFunction = Rules[r.ruleType]!
       result = await ruleFunction(fileSystem, r.ruleConfig)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
@@ -316,7 +317,8 @@ export async function runRuleset(
     if (!r.fixType || result.passed) {
       return FormatResult.CreateLintOnly(r, result)
     }
-    if (!Object.hasOwn(Fixes, r.fixType)) {
+    const fixFunction = Fixes[r.fixType]
+    if (!fixFunction) {
       logger.warn(
         { rule: r.name, fixType: r.fixType },
         'Unknown fix type, skipping'
@@ -325,7 +327,6 @@ export async function runRuleset(
     }
     let fixresult: Result
     try {
-      const fixFunction = Fixes[r.fixType]!
       fixresult = await fixFunction(
         fileSystem,
         r.fixConfig as Record<string, unknown>,
@@ -355,14 +356,14 @@ export async function determineTargets(
 ): Promise<Record<string, Result>> {
   const ruleresults = await Promise.all(
     Object.entries(axiomconfig).map(async ([axiomId, axiomName]) => {
-      if (!Object.hasOwn(Axioms, axiomId)) {
+      const axiomFunction = Axioms[axiomId]
+      if (!axiomFunction) {
         logger.warn({ axiomId }, 'Unknown axiom ID, skipping')
         return [
           axiomName,
           new Result(`invalid axiom name ${axiomId}`, [], false)
         ] as [string, Result]
       }
-      const axiomFunction = Axioms[axiomId]!
       return [axiomName, await axiomFunction(fs)] as [string, Result]
     })
   )

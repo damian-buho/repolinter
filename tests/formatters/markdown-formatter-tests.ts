@@ -21,7 +21,8 @@ function extractHeadings(markdown: string): Heading[] {
     .filter((line: string) => /^#{1,6}\s/.test(line))
     .map((line: string) => {
       const match = line.match(/^(#{1,6})\s+(.*)/)
-      return { lvl: match![1]!.length, slug: slugger(match![2]!) }
+      assert.ok(match && match[1] && match[2] !== undefined)
+      return { lvl: match[1].length, slug: slugger(match[2]) }
     })
 }
 import FormatResult from '../../src/lib/formatresult.js'
@@ -95,8 +96,10 @@ describe('formatters', () => {
       ]
 
       for (const [index, element] of expected.entries()) {
-        assert.strictEqual(filteredSections[index]!.lvl, element.lvl)
-        assert.ok(filteredSections[index]!.slug.includes(element.slug))
+        const section = filteredSections[index]
+        assert.ok(section)
+        assert.strictEqual(section.lvl, element.lvl)
+        assert.ok(section.slug.includes(element.slug))
       }
     })
 

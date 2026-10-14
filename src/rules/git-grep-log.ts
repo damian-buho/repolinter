@@ -65,6 +65,7 @@ function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
       true
     )
   }
+  const denylist = options.denylist
 
   const commits = grepLog(fs, options)
 
@@ -74,7 +75,7 @@ function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
         0,
         7
       )} contains denylisted words.\n`,
-      `\tDenylist: ${options.denylist!.join(', ')}`
+      `\tDenylist: ${denylist.join(', ')}`
     ].join('\n')
 
     return {
@@ -85,7 +86,7 @@ function gitGrepLog(fs: FileSystem, options: GitGrepLogOptions): Result {
   })
 
   if (targets.length === 0) {
-    const message = `No denylisted words found in any commit messages.\n\tDenylist: ${options.denylist!.join(
+    const message = `No denylisted words found in any commit messages.\n\tDenylist: ${denylist.join(
       ', '
     )}`
     return new Result(message, [], true)

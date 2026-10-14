@@ -129,12 +129,17 @@ async function fileContents(
           } else if (current === 1 || index === chunkLineCounts.length - 1) {
             // no-op: trailing chunk or single-line separator
           } else {
-            lineNumbers.push(current - 1 + lineNumbers.at(-1)!)
+            const previous = lineNumbers.at(-1)
+            if (previous === undefined)
+              throw new Error('file-contents: line number stack empty')
+            lineNumbers.push(current - 1 + previous)
           }
         }
         const contextLines: ContextLine[] = []
         for (const current of lineNumbers) {
-          const matchedLine = fileLines[current - 1]!
+          const matchedLine = fileLines[current - 1]
+          if (matchedLine === undefined)
+            throw new Error('file-contents: line number out of range')
           if (regexFlags.includes('m')) {
             addMultilineContext(
               regex,

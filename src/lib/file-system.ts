@@ -279,9 +279,9 @@ class FileSystem {
       }
       leftOver += buffer.toString('utf8', 0, read)
       indexStart = 0
-      while ((index = leftOver.indexOf('\n', indexStart!)) !== -1) {
+      while ((index = leftOver.indexOf('\n', indexStart)) !== -1) {
         lineNumber++
-        lines += leftOver.slice(indexStart!, index) + '\n'
+        lines += leftOver.slice(indexStart, index) + '\n'
         indexStart = index + 1
 
         if (lineNumber >= lineCount) {

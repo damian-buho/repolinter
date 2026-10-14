@@ -4,6 +4,7 @@
 
 import FormatResult from '../lib/formatresult.js'
 import type FormatResultType from '../lib/formatresult.js'
+import type { FormatResultStatus } from '../lib/formatresult.js'
 import type { ResultTarget } from '../lib/result.js'
 import { slug as slugger } from '../lib/github-slugger.js'
 import type { LintResult } from '../index.js'
@@ -78,86 +79,94 @@ const MarkdownFormatter = {
           )}`
         )
       }
-    } else if (result.lintResult!.targets.length <= 1 && !result.fixResult) {
-      const body =
-        '\n\n' +
-        opWrap(undefined, result.lintResult!.message, '. ') +
-        opWrap(
-          undefined,
-          result.lintResult!.targets.length > 0 &&
-            result.lintResult!.targets[0]!.message,
-          ' '
-        ) +
-        opWrap(
-          '(`',
-          result.lintResult!.targets.length > 0 &&
-            (result.lintResult!.targets[0]!.path ||
-              result.lintResult!.targets[0]!.pattern),
-          '`). '
-        ) +
-        opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
-        opWrap(
-          'For more information please visit ',
-          result.ruleInfo.policyUrl,
-          '.'
-        )
-      formatBase.push(body)
     } else {
-      const start =
-        '\n\n' +
-        opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
-        opWrap(
-          'For more information please visit ',
-          result.ruleInfo.policyUrl,
-          '. '
-        ) +
-        opWrap(undefined, result.lintResult!.message, '. ')
-      formatBase.push(start)
-      const failedList = result.lintResult!.targets.filter(
-        (t: ResultTarget) => t.passed === false
-      )
-      if (failedList.length === 0) {
-        formatBase.push('All files passed this test.')
-      } else {
-        formatBase.push('Below is a list of files or patterns that failed:\n\n')
-        const list = failedList
-          .map((t: ResultTarget) =>
-            result.fixResult && t.path
-              ? ([
-                  t,
-                  result.fixResult.targets.find(
-                    (f: ResultTarget) => f.path === t.path
-                  )
-                ] as [ResultTarget, ResultTarget | undefined])
-              : ([t, undefined] as [ResultTarget, ResultTarget | undefined])
+      const lintResult = result.lintResult
+      if (!lintResult) {
+        throw new Error(
+          `markdown_formatter: status ${result.status} carries no lint result`
+        )
+      }
+      if (lintResult.targets.length <= 1 && !result.fixResult) {
+        const first = lintResult.targets[0]
+        const body =
+          '\n\n' +
+          opWrap(undefined, lintResult.message, '. ') +
+          opWrap(
+            undefined,
+            lintResult.targets.length > 0 && first?.message,
+            ' '
+          ) +
+          opWrap(
+            '(`',
+            lintResult.targets.length > 0 && (first?.path || first?.pattern),
+            '`). '
+          ) +
+          opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
+          opWrap(
+            'For more information please visit ',
+            result.ruleInfo.policyUrl,
+            '.'
           )
-          .map(([lintTarget, fixTarget]) => {
-            const base = `- \`${
-              lintTarget.path || lintTarget.pattern
-            }\`${opWrap(': ', lintTarget.message, '.')}`
-            return !fixTarget || !fixTarget.passed
-              ? base
-              : base +
-                  `\n  - ${isDryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
-                    fixTarget.message || result.fixResult!.message
-                  }`
-          })
-          .join('\n')
-        formatBase.push(list)
+        formatBase.push(body)
+      } else {
+        const start =
+          '\n\n' +
+          opWrap(undefined, result.ruleInfo.policyInfo, '. ') +
+          opWrap(
+            'For more information please visit ',
+            result.ruleInfo.policyUrl,
+            '. '
+          ) +
+          opWrap(undefined, lintResult.message, '. ')
+        formatBase.push(start)
+        const failedList = lintResult.targets.filter(
+          (t: ResultTarget) => t.passed === false
+        )
+        if (failedList.length === 0) {
+          formatBase.push('All files passed this test.')
+        } else {
+          formatBase.push(
+            'Below is a list of files or patterns that failed:\n\n'
+          )
+          const fixResult = result.fixResult
+          const list = failedList
+            .map((t: ResultTarget) =>
+              fixResult && t.path
+                ? ([
+                    t,
+                    fixResult.targets.find(
+                      (f: ResultTarget) => f.path === t.path
+                    )
+                  ] as [ResultTarget, ResultTarget | undefined])
+                : ([t, undefined] as [ResultTarget, ResultTarget | undefined])
+            )
+            .map(([lintTarget, fixTarget]) => {
+              const base = `- \`${
+                lintTarget.path || lintTarget.pattern
+              }\`${opWrap(': ', lintTarget.message, '.')}`
+              return fixTarget && fixTarget.passed
+                ? base +
+                    `\n  - ${isDryRun ? SUGGESTED_FIX : APPLIED_FIX} ${
+                      fixTarget.message || fixResult?.message
+                    }`
+                : base
+            })
+            .join('\n')
+          formatBase.push(list)
+        }
       }
     }
     if (result.fixResult && result.fixResult.passed) {
-      const unassociatedFixList = result.fixResult.targets.filter(
+      const fixResult = result.fixResult
+      const lintTargets = result.lintResult?.targets ?? []
+      const unassociatedFixList = fixResult.targets.filter(
         (t: ResultTarget) =>
-          !t.path ||
-          result.lintResult!.targets.every(
-            (l: ResultTarget) => l.path !== t.path
-          )
+          !t.path || lintTargets.every((l: ResultTarget) => l.path !== t.path)
       )
-      if (result.fixResult.message || unassociatedFixList.length > 0) {
+      if (fixResult.message || unassociatedFixList.length > 0) {
         const fixSuggest = `\n\n${isDryRun ? SUGGESTED_FIX : APPLIED_FIX}${opWrap(
           ' ',
-          result.fixResult.message,
+          fixResult.message,
           '.'
         )}`
         formatBase.push(fixSuggest)
@@ -174,13 +183,15 @@ const MarkdownFormatter = {
     return formatBase.join('')
   },
 
-  sortResults(results: FormatResultType[]): Record<string, FormatResultType[]> {
-    const out: Record<string, FormatResultType[]> = {}
+  sortResults(
+    results: FormatResultType[]
+  ): Record<FormatResultStatus, FormatResultType[]> {
+    const out = {} as Record<FormatResultStatus, FormatResultType[]>
     for (const key of FormatResult.getAllStatus()) {
       out[key] = []
     }
     for (const result of results) {
-      out[result.status]!.push(result)
+      out[result.status].push(result)
     }
     return out
   },
@@ -205,11 +216,11 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     ]
     const sorted = MarkdownFormatter.sortResults(output.results)
     const values = [
-      sorted[FormatResult.ERROR]!.length,
-      sorted[FormatResult.RULE_NOT_PASSED_ERROR]!.length,
-      sorted[FormatResult.RULE_NOT_PASSED_WARN]!.length,
-      sorted[FormatResult.RULE_PASSED]!.length,
-      sorted[FormatResult.IGNORED]!.length,
+      sorted[FormatResult.ERROR].length,
+      sorted[FormatResult.RULE_NOT_PASSED_ERROR].length,
+      sorted[FormatResult.RULE_NOT_PASSED_WARN].length,
+      sorted[FormatResult.RULE_PASSED].length,
+      sorted[FormatResult.IGNORED].length,
       output.results.length
     ]
     const headCells = [
@@ -222,7 +233,7 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     ]
     const dataCells = values.map(String)
     const colWidths = headCells.map((h, index) =>
-      Math.max(h.length, dataCells[index]!.length)
+      Math.max(h.length, dataCells[index]?.length ?? 0)
     )
     const tableHead = headCells.join('|')
     const tableSeparator = colWidths.map(w => '-'.repeat(w)).join('|')
@@ -262,11 +273,11 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
       }
     ]
     const relevantSections = sectionConfig.filter(
-      config => sorted[config.type]!.length > 0
+      config => sorted[config.type].length > 0
     )
     formatBase.push('\n')
     const toc = relevantSections.map(config => {
-      const subItems = sorted[config.type]!.map(r => {
+      const subItems = sorted[config.type].map(r => {
         const heading = MarkdownFormatter.formatRuleHeading(
           r.ruleInfo.name,
           config.symbol
@@ -281,9 +292,9 @@ ${isCollapse ? `\n${COLLAPSE_BOTTOM}` : ''}`
     const allSections = relevantSections.map(config =>
       MarkdownFormatter.createSection(
         config.name,
-        sorted[config.type]!.map(r =>
-          MarkdownFormatter.formatResult(r, config.symbol, isDryRun)
-        ).join('\n\n'),
+        sorted[config.type]
+          .map(r => MarkdownFormatter.formatResult(r, config.symbol, isDryRun))
+          .join('\n\n'),
         config.collapse
       )
     )

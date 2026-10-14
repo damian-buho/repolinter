@@ -22,11 +22,12 @@ const config = tseslint.config(
       'out/',
       'apidoc/',
       'docs/generated/',
-      'dist/'
+      'dist/',
+      '**/*.tmp.*'
     ]
   },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.strict,
   nPlugin.configs['flat/recommended-module'],
   flatConfigs.recommended,
   promisePlugin.configs['flat/recommended'],
@@ -59,27 +60,19 @@ const config = tseslint.config(
       'import-x/no-unresolved': 'off',
       'n/hashbang': 'off',
       'unicorn/throw-new-error': 'off',
-      // `consistent-boolean-name`: unicorn v73 split `checkProperties` into
-      // `checkMethods`/`checkFields`, both defaulting to 'never' — i.e. the old
-      // `checkProperties: false`. Recommended preset already enables the rule,
-      // so no override is needed.
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
           argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_'
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true
         }
       ]
     }
   },
   {
     files: ['tests/**/*.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.mocha
-      }
-    },
     rules: {
       'tsdoc/syntax': 'off',
       'n/no-unpublished-import': 'off',

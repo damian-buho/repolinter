@@ -45,7 +45,7 @@ function gitWithEnvironment(
   extraEnvironment: Record<string, string>
 ): string {
   const clean: Record<string, string | undefined> = { ...process.env }
-  for (const key of LEAKED_GIT_KEYS) delete clean[key]
+  for (const key of LEAKED_GIT_KEYS) Reflect.deleteProperty(clean, key)
   const result = spawnSync('git', ['-C', cwd, ...arguments_], {
     encoding: 'utf8',
     env: { ...clean, ...HERMETIC_ENV, ...extraEnvironment } as Record<
