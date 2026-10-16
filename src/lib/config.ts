@@ -331,6 +331,7 @@ function parseConfig(config: RulesetConfig): RuleInfo[] {
   )
   return v1Entries.flatMap(([where, rules]) => {
     return Object.entries(rules).map(([rulename, configray]) => {
+      // eslint-disable-next-line unicorn/prefer-default-parameters -- an empty-string type still falls back at use
       const [name = '', type] = rulename.split(':', 2)
       return new RuleInfo(
         name,

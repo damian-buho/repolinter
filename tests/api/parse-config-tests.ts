@@ -150,11 +150,11 @@ describe('api', () => {
       assert.strictEqual(parsed.length, 1)
       assert.strictEqual(
         parsed[0].policyInfo,
-        mockConfig.rules!['my-rule'].policyInfo
+        mockConfig.rules?.['my-rule'].policyInfo
       )
       assert.strictEqual(
         parsed[0].policyUrl,
-        mockConfig.rules!['my-rule'].policyUrl
+        mockConfig.rules?.['my-rule'].policyUrl
       )
     })
   })

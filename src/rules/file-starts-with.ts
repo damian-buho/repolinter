@@ -44,18 +44,19 @@ async function fileStartsWith(
   }
 
   if (options['skip-paths-matching']) {
+    const skip = options['skip-paths-matching']
     let regexes: RegExp[] = []
-    const extensions = options['skip-paths-matching'].extensions
+    const extensions = skip.extensions
     if (extensions && extensions.length > 0) {
       const extensionJoined = extensions.join('|')
       regexes.push(new RegExp('.(' + extensionJoined + ')$', 'i'))
     }
 
-    const patterns = options['skip-paths-matching'].patterns
+    const patterns = skip.patterns
     if (patterns && patterns.length > 0) {
       const filteredPatterns = patterns
         .filter(p => typeof p === 'string' && p !== '')
-        .map(p => new RegExp(p, options['skip-paths-matching']!.flags))
+        .map(p => new RegExp(p, skip.flags))
       regexes = [...regexes, ...filteredPatterns]
     }
     filteredFiles = filteredFiles.filter(file =>

@@ -84,7 +84,9 @@ function gitLinesAtCommit(
       const [filePath, ...rest] = entry
         .slice(Math.max(0, commit.length + 1))
         .split(':')
-      return { path: filePath!, content: rest.join(':') }
+      if (filePath === undefined)
+        throw new Error('git-grep-commits: empty grep entry')
+      return { path: filePath, content: rest.join(':') }
     }
   )
 
@@ -139,21 +141,24 @@ function gitGrepCommits(
       true
     )
   }
+  const denylist = options.denylist
 
   const files = listFiles(fs, options)
   const targets = files.map(file => {
     const [firstCommit, ...rest] = file.commits
+    if (firstCommit === undefined)
+      throw new Error('git-grep-commits: file carries no commits')
     const restMessage =
       rest.length > 0 ? `, and ${rest.length} more commits` : ''
 
     const message = [
       `(${
         file.path
-      }) contains denylisted words in commit ${firstCommit!.hash.slice(
+      }) contains denylisted words in commit ${firstCommit.hash.slice(
         0,
         7
       )}${restMessage}.`,
-      `\tdenylist: ${options.denylist!.join(', ')}`
+      `\tdenylist: ${denylist.join(', ')}`
     ].join('\n')
 
     return {
@@ -166,7 +171,7 @@ function gitGrepCommits(
   if (targets.length === 0) {
     const message = [
       'No denylisted words found in any commits.',
-      `\tdenylist: ${options.denylist!.join(', ')}`
+      `\tdenylist: ${denylist.join(', ')}`
     ].join('\n')
     return new Result(message, [], true)
   }

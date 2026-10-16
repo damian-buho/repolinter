@@ -39,18 +39,19 @@ async function fileModify(
   let files: string[] = await fs.findAllFiles(realTargets, options.nocase)
 
   if (options['skip-paths-matching']) {
+    const skip = options['skip-paths-matching']
     let regexes: RegExp[] = []
-    const extensions = options['skip-paths-matching'].extensions
+    const extensions = skip.extensions
     if (extensions && extensions.length > 0) {
       const extensionJoined = extensions.join('|')
       regexes.push(new RegExp('.(' + extensionJoined + ')$', 'i'))
     }
 
-    const patterns = options['skip-paths-matching'].patterns
+    const patterns = skip.patterns
     if (patterns && patterns.length > 0) {
       const filteredPatterns = patterns
         .filter((p): p is string => typeof p === 'string' && p !== '')
-        .map(p => new RegExp(p, options['skip-paths-matching']!.flags))
+        .map(p => new RegExp(p, skip.flags))
       regexes = [...regexes, ...filteredPatterns]
     }
     files = files.filter(file => regexes.every(regex => !regex.test(file)))
@@ -93,6 +94,7 @@ async function fileModify(
     )
   }
 
+  const text = content
   const resultTargets = await Promise.all(
     files.map(
       async (
@@ -111,16 +113,14 @@ async function fileModify(
             options.newlines && options.newlines.end
               ? '\n'.repeat(options.newlines.end)
               : ''
-          const fileContent = startNewlines + content! + endNewlines
-          await (options.write_mode === 'prepend'
-            ? fs.setFileContents(
-                file,
-                fileContent + (await fs.getFileContents(file))
-              )
-            : fs.setFileContents(
-                file,
-                (await fs.getFileContents(file)) + fileContent
-              ))
+          const fileContent = startNewlines + text + endNewlines
+          const oldContent = await fs.getFileContents(file)
+          await fs.setFileContents(
+            file,
+            options.write_mode === 'prepend'
+              ? fileContent + oldContent
+              : oldContent + fileContent
+          )
         }
         const message =
           typeof options.text === 'object'

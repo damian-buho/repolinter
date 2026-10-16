@@ -62,7 +62,9 @@
                 },
                 {
                   "if": {
-                    "properties": { "type": { "const": "best-practices-badge-present" } }
+                    "properties": {
+                      "type": { "const": "best-practices-badge-present" }
+                    }
                   },
                   "then": {
                     "properties": {
@@ -117,18 +119,30 @@
                   }
                 },
                 {
-                  "if": { "properties": { "type": { "const": "file-hashes-not-exist" } } },
+                  "if": {
+                    "properties": {
+                      "type": { "const": "file-hashes-not-exist" }
+                    }
+                  },
                   "then": {
                     "properties": {
-                      "options": { "$ref": "../rules/file-hashes-not-exist-config.json" }
+                      "options": {
+                        "$ref": "../rules/file-hashes-not-exist-config.json"
+                      }
                     }
                   }
                 },
                 {
-                  "if": { "properties": { "type": { "const": "file-no-broken-links" } } },
+                  "if": {
+                    "properties": {
+                      "type": { "const": "file-no-broken-links" }
+                    }
+                  },
                   "then": {
                     "properties": {
-                      "options": { "$ref": "../rules/file-no-broken-links-config.json" }
+                      "options": {
+                        "$ref": "../rules/file-no-broken-links-config.json"
+                      }
                     }
                   }
                 },
@@ -286,6 +300,20 @@
                   "then": {
                     "properties": {
                       "options": { "$ref": "../fixes/file-remove-config.json" }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "type": { "const": "github-issue-create" }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "options": {
+                        "$ref": "../fixes/github-issue-create-config.json"
+                      }
                     }
                   }
                 }

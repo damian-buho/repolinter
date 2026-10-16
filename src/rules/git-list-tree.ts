@@ -71,20 +71,23 @@ function gitListTree(fs: FileSystem, options: GitListTreeOptions): Result {
       true
     )
   }
+  const denylist = options.denylist
 
   const files = listFiles(fs, options)
 
   const targets = files.map(file => {
     const [firstCommit, ...rest] = file.commits
+    if (firstCommit === undefined)
+      throw new Error('git-list-tree: file carries no commits')
     const restMessage =
       rest.length > 0 ? `, and ${rest.length} more commits` : ''
 
     const message = [
-      `denylisted path (${file.path}) found in commit ${firstCommit!.slice(
+      `denylisted path (${file.path}) found in commit ${firstCommit.slice(
         0,
         7
       )}${restMessage}.`,
-      `\tdenylist: ${options.denylist!.join(', ')}`
+      `\tdenylist: ${denylist.join(', ')}`
     ].join('\n')
 
     return {
@@ -95,7 +98,7 @@ function gitListTree(fs: FileSystem, options: GitListTreeOptions): Result {
   })
 
   if (targets.length === 0) {
-    const message = `No denylisted paths found in any commits.\n\tdenylist: ${options.denylist!.join(
+    const message = `No denylisted paths found in any commits.\n\tdenylist: ${denylist.join(
       ', '
     )}`
     return new Result(message, [], true)

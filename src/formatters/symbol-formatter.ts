@@ -49,7 +49,8 @@ const SymbolFormatter = {
       return formatbase
     }
     if (result.targets.length === 1) {
-      const target = result.targets[0]!
+      const target = result.targets[0]
+      if (!target) throw new Error('symbol_formatter: single target missing')
       return (
         formatbase +
         `${frontSpace(target.message)} (${target.path || target.pattern})`
@@ -98,7 +99,10 @@ const SymbolFormatter = {
         : [])
     ]
     if (output.errored) {
-      return returnValue.join('') + `\n${styleText('red', output.errMsg!)}`
+      if (output.errMsg === undefined) {
+        throw new Error('symbol_formatter: errored result carries no message')
+      }
+      return returnValue.join('') + `\n${styleText('red', output.errMsg)}`
     }
     returnValue.push(
       Object.entries(output.targets)
@@ -119,18 +123,25 @@ const SymbolFormatter = {
                 `${result.ruleInfo.name} failed to run:`
               )} ${result.runMessage}`
             }
-            return result.status === FormatResult.IGNORED
-              ? `\n${styleText('gray', logSymbols.info)} ${styleText(
-                  'gray',
-                  `${result.ruleInfo.name}: ${result.runMessage}`
-                )}`
-              : SymbolFormatter.formatResult(
-                  result.lintResult!,
-                  result.ruleInfo.name,
-                  result.ruleInfo.policyUrl,
-                  result.ruleInfo.policyInfo,
-                  SymbolFormatter.getSymbol(result.ruleInfo.level)
-                )
+            if (result.status === FormatResult.IGNORED) {
+              return `\n${styleText('gray', logSymbols.info)} ${styleText(
+                'gray',
+                `${result.ruleInfo.name}: ${result.runMessage}`
+              )}`
+            }
+            const lint = result.lintResult
+            if (!lint) {
+              throw new Error(
+                `symbol_formatter: status ${result.status} carries no lint result`
+              )
+            }
+            return SymbolFormatter.formatResult(
+              lint,
+              result.ruleInfo.name,
+              result.ruleInfo.policyUrl,
+              result.ruleInfo.policyInfo,
+              SymbolFormatter.getSymbol(result.ruleInfo.level)
+            )
           })
           .join('')
     )
@@ -138,16 +149,20 @@ const SymbolFormatter = {
     if (fixresults.length > 0) {
       returnValue.push(
         styleText('bold', `\nFix(es) ${isDryRun ? 'suggested' : 'applied'}:`) +
-          fixresults.map(result =>
-            SymbolFormatter.formatResult(
-              result.fixResult!,
+          fixresults.map(result => {
+            const fix = result.fixResult
+            if (!fix) {
+              throw new Error('symbol_formatter: filtered fix result missing')
+            }
+            return SymbolFormatter.formatResult(
+              fix,
               result.ruleInfo.name,
               result.ruleInfo.policyUrl,
               result.ruleInfo.policyInfo,
               SymbolFormatter.getSymbol(result.ruleInfo.level),
               isDryRun ? logSymbols.info : logSymbols.success
             )
-          )
+          })
       )
     }
     return returnValue.join('')

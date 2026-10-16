@@ -38,7 +38,7 @@ describe('api', () => {
         where: []
       })
       assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
-      assert.strictEqual(result[0].lintResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, true)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -63,7 +63,7 @@ describe('api', () => {
         where: []
       })
       assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_ERROR)
-      assert.strictEqual(result[0].lintResult!.passed, false)
+      assert.strictEqual(result[0].lintResult?.passed, false)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -88,7 +88,7 @@ describe('api', () => {
         where: []
       })
       assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_WARN)
-      assert.strictEqual(result[0].lintResult!.passed, false)
+      assert.strictEqual(result[0].lintResult?.passed, false)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -130,7 +130,7 @@ describe('api', () => {
       )
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
-      assert.strictEqual(result[0].lintResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, true)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -148,7 +148,7 @@ describe('api', () => {
       )
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
-      assert.strictEqual(result[0].lintResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, true)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -192,7 +192,7 @@ describe('api', () => {
       )
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
-      assert.strictEqual(result[0].lintResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, true)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -232,7 +232,7 @@ describe('api', () => {
       )
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].status, FormatResult.RULE_PASSED)
-      assert.strictEqual(result[0].lintResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, true)
       assert.strictEqual(result[0].fixResult, undefined)
     })
 
@@ -256,8 +256,8 @@ describe('api', () => {
       )
       assert.strictEqual(result.length, 1)
       assert.strictEqual(result[0].status, FormatResult.RULE_NOT_PASSED_ERROR)
-      assert.strictEqual(result[0].lintResult!.passed, false)
-      assert.strictEqual(result[0].fixResult!.passed, true)
+      assert.strictEqual(result[0].lintResult?.passed, false)
+      assert.strictEqual(result[0].fixResult?.passed, true)
       assert.deepStrictEqual(structuredClone(result[0].ruleInfo), {
         level: 'error',
         name: 'my-rule',

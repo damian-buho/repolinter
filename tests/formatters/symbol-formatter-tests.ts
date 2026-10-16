@@ -18,6 +18,8 @@ describe('formatters', () => {
   describe('symbol_formatter', () => {
     it('returns a simple string with the correct log symbol', () => {
       const result = new Result('a message', [], true)
+      const message = result.message
+      assert.ok(message)
       const successResult: string = symbolFormatter.formatResult(
         result,
         'myrule',
@@ -26,7 +28,7 @@ describe('formatters', () => {
         logSymbols.error
       )
       assert.ok(successResult.includes(logSymbols.success))
-      assert.ok(successResult.includes(result.message!))
+      assert.ok(successResult.includes(message))
       assert.ok(successResult.includes('myrule'))
 
       result.passed = false
@@ -38,7 +40,7 @@ describe('formatters', () => {
         logSymbols.error
       )
       assert.ok(errorResult.includes(logSymbols.error))
-      assert.ok(errorResult.includes(result.message!))
+      assert.ok(errorResult.includes(message))
       assert.ok(errorResult.includes('myrule'))
     })
 

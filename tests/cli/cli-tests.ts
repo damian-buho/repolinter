@@ -335,9 +335,14 @@ describe(
     it('runs repolinter using encoded ruleset', async () => {
       const encodedRuleset: string =
         'ewogICAgIiRzY2hlbWEiOiAiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3BoaWxpcHMtbGFicy9yZXBvbGludGVyL2ZlYXR1cmUvZ2l0aHViLWlzc3VlLWZpeC9ydWxlc2V0cy9zY2hlbWEuanNvbiIsCiAgICAidmVyc2lvbiI6IDIsCiAgICAiYXhpb21zIjogewogICAgICAibGluZ3Vpc3QiOiAibGFuZ3VhZ2UiLAogICAgICAibGljZW5zZWUiOiAibGljZW5zZSIsCiAgICAgICJwYWNrYWdlcnMiOiAicGFja2FnZXIiCiAgICB9LAogICAgInJ1bGVzIjogewogICAgICAibGljZW5zZS1maWxlLWV4aXN0cyI6IHsKICAgICAgICAibGV2ZWwiOiAid2FybmluZyIsCiAgICAgICAgInJ1bGUiOiB7CiAgICAgICAgICAidHlwZSI6ICJmaWxlLWV4aXN0ZW5jZSIsCiAgICAgICAgICAib3B0aW9ucyI6IHsKICAgICAgICAgICAgImdsb2JzQW55IjogWwogICAgICAgICAgICAgICJMSUNFTlNFKiIsCiAgICAgICAgICAgICAgIkNPUFlJTkcqIgogICAgICAgICAgICBdLAogICAgICAgICAgICAibm9jYXNlIjogdHJ1ZQogICAgICAgICAgfQogICAgICAgIH0KICAgICAgfSwKICAgICAgInJlYWRtZS1maWxlLWV4aXN0cyI6IHsKICAgICAgICAibGV2ZWwiOiAid2FybmluZyIsCiAgICAgICAgInJ1bGUiOiB7CiAgICAgICAgICAidHlwZSI6ICJmaWxlLWV4aXN0ZW5jZSIsCiAgICAgICAgICAib3B0aW9ucyI6IHsKICAgICAgICAgICAgImdsb2JzQW55IjogWwogICAgICAgICAgICAgICJSRUFETUUqIgogICAgICAgICAgICBdLAogICAgICAgICAgICAibm9jYXNlIjogdHJ1ZQogICAgICAgICAgfQogICAgICAgIH0sCiAgICAgICAgImZpeCI6IHsKICAgICAgICAgICJ0eXBlIjogImdpdGh1Yi1pc3N1ZS1jcmVhdGUiLAogICAgICAgICAgIm9wdGlvbnMiOiB7CiAgICAgICAgICAgICJpc3N1ZUxhYmVscyI6IFsKICAgICAgICAgICAgICAiY29udGludW91cy1jb21wbGlhbmNlIiwKICAgICAgICAgICAgICAiYXV0b21hdGVkIgogICAgICAgICAgICBdLAogICAgICAgICAgICAiYnlwYXNzTGFiZWwiOiAiQ0M6IEJ5cGFzcyIsCiAgICAgICAgICAgICJpc3N1ZVRpdGxlIjogIkNvbnRpbnVvdXMgQ29tcGxpYW5jZSAtIENyZWF0ZSBhIFJlYWQtbWUg8J+RjSIsCiAgICAgICAgICAgICJpc3N1ZUJvZHkiOiAiSGkgdGhlcmUg8J+RiywgXG4gUGhpbGlwcyB0cmllcyB0byBtYWtlIHN1cmUgdGhhdCByZXBvc2l0b3JpZXMgaW4gdGhpcyBvcmdhbml6YXRpb24gZm9sbG93IGEgY2VydGFpbiBzdGFuZGFyZGl6YXRpb24uIFdoaWxlIHJldmlld2luZyB5b3VyIHJlcG9zaXRvcnksIHdlIGNvdWxkIG5vdCBzdG9wIG91cnNlbHZlcyB0byBmdXJ0aGVyIGltcHJvdmUgdGhpcyByZXBvc2l0b3J5ISBcbiBcbiBBY2NvcmRpbmcgdG8gb3VyIHN0YW5kYXJkcywgd2UgdGhpbmsgdGhlIGZvbGxvd2luZyBjYW4gYmUgaW1wcm92ZWQ6IFxuIC0gQWRkIGEgUmVhZC1tZSBmaWxlIHRvIGV4cGxhaW4gdG8gb3RoZXIgcGVvcGxlIHdoYXQgeW91ciByZXBvc2l0b3J5IGRvZXMuIFxuIC0gUmVwbGFjZSB0aGUgYXV0b21hdGVkIFBSTE5HIHRhZyB3aXRoIGEgbWFudWFsIG9uZSBhbmQgYWRkIGEgbm90ZSBleHBsYWluaW5nIHdoeS4iLAogICAgICAgICAgICAiaXNzdWVTdGF0dXMiOiAiY29udGludW91cy1jb21wbGlhbmNlIgogICAgICAgICAgfQogICAgICAgIH0KICAgICAgfQogICAgfQp9'
+      const fixturePath: string = path.resolve(selfPath, 'encoded-fixture')
       const [actual, actual2] = await Promise.all([
-        execAsync(`"${repolinterPath}" lint -c ${encodedRuleset}`),
-        execAsync(`"${repolinterPath}" lint --rulesetEncoded ${encodedRuleset}`)
+        execAsync(
+          `"${repolinterPath}" lint "${fixturePath}" -c ${encodedRuleset}`
+        ),
+        execAsync(
+          `"${repolinterPath}" lint "${fixturePath}" --rulesetEncoded ${encodedRuleset}`
+        )
       ])
 
       assert.strictEqual(actual.code, 0)

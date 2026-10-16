@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+printWidth: 80
+tabWidth: 2
+useTabs: false
+singleQuote: true
+quoteProps: as-needed
+semi: false
+trailingComma: none
+bracketSpacing: true
+arrowParens: avoid
+embeddedLanguageFormatting: off
