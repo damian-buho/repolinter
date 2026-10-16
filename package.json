@@ -78,7 +78,7 @@
     "simple-git": "4.0.2",
     "spdx-license-list": "6.12.0",
     "tinyglobby": "0.2.17",
-    "undici": "8.11.2",
+    "undici": "8.12.2",
     "yaml": "2.9.1"
   },
   "devDependencies": {
