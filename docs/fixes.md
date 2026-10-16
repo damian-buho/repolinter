@@ -16,6 +16,7 @@ Below is a complete list of fixes that Repolinter can run, along with their conf
   - [`file-create`](#file-create)
   - [`file-modify`](#file-modify)
   - [`file-remove`](#file-remove)
+  - [`github-issue-create`](#github-issue-create)
 
 ## Reference
 
@@ -49,3 +50,21 @@ Removes a file or files.
 | ---------- | -------- | ---------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `globsAll` | No       | `string[]` | Failing files specified by the rule | The list of globs to remove files for. If this value is omitted, file-remove will instead target files that failed the rule. |
 | `nocase`   | No       | `boolean`  | `false`                             | Set to `true` to perform an case insensitive search with `globsAll`.                                                         |
+
+### github-issue-create
+
+Opens a Github issue tracking the failed rule. Issues carry a `Unique rule set ID: <uniqueRuleId>`
+marker in the body, so reruns find the existing issue instead of opening duplicates: an open match is
+left alone, a closed match is re-opened with a comment, and issues carrying the bypass label are skipped.
+Requires the `TARGET_REPO` (`owner/repo`) and `GITHUB_TOKEN` environment variables. A dry run reports
+the intended issue without calling the API.
+
+| Input          | Required | Type       | Default      | Description                                                                           |
+| -------------- | -------- | ---------- | ------------ | ------------------------------------------------------------------------------------- |
+| `issueLabels`  | **Yes**  | `string[]` |              | Labels identifying repolinter issues; each is created on the repository when missing. |
+| `bypassLabel`  | No       | `string`   | `CC: Bypass` | Issues carrying this label are left alone.                                            |
+| `issueTitle`   | **Yes**  | `string`   |              | Title of the created issue.                                                           |
+| `issueBody`    | **Yes**  | `string`   |              | Body of the created issue.                                                            |
+| `commentBody`  | No       | `string`   |              | Comment posted when re-opening a regressed issue; no comment is posted when omitted.  |
+| `uniqueRuleId` | No       | `string`   | `issueTitle` | Marker written into the issue body to match issues back to the rule.                  |
+| `issueStatus`  | No       | `string`   |              | Accepted for compatibility with older rulesets; ignored.                              |
