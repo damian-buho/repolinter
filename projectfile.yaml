@@ -20,13 +20,15 @@ identity:
 includes:
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
 keywords:
-  - repolinter
+  - audit
+  - best-practices
+  - github-actions
+  - innersource
   - linter
-  - open-source
-  - repository
-  - license
-  - readme
-  - github
+  - maintainability
+  - ospo
+  - repository-health
+  - scorecard
 kind: SoftwareSourceCode
 license:
   spdx: Apache-2.0
