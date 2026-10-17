@@ -17,6 +17,7 @@ identity:
     en: Linter that checks open-source repositories for community-health files and common issues, including license, README, contributing guide and test setup. A heavily modernized, maintained fork of the now-archived todogroup/repolinter.
     es: Linter que comprueba los repositorios de código abierto en busca de archivos de salud de la comunidad y problemas comunes, incluyendo licencia, README, guía de contribución y configuración de pruebas. Un fork muy modernizado y mantenido del hoy archivado todogroup/repolinter.
     uk: Лінтер, який перевіряє репозиторії з відкритим кодом на наявність файлів здоровʼя спільноти та типових проблем, зокрема ліцензії, README, інструкції для контрибʼюторів і налаштування тестів. Глибоко осучаснений і підтримуваний форк заархівованого todogroup/repolinter.
+  modified: "2026-10-16"
   visibility: private
 includes:
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
@@ -35,9 +36,9 @@ license:
   spdx: Apache-2.0
 links:
   - label:
-      en: Repolinter (fork by Damián Búho) on GitHub
-      es: Repolinter (fork by Damián Búho) en GitHub
-      uk: Repolinter (fork by Damián Búho) на GitHub
+      en: Repository on GitHub
+      es: Repositorio en GitHub
+      uk: Репозиторій на GitHub
     preferred: true
     tags:
       - public
@@ -50,7 +51,7 @@ links:
   - label:
       en: Issues on GitHub
       es: Incidencias en GitHub
-      uk: Issues на GitHub
+      uk: Задачі на GitHub
     tags:
       - support
     type: bugs
@@ -59,9 +60,9 @@ links:
     type: package-registry
     url: https://www.npmjs.com/package/@damian-buho/repolinter
   - label:
-      en: Repolinter (fork by Damián Búho) on Codeberg
-      es: Repolinter (fork by Damián Búho) en Codeberg
-      uk: Repolinter (fork by Damián Búho) на Codeberg
+      en: Repository on Codeberg
+      es: Repositorio en Codeberg
+      uk: Репозиторій на Codeberg
     tags:
       - public
       - badges
@@ -69,15 +70,15 @@ links:
     type: source-code
     url: https://codeberg.org/damian-buho/repolinter
   - label:
-      en: Repolinter (fork by Damián Búho) on kiota.ch
-      es: Repolinter (fork by Damián Búho) en kiota.ch
-      uk: Repolinter (fork by Damián Búho) на kiota.ch
+      en: Repository on kiota.ch
+      es: Repositorio en kiota.ch
+      uk: Репозиторій на kiota.ch
     type: source-code
     url: https://kiota.ch/damian-buho/repolinter
   - label:
       en: Issues on Codeberg
       es: Incidencias en Codeberg
-      uk: Issues на Codeberg
+      uk: Задачі на Codeberg
     tags:
       - support
     type: bugs
