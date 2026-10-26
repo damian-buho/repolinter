@@ -83,9 +83,9 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@stryker-mutator/core": "10.0.0",
-    "@stryker-mutator/tap-runner": "10.0.0",
-    "@stryker-mutator/typescript-checker": "10.0.0",
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/tap-runner": "10.1.1",
+    "@stryker-mutator/typescript-checker": "10.1.1",
     "@types/eslint": "9.6.1",
     "@types/node": "26.6.5",
     "eslint": "10.13.0",
