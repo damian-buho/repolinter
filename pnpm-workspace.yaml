@@ -19,3 +19,4 @@ overrides:
   source-map-js: 1.2.2
   markdown-it: 14.3.3
   body-parser: 1.20.9
+  re2js: 2.9.1
