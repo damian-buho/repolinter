@@ -1,0 +1,7 @@
+{
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  // Fail on every severity, as plain npm/pnpm audit does
+  "low": true,
+  // Suppressed advisories: GHSA ids, "path|GHSA" strings or package names
+  "allowlist": ["GHSA-g3hv-75wg-m249", "GHSA-3g3m-2fjr-6pw4"]
+}
