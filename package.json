@@ -66,7 +66,7 @@
     "type": "git"
   },
   "dependencies": {
-    "@asciidoctor/core": "4.1.1",
+    "@asciidoctor/core": "4.2.1",
     "ajv": "8.20.0",
     "find-config": "1.0.0",
     "gitlog": "5.1.0",

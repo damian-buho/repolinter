@@ -180,8 +180,8 @@ importers:
   .:
     dependencies:
       '@asciidoctor/core':
-        specifier: 4.1.1
-        version: 4.1.1
+        specifier: 4.2.1
+        version: 4.2.1
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -294,8 +294,8 @@ importers:
 
 packages:
 
-  '@asciidoctor/core@4.1.1':
-    resolution: {integrity: sha512-kwynyx6FXXi985Q9tfIPUitZ/2vzISYmcUVVZXkSamwD91I5nL7TJt33HXjnBYwfzugLu36RZuhNA/DB4fogEA==}
+  '@asciidoctor/core@4.2.1':
+    resolution: {integrity: sha512-c/LvM4nnkeLhHryAQOI41AL7UlOowmydMhNaVoH4zecKo2HkyalaNodeVqueR2RVU0/MOg4HPikYtFMHdVXa4A==}
     engines: {node: '>=20'}
     peerDependencies:
       highlight.js: ^11.0.0
@@ -2753,7 +2753,7 @@ packages:
 
 snapshots:
 
-  '@asciidoctor/core@4.1.1': {}
+  '@asciidoctor/core@4.2.1': {}
 
   '@babel/code-frame@8.0.6':
     dependencies:
