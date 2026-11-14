@@ -99,7 +99,7 @@
     "globals": "17.14.0",
     "markdownlint": "0.42.1",
     "mock-http-server": "1.4.5",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "tsx": "4.23.15",
     "typedoc": "0.28.20",
     "typedoc-rhineai-theme": "1.2.0",
