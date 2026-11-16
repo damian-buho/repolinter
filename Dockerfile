@@ -12,6 +12,7 @@ WORKDIR /build
 COPY --parents  docker/build-node.sh      \
                 fixes/                    \
                 package.json              \
+                patches/                  \
                 pnpm-lock.yaml            \
                 pnpm-workspace.yaml       \
                 rules/                    \
