@@ -15,7 +15,7 @@ import Fixes from '../fixes/fixes.js'
 import { safeFetch } from './safe-fetch.js'
 import { logger } from '../logger.js'
 
-interface RuleEntry {
+export interface RuleEntry {
   level: 'off' | 'warning' | 'error'
   where?: string[]
   rule: { type: string; options?: Record<string, unknown> }
