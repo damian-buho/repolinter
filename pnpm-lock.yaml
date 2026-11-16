@@ -175,6 +175,9 @@ overrides:
   body-parser: 1.20.9
   re2js: 2.9.1
 
+patchedDependencies:
+  typedoc@0.28.20: b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1
+
 importers:
 
   .:
@@ -281,10 +284,10 @@ importers:
         version: 4.23.15
       typedoc:
         specifier: 0.28.20
-        version: 0.28.20(typescript@6.0.3)
+        version: 0.28.20(patch_hash=b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1)(typescript@6.0.3)
       typedoc-rhineai-theme:
         specifier: 1.2.0
-        version: 1.2.0(typedoc@0.28.20(typescript@6.0.3))
+        version: 1.2.0(typedoc@0.28.20(patch_hash=b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1)(typescript@6.0.3))
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -5262,11 +5265,11 @@ snapshots:
       tunnel: 0.0.6
       underscore: 1.13.8
 
-  typedoc-rhineai-theme@1.2.0(typedoc@0.28.20(typescript@6.0.3)):
+  typedoc-rhineai-theme@1.2.0(typedoc@0.28.20(patch_hash=b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1)(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@6.0.3)
+      typedoc: 0.28.20(patch_hash=b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1)(typescript@6.0.3)
 
-  typedoc@0.28.20(typescript@6.0.3):
+  typedoc@0.28.20(patch_hash=b97062d7462ca10ac72dcf15a08d3f564f74506da983d2bc93842b583c83d9d1)(typescript@6.0.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
