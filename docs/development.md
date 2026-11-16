@@ -13,8 +13,8 @@ Repolinter is broken down into 7 main components, each of which is contained in 
 - **CLI** - located in [cli.ts](../src/cli.ts)
 - **Rules** - registered in [rules.ts](../src/rules/rules.ts)
 - **Fixes** - registered in [fixes.ts](../src/fixes/fixes.ts)
-- **Formatters** - see [symbol_formatter.ts](../src/formatters/symbol_formatter.ts), [json_formatter.ts](../src/formatters/json_formatter.ts), [markdown_formatter.ts](../src/formatters/markdown_formatter.ts)
-- **Utilities** - located in [lib/](../src/lib/file_system.ts)
+- **Formatters** - see [symbol-formatter.ts](../src/formatters/symbol-formatter.ts), [json-formatter.ts](../src/formatters/json-formatter.ts), [markdown-formatter.ts](../src/formatters/markdown-formatter.ts)
+- **Utilities** - located in [lib/](../src/lib/file-system.ts)
 - **Built-In Rulesets and Schema** - see [schema.json](../rulesets/schema.json), [default.json](../rulesets/default.json)
 
 ## Axioms
@@ -25,7 +25,7 @@ Axioms are registered in [axioms/axioms.ts](../src/axioms/axioms.ts) and in [rul
 async (fs: FileSystem) => Result
 ```
 
-Where fs is a [`FileSystem`](../src/lib/file_system.ts) scoped to the current repository.
+Where fs is a [`FileSystem`](../src/lib/file-system.ts) scoped to the current repository.
 
 The contents of the result should be an array of targets where `t.path` is a target that the axiom has determined is valid (ex. for language detecting axiom a possible result could be `new Result('', [{ path: 'javascript' passed: true }, { path: 'typescript', passed: true}], true)`). If the axiom fails to execute, it should return a failing result with an error message included instead of throwing an error.
 
@@ -66,7 +66,7 @@ A rule implementation consists of a module with the following interface:
 async (fs: FileSystem, opts /* type determined by your JSON schema */) => Result
 ```
 
-Where fs is a [`FileSystem`](../src/lib/file_system.ts) scoped to the current repository and `opts` is the options provided by the ruleset.
+Where fs is a [`FileSystem`](../src/lib/file-system.ts) scoped to the current repository and `opts` is the options provided by the ruleset.
 
 A rule implementation is encouraged to use `Result#targets` to show the individual files/patterns checked when processing the rule. Including filenames in `Result#message` is discouraged as it makes formatting difficult. If a rule fails to execute, it should throw an error.
 
@@ -103,7 +103,7 @@ Unlike rules, a fix implementation consists of a module with the following inter
 async (fs: FileSystem, options /* Type determined by your JSON schema */, targets: string[], dryRun: boolean) => Result
 ```
 
-Where fs is a [`FileSystem`](../src/lib/file_system.ts) scoped to the current repository, `opts` is the options provided by the ruleset, `targets` are filepaths which did not pass the rule associated with this fix, and `dryRun` determines if the fix is allowed to make changes to the repository.
+Where fs is a [`FileSystem`](../src/lib/file-system.ts) scoped to the current repository, `opts` is the options provided by the ruleset, `targets` are filepaths which did not pass the rule associated with this fix, and `dryRun` determines if the fix is allowed to make changes to the repository.
 
 The fix implementation is encouraged to use `Result#targets` to show the individual files/patterns changed. If the fix fails to execute, it should either return a failed result or throw an error.
 
