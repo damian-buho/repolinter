@@ -75,7 +75,7 @@
     "linkinator": "8.1.0",
     "pino": "10.4.0",
     "pino-pretty": "13.2.0",
-    "simple-git": "4.0.2",
+    "simple-git": "4.1.0",
     "spdx-license-list": "6.12.0",
     "tinyglobby": "0.2.17",
     "undici": "8.12.4",
