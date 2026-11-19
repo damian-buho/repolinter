@@ -20,7 +20,7 @@ function extractHeadings(markdown: string): Heading[] {
     .split('\n')
     .filter((line: string) => /^#{1,6}\s/.test(line))
     .map((line: string) => {
-      const match = line.match(/^(#{1,6})\s+(.*)/)
+      const match = /^(#{1,6})\s+(.*)/.exec(line)
       assert.ok(match && match[1] && match[2] !== undefined)
       return { lvl: match[1].length, slug: slugger(match[2]) }
     })
